@@ -1,0 +1,38 @@
+@import "tailwindcss";
+
+/* police par defaut utilisation de poppins dans assets */
+@font-face {
+    font-family: 'Poppins';
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: local('Poppins Regular'), local('Poppins-Regular'),
+        url('/fonts/Poppins-Regular.ttf') format('ttf');
+}
+
+@font-face {
+    font-family: 'Poppins';
+    font-style: normal;
+    font-weight: 500;
+    font-display: swap;
+    src: local('Poppins Medium'), local('Poppins-Medium'),
+        url('/fonts/Poppins-Medium.ttf') format('ttf');
+}
+
+@font-face {
+    font-family: 'Poppins';
+    font-style: normal;
+    font-weight: 600;
+    font-display: swap;
+    src: local('Poppins SemiBold'), local('Poppins-SemiBold'),
+        url('/fonts/Poppins-SemiBold.ttf') format('ttf');
+}
+
+/* Appliquer la font via Tailwind : override de la font-sans par défaut */
+@layer base {
+
+    html,
+    body {
+        font-family: 'Poppins', ui-sans-serif, system-ui, -apple-system, Roboto;
+    }
+}
