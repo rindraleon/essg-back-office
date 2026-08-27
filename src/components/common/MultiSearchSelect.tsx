@@ -1,12 +1,11 @@
 import { AlertCircle, Check, ChevronDown, Loader2, Search, X } from 'lucide-react';
 import React, { useEffect, useId, useMemo, useRef, useState } from 'react';
-import useDebounce from '../../hooks/useDebounce';
-import { cn } from '@/lib/utils';
+import useDebounce from '@/hooks/useDebounce';
+import { cn } from '@/lib';
 import type { SearchSelectOption } from './SearchSelect';
 
 interface MultiSearchSelectProps {
   label: string;
-  /** Identifiants sélectionnés (ordre conservé). */
   values: string[];
   onChange: (values: string[], options: SearchSelectOption[]) => void;
   options: SearchSelectOption[];
@@ -21,13 +20,6 @@ interface MultiSearchSelectProps {
   className?: string;
 }
 
-/**
- * Sélection multiple avec recherche, alimentée dynamiquement par une API.
- *
- * Utilisée pour les partenaires d'un projet : le composant affiche les noms
- * et remonte les identifiants, en création comme en modification.
- * Gère les états loading / error (avec réessai) / empty / success.
- */
 const MultiSearchSelect: React.FC<MultiSearchSelectProps> = ({
   label,
   values,
@@ -55,7 +47,6 @@ const MultiSearchSelect: React.FC<MultiSearchSelectProps> = ({
     [options]
   );
 
-  /** Options sélectionnées, dans l'ordre choisi par l'utilisateur. */
   const selected = useMemo(
     () =>
       values
@@ -135,8 +126,8 @@ const MultiSearchSelect: React.FC<MultiSearchSelectProps> = ({
               className="inline-flex max-w-full items-center gap-1 rounded-md border border-brand-200 bg-brand-50 px-2 py-0.5 text-xs font-medium text-brand-700"
             >
               <span className="truncate">{option.label}</span>
-              <span
-                role="button"
+              <button
+                type="button"
                 tabIndex={-1}
                 aria-label={`Retirer ${option.label}`}
                 onClick={(event) => {
@@ -146,7 +137,7 @@ const MultiSearchSelect: React.FC<MultiSearchSelectProps> = ({
                 className="shrink-0 rounded hover:text-red-600"
               >
                 <X className="size-3" />
-              </span>
+              </button>
             </span>
           ))}
         </span>
@@ -186,7 +177,12 @@ const MultiSearchSelect: React.FC<MultiSearchSelectProps> = ({
             />
           </div>
 
-          <div id={listboxId} role="listbox" aria-multiselectable className="max-h-60 overflow-y-auto py-1">
+          <div
+            id={listboxId}
+            role="listbox"
+            aria-multiselectable
+            className="max-h-60 overflow-y-auto py-1"
+          >
             {isLoading && (
               <div className="flex items-center gap-2 px-3 py-6 text-sm text-ink-500">
                 <Loader2 className="size-4 animate-spin" />

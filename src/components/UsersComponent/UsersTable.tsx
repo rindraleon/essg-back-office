@@ -1,12 +1,11 @@
 import { Eye, Pencil, Trash2 } from 'lucide-react';
 import React from 'react';
-import { getImageUrl } from '../../utils/image.utils';
-import type { User } from '../../types';
+import { getImageUrl , formatFullName, getPersonInitials } from '@/utils';
+import type { User } from '@/types';
 import DataTable from '../common/DataTable';
 import type { Column } from '../common/DataTable';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { formatFullName, getPersonInitials } from '../../utils/name.utils';
+import { Badge } from '../ui/badge';
+import { Button } from '../ui/button';
 
 interface UsersTableProps {
   data: User[];
@@ -68,6 +67,8 @@ const UsersTable: React.FC<UsersTableProps> = ({
         <div className="w-10 h-10 rounded-full bg-brand-100 flex items-center justify-center text-brand-600 font-semibold text-sm">
           {user.avatar ? (
             <img
+              loading="lazy"
+              decoding="async"
               src={getImageUrl(user.avatar)}
               alt={formatFullName(user)}
               className="w-10 h-10 rounded-full object-cover"
@@ -88,9 +89,7 @@ const UsersTable: React.FC<UsersTableProps> = ({
       minWidth: 200,
       render: (user) => (
         <div>
-          <span className="font-semibold text-ink-900">
-            {formatFullName(user)}
-          </span>
+          <span className="font-semibold text-ink-900">{formatFullName(user)}</span>
         </div>
       ),
     },

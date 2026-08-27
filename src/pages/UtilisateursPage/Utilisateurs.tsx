@@ -8,13 +8,19 @@ import {
   UsersFilter,
   ListPageHeader,
   type UserFilters,
-} from '../../components';
-import { usePagination, useScrollToTop } from '../../hooks';
-import { useAuth } from '../../contexts/AuthContext';
-import type { User, UserFormData } from '../../types';
-import { useCreateUser, useDeleteUser, useUpdateUser, useUsersQuery } from '../../hooks/queries';
-import { ApiError } from '@/api/types/api';
-import { useTitle } from '@/hooks/useTitle';
+} from '@/components';
+import {
+  usePagination,
+  useScrollToTop,
+  useCreateUser,
+  useDeleteUser,
+  useUpdateUser,
+  useUsersQuery,
+  useTitle,
+} from '@/hooks';
+import { useAuth } from '@/contexts';
+import type { User, UserFormData } from '@/types';
+import { ApiError } from '@/api';
 
 const Utilisateurs: React.FC = () => {
   useScrollToTop();
@@ -158,7 +164,9 @@ const Utilisateurs: React.FC = () => {
             },
             avatarFile,
           });
-          toast.success(avatarFile ? 'Utilisateur créé avec succès avec avatar' : 'Utilisateur créé avec succès');
+          toast.success(
+            avatarFile ? 'Utilisateur créé avec succès avec avatar' : 'Utilisateur créé avec succès'
+          );
         } else if (selectedUser) {
           await updateMutation.mutateAsync({ id: selectedUser.id, data: formData });
           toast.success('Utilisateur modifié avec succès');
@@ -189,7 +197,6 @@ const Utilisateurs: React.FC = () => {
         onAction={isAdmin ? handleOpenCreate : undefined}
       />
 
-      {/* Filters */}
       <UsersFilter
         filters={filters}
         onUpdateFilter={handleUpdateFilter}
@@ -199,7 +206,6 @@ const Utilisateurs: React.FC = () => {
         onToggle={handleToggleFilters}
       />
 
-      {/* Table */}
       <UsersTable
         data={paginatedData}
         totalCount={filteredData.length}
@@ -213,7 +219,6 @@ const Utilisateurs: React.FC = () => {
         isAdmin={isAdmin}
       />
 
-      {/* Form Dialog (Create / Edit) */}
       <UsersForm
         open={formOpen}
         onClose={() => setFormOpen(false)}
@@ -222,14 +227,12 @@ const Utilisateurs: React.FC = () => {
         mode={formMode}
       />
 
-      {/* View Dialog */}
       <UsersViewDialog
         open={viewDialogOpen}
         onClose={() => setViewDialogOpen(false)}
         user={selectedUser}
       />
 
-      {/* Delete Confirmation Dialog */}
       <ConfirmDialog
         open={deleteDialogOpen}
         title="Supprimer l'utilisateur"

@@ -1,22 +1,29 @@
-import { CircleCheck, Upload } from 'lucide-react';
+import { CircleCheck, ImageUp, Loader2, TriangleAlert, UserCog } from 'lucide-react';
 import React, { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
-import { updateUser as updateUserRequest, uploadAvatar } from '../../services/users.service';
-import { useAuth } from '../../contexts/AuthContext';
-import { getImageUrl } from '../../utils/image.utils';
-import type { User } from '../../types/auth.types';
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
+import { updateUser as updateUserRequest, uploadAvatar } from '@/services';
+import { useAuth } from '@/contexts';
+import type { User } from '@/types';
 import {
+  Button,
+  Label,
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
   Dialog,
+  DialogBody,
   DialogContent,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
-import { FloatingInput } from '@/components/ui/floating-input';
-import { EMAIL_PATTERN } from '../../constants/validation.constants';
-import { getPersonInitials } from '../../utils/name.utils';
+  FloatingInput,
+} from '@/components';
+import { EMAIL_PATTERN } from '@/constants';
+import {
+  ACCEPTED_IMAGE_MIME_TYPES,
+  MAX_IMAGE_UPLOAD_SIZE,
+  isAcceptedImage,
+  getPersonInitials,
+} from '@/utils';
 
 interface ProfilEditDialogProps {
   open: boolean;
@@ -32,6 +39,8 @@ interface FormState {
   confirmation: string;
 }
 
+type AvatarState = 'idle' | 'uploading' | 'success' | 'error';
+
 const ProfilEditDialog: React.FC<ProfilEditDialogProps> = ({ open, onClose, user }) => {
   const { updateUser } = useAuth();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -45,8 +54,9 @@ const ProfilEditDialog: React.FC<ProfilEditDialogProps> = ({ open, onClose, user
   });
   const [errors, setErrors] = useState<Partial<Record<keyof FormState, string>>>({});
   const [saving, setSaving] = useState(false);
-  const [uploadingAvatar, setUploadingAvatar] = useState(false);
-  const [avatarPreview, setAvatarPreview] = useState('');
+  const [avatarState, setAvatarState] = useState<AvatarState>('idle');
+  const [avatarError, setAvatarError] = useState<string>('');
+  const [avatarPath, setAvatarPath] = useState<string>('');
 
   useEffect(() => {
     if (!open) return;
@@ -58,7 +68,9 @@ const ProfilEditDialog: React.FC<ProfilEditDialogProps> = ({ open, onClose, user
       confirmation: '',
     });
     setErrors({});
-    setAvatarPreview(user.avatar ? getImageUrl(user.avatar) : '');
+    setAvatarState('idle');
+    setAvatarError('');
+    setAvatarPath(user.avatar ?? '');
   }, [open, user]);
 
   const setField = (field: keyof FormState, value: string) => {
@@ -73,7 +85,6 @@ const ProfilEditDialog: React.FC<ProfilEditDialogProps> = ({ open, onClose, user
     if (form.nom.trim().length < 2) next.nom = 'Au moins 2 caractères';
     if (!EMAIL_PATTERN.test(form.email.trim())) next.email = 'Email invalide';
 
-    // Le mot de passe est facultatif : validé seulement s'il est renseigné.
     if (form.motDePasse) {
       if (form.motDePasse.length < 6) next.motDePasse = 'Au moins 6 caractères';
       else if (form.motDePasse !== form.confirmation) {
@@ -87,25 +98,40 @@ const ProfilEditDialog: React.FC<ProfilEditDialogProps> = ({ open, onClose, user
 
   const handleAvatarChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (!file) return;
-    setUploadingAvatar(true);
+    event.target.value = '';
+    if (!file || avatarState === 'uploading') return;
+
+    if (!isAcceptedImage(file)) {
+      setAvatarState('error');
+      setAvatarError('Format non supporté. Utilisez JPG, PNG, GIF ou WebP.');
+      return;
+    }
+    if (file.size > MAX_IMAGE_UPLOAD_SIZE) {
+      setAvatarState('error');
+      setAvatarError("L'image ne doit pas dépasser 5 Mo.");
+      return;
+    }
+
+    setAvatarState('uploading');
+    setAvatarError('');
     try {
       const updated = await uploadAvatar(user.id, file);
-      updateUser({ avatar: updated.avatar });
-      setAvatarPreview(updated.avatar ? getImageUrl(updated.avatar) : '');
+      const nextAvatar = updated.avatar ?? '';
+      setAvatarPath(nextAvatar);
+      updateUser({ avatar: nextAvatar });
+      setAvatarState('success');
       toast.success('Photo de profil mise à jour');
     } catch (error) {
-      toast.error(
-        error instanceof Error ? error.message : "Échec du téléversement de la photo."
-      );
-    } finally {
-      setUploadingAvatar(false);
-      event.target.value = '';
+      setAvatarState('error');
+      const message =
+        error instanceof Error ? error.message : 'Échec du téléversement de la photo.';
+      setAvatarError(message);
+      toast.error(message);
     }
   };
 
   const handleSubmit = async () => {
-    if (saving || !validate()) return;
+    if (saving || avatarState === 'uploading' || !validate()) return;
     setSaving(true);
     try {
       const updated = await updateUserRequest(user.id, {
@@ -115,7 +141,6 @@ const ProfilEditDialog: React.FC<ProfilEditDialogProps> = ({ open, onClose, user
         ...(form.motDePasse ? { motDePasse: form.motDePasse } : {}),
       });
 
-      // Mise à jour immédiate des informations affichées.
       updateUser({
         prenom: updated.prenom ?? form.prenom.trim(),
         nom: updated.nom ?? form.nom.trim(),
@@ -134,83 +159,115 @@ const ProfilEditDialog: React.FC<ProfilEditDialogProps> = ({ open, onClose, user
   };
 
   const initials = getPersonInitials(user);
+  const busy = saving || avatarState === 'uploading';
 
   return (
-    <Dialog open={open} onOpenChange={(isOpen) => !isOpen && !saving && onClose()}>
-      <DialogContent className="w-[95vw] gap-0 overflow-hidden bg-white p-0 sm:max-w-lg [&>button]:hidden">
-        <DialogHeader className="border-b bg-ink-50/80 px-5 pt-4 pb-3">
-          <DialogTitle className="text-lg font-bold text-ink-900">Modifier le profil</DialogTitle>
-        </DialogHeader>
+    <Dialog open={open} onOpenChange={(isOpen) => !isOpen && !busy && onClose()}>
+      <DialogContent size="xl" showCloseButton={!busy}>
+        <DialogHeader
+          icon={<UserCog aria-hidden="true" />}
+          title="Modifier le profil"
+          description="Mettez à jour vos informations personnelles, votre photo et votre mot de passe."
+        />
 
-        <div className="max-h-[65vh] space-y-4 overflow-y-auto px-5 py-4">
-          {/* Avatar */}
-          <div className="flex items-center gap-4">
-            {avatarPreview ? (
-              <img
-                src={avatarPreview}
-                alt="Profil"
-                className="size-16 shrink-0 rounded-full border border-ink-100 object-cover"
-                onError={() => setAvatarPreview('')}
-              />
-            ) : (
-              <span className="grid size-16 shrink-0 place-items-center rounded-full bg-brand-100 text-lg font-semibold text-brand-800">
-                {initials}
-              </span>
-            )}
+        <DialogBody className="space-y-6">
+          <section aria-labelledby="profil-photo-label" className="space-y-3">
+            <Label id="profil-photo-label" className="text-section text-ink-500 uppercase" htmlFor={''}>
+              Photo de profil
+            </Label>
 
-            <div className="flex flex-col gap-1.5">
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
-                onChange={handleAvatarChange}
-                className="hidden"
-              />
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() => fileInputRef.current?.click()}
-                disabled={uploadingAvatar || saving}
-              >
-                <Upload className="size-3.5" />
-                {uploadingAvatar ? 'Téléversement…' : 'Changer la photo'}
-              </Button>
-              <span className="text-[10px] text-ink-400">JPG, PNG, GIF, WebP — max 5 Mo</span>
+            <div className="flex flex-wrap items-center gap-4">
+              <Avatar size="lg" className="ring-1 ring-ink-100">
+                <AvatarImage src={avatarPath} alt={`Photo de ${form.nom} ${form.prenom}`} />
+                <AvatarFallback className="text-lg">{initials}</AvatarFallback>
+              </Avatar>
+
+              <div className="flex flex-col gap-1.5">
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept={ACCEPTED_IMAGE_MIME_TYPES.join(',')}
+                  onChange={handleAvatarChange}
+                  className="hidden"
+                  aria-label="Choisir une nouvelle photo de profil"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={busy}
+                  aria-busy={avatarState === 'uploading'}
+                >
+                  {avatarState === 'uploading' ? (
+                    <Loader2 className="size-3.5 animate-spin" aria-hidden="true" />
+                  ) : (
+                    <ImageUp className="size-3.5" aria-hidden="true" />
+                  )}
+                  {avatarState === 'uploading' ? 'Téléversement…' : 'Changer la photo'}
+                </Button>
+
+                <p className="text-xs text-ink-400">
+                  JPG, PNG, GIF ou WebP — 5 Mo max. L’image est optimisée en WebP automatiquement.
+                </p>
+
+                <p aria-live="polite" className="min-h-4 text-xs">
+                  {avatarState === 'success' && (
+                    <span className="inline-flex items-center gap-1 text-brand-700">
+                      <CircleCheck className="size-3.5" aria-hidden="true" />
+                      Photo enregistrée
+                    </span>
+                  )}
+                  {avatarState === 'error' && (
+                    <span className="inline-flex items-center gap-1 text-destructive">
+                      <TriangleAlert className="size-3.5" aria-hidden="true" />
+                      {avatarError}
+                    </span>
+                  )}
+                </p>
+              </div>
             </div>
-          </div>
+          </section>
 
-          <div className="grid grid-cols-1 items-start gap-x-3 sm:grid-cols-2">
+          <section aria-labelledby="profil-identite-label" className="space-y-2">
+            <Label id="profil-identite-label" className="text-section text-ink-500 uppercase" htmlFor={''}>
+              Informations personnelles
+            </Label>
+            <div className="grid grid-cols-1 items-start gap-x-3 sm:grid-cols-2">
+              <FloatingInput
+                id="profil-nom"
+                label="Nom *"
+                autoComplete="family-name"
+                value={form.nom}
+                onChange={(event) => setField('nom', event.target.value)}
+                error={errors.nom}
+              />
+              <FloatingInput
+                id="profil-prenom"
+                label="Prénom *"
+                autoComplete="given-name"
+                value={form.prenom}
+                onChange={(event) => setField('prenom', event.target.value)}
+                error={errors.prenom}
+              />
+            </div>
+
             <FloatingInput
-              id="profil-prenom"
-              label="Prénom *"
-              autoComplete="given-name"
-              value={form.prenom}
-              onChange={(event) => setField('prenom', event.target.value)}
-              error={errors.prenom}
+              id="profil-email"
+              label="Email *"
+              type="email"
+              autoComplete="email"
+              value={form.email}
+              onChange={(event) => setField('email', event.target.value)}
+              error={errors.email}
             />
-            <FloatingInput
-              id="profil-nom"
-              label="Nom *"
-              autoComplete="family-name"
-              value={form.nom}
-              onChange={(event) => setField('nom', event.target.value)}
-              error={errors.nom}
-            />
-          </div>
+          </section>
 
-          <FloatingInput
-            id="profil-email"
-            label="Email *"
-            type="email"
-            autoComplete="email"
-            value={form.email}
-            onChange={(event) => setField('email', event.target.value)}
-            error={errors.email}
-          />
-
-          <div className="space-y-1 rounded-md border border-ink-100 bg-ink-50/60 p-3">
-            <Label className="text-xs font-semibold uppercase tracking-wide text-ink-600">
+          <section
+            aria-labelledby="profil-securite-label"
+            className="space-y-1 rounded-xl border border-ink-100 bg-ink-50/60 p-3"
+          >
+            <Label id="profil-securite-label" className="text-section text-ink-600 uppercase" htmlFor={''}>
               Changer le mot de passe (facultatif)
             </Label>
             <div className="grid grid-cols-1 items-start gap-x-3 sm:grid-cols-2">
@@ -233,22 +290,24 @@ const ProfilEditDialog: React.FC<ProfilEditDialogProps> = ({ open, onClose, user
                 error={errors.confirmation}
               />
             </div>
-            <p className="text-[11px] text-ink-400">
+            <p className="text-xs text-ink-400">
               Laissez ces champs vides pour conserver votre mot de passe actuel.
             </p>
-          </div>
-        </div>
+          </section>
+        </DialogBody>
 
-        <DialogFooter className="border-t bg-ink-50/80 px-5 py-3">
-          <div className="flex w-full items-center justify-end gap-2">
-            <Button type="button" variant="ghost" size="sm" onClick={onClose} disabled={saving}>
-              Annuler
-            </Button>
-            <Button type="button" size="sm" onClick={handleSubmit} disabled={saving}>
-              <CircleCheck className="size-3.5" />
-              {saving ? 'Enregistrement…' : 'Enregistrer'}
-            </Button>
-          </div>
+        <DialogFooter>
+          <Button type="button" variant="outline" onClick={onClose} disabled={busy}>
+            Annuler
+          </Button>
+          <Button type="button" onClick={handleSubmit} disabled={busy} aria-busy={saving}>
+            {saving ? (
+              <Loader2 className="size-4 animate-spin" aria-hidden="true" />
+            ) : (
+              <CircleCheck className="size-4" aria-hidden="true" />
+            )}
+            {saving ? 'Enregistrement…' : 'Enregistrer'}
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

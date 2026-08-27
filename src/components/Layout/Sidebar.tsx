@@ -2,8 +2,8 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import EssG from '../../assets/files/images/logo/EssG.png';
 
-import { getVisibleNavItems, isNavActive } from '../../constants/navigation';
-import { useAuth } from '../../contexts/AuthContext';
+import { getVisibleNavItems, isNavActive } from '@/constants';
+import { useAuth } from '@/contexts';
 
 const Sidebar: React.FC = () => {
   const location = useLocation();
@@ -12,19 +12,16 @@ const Sidebar: React.FC = () => {
 
   return (
     <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 flex-col border-r border-ink-100 bg-white lg:flex">
-      {/* Logo */}
       <div className="flex h-16 shrink-0 items-center border-b border-ink-100 px-5">
         <Link to="/" className="flex items-center" aria-label="Accueil ESSG">
           <img src={EssG} alt="Logo ESSG" className="h-12 w-auto object-contain" />
         </Link>
       </div>
 
-      {/* Navigation */}
       <nav
         className="flex-1 space-y-1 overflow-y-auto px-3 py-2"
         aria-label="Navigation principale"
       >
-
         {items.map((item) => {
           const Icon = item.icon;
           const active = isNavActive(item.href, location.pathname);

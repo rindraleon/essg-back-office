@@ -1,9 +1,18 @@
-import { FormControl, InputLabel, Select, MenuItem, TextField, Button, Collapse, Box, IconButton } from '@/components/compat/mui';
+import {
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  TextField,
+  Button,
+  Collapse,
+  Box,
+  IconButton,
+} from '../compat/mui';
 import { RotateCcw, X } from 'lucide-react';
-// src/components/ProjetComponents/ProjetFilter.tsx
 import React from 'react';
-import type { ProjetFilterOptions } from '../../types/projet.types';
-import { PROJET_TYPES } from '../../constants/projet.constants';
+import type { ProjetFilterOptions } from '@/types';
+import { PROJET_TYPES } from '@/constants';
 
 interface ProjetFiltersProps {
   filters: ProjetFilterOptions;

@@ -1,6 +1,5 @@
-// src/hooks/useFilter.ts
 import { useState, useMemo, useCallback } from 'react';
-import type { ActualiteItem, FilterOptions } from '../types/actualite.types';
+import type { ActualiteItem, FilterOptions } from '@/types';
 
 const initialFilters: FilterOptions = {
   categorie: '',
@@ -42,7 +41,6 @@ export function useFilter({ data, searchTerm }: UseFilterProps): UseFilterReturn
   const filteredData = useMemo(() => {
     let result = [...data];
 
-    // Search filter
     if (searchTerm) {
       const term = searchTerm.toLowerCase();
       result = result.filter(
@@ -53,17 +51,14 @@ export function useFilter({ data, searchTerm }: UseFilterProps): UseFilterReturn
       );
     }
 
-    // Category filter
     if (filters.categorie) {
       result = result.filter((item) => item.categorie === filters.categorie);
     }
 
-    // Status filter
     if (filters.statut) {
       result = result.filter((item) => item.statut === filters.statut);
     }
 
-    // Date range filter
     if (filters.dateDebut) {
       result = result.filter((item) => item.date >= filters.dateDebut);
     }

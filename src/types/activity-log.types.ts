@@ -1,7 +1,6 @@
 export interface ActivityLog {
   id: number;
   userId: number | null;
-  /** Nom complet de l'auteur, dénormalisé par le backend. */
   userName: string | null;
   action: string;
   description: string;

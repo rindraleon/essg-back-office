@@ -1,27 +1,16 @@
 import { ImageOff } from 'lucide-react';
 import React, { useState } from 'react';
-import { getImageUrl } from '../../utils/image.utils';
-import { cn } from '@/lib/utils';
+import { getImageUrl } from '@/utils';
+import { cn } from '@/lib';
 
 interface CoverImageProps {
   src?: string | null;
   alt: string;
-  /** Ratio d'affichage (classe Tailwind). */
   aspect?: string;
   className?: string;
-  /** Rendu sur fond sombre (colonne latérale des dialogs). */
   dark?: boolean;
 }
 
-/**
- * Image de couverture d'une fiche (projet, actualité).
- *
- * Volontairement distincte de `ImageGallery` : la couverture est l'image
- * principale de la ressource, elle a son emplacement propre en tête de
- * dialog et ne doit pas défiler avec les autres visuels. Auparavant, elle
- * était injectée dans le carrousel comme une image parmi d'autres, ce qui
- * la rendait indiscernable du reste de la galerie.
- */
 const CoverImage: React.FC<CoverImageProps> = ({
   src,
   alt,
@@ -38,7 +27,7 @@ const CoverImage: React.FC<CoverImageProps> = ({
         'w-full overflow-hidden rounded-2xl border',
         dark ? 'border-white/10 bg-ink-800' : 'border-ink-100 bg-ink-50',
         aspect,
-        className,
+        className
       )}
     >
       {showImage ? (

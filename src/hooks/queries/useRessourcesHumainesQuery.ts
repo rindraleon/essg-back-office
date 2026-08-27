@@ -4,8 +4,8 @@ import {
   deleteRessourceHumaine,
   getAllRessourcesHumaines,
   updateRessourceHumaine,
-} from '../../services';
-import type { RessourceHumaineItem } from '../../types';
+} from '@/services';
+import type { RessourceHumaineItem } from '@/types';
 import { queryKeys } from './keys';
 
 export function useRessourcesHumainesQuery() {

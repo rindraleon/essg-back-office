@@ -2,7 +2,7 @@ import Header from './Header';
 import Footer from './Footer';
 import Sidebar from './Sidebar';
 import Breadcrumb from './Breadcrumb';
-import type { LayoutProps } from '../../types/layout.types';
+import type { LayoutProps } from '@/types';
 
 const Layout: React.FC<LayoutProps> = ({
   children,
@@ -12,7 +12,6 @@ const Layout: React.FC<LayoutProps> = ({
 }) => {
   return (
     <div className="min-h-screen flex bg-ink-50 text-ink-900">
-      {/* Sidebar : tablette (lg) et desktop uniquement */}
       {showSidebar && <Sidebar />}
 
       <div className={`flex min-w-0 flex-1 flex-col ${showSidebar ? 'lg:ml-64' : ''}`}>

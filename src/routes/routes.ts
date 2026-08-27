@@ -1,6 +1,5 @@
 const routesStatic = {
   home: '/',
-  example: '/example',
   login: '/login',
   dashboard: '/dashboard',
   actualites: '/actualites',

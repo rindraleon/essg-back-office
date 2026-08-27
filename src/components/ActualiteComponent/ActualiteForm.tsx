@@ -1,25 +1,18 @@
 import { ArrowLeft, ArrowRight, CircleCheck, Globe, Info, Pencil, Upload } from 'lucide-react';
-// src/components/actualites/ActualiteForm.tsx
 import React, { useRef, useState, useEffect } from 'react';
 import { toast } from 'sonner';
-import { uploadImage } from '../../services';
-import { getImageUrl } from '../../utils/image.utils';
-import type { ActualiteItem, ActualiteFormData } from '../../types/actualite.types';
-import { categories, statuts } from '../../data/mockData';
-import { useFormValidation } from '../../hooks/useFormValidation';
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
-import { Checkbox } from '@/components/ui/checkbox';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from '@/components/ui/dialog';
-import { FloatingInput } from '@/components/ui/floating-input';
-import { FloatingTextarea } from '@/components/ui/floating-textarea';
-import { FloatingSelect } from '@/components/ui/floating-select';
+import { uploadImage } from '@/services';
+import { getImageUrl } from '@/utils';
+import type { ActualiteItem, ActualiteFormData } from '@/types';
+import { ACTUALITE_CATEGORIES as categories, ACTUALITE_STATUTS as statuts } from '@/constants';
+import { useFormValidation } from '@/hooks';
+import { Button } from '../ui/button';
+import { Label } from '../ui/label';
+import { Checkbox } from '../ui/checkbox';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../ui/dialog';
+import { FloatingInput } from '../ui/floating-input';
+import { FloatingTextarea } from '../ui/floating-textarea';
+import { FloatingSelect } from '../ui/floating-select';
 import MultiImageUpload from '../common/MultiImageUpload';
 
 interface ActualiteFormProps {
@@ -133,7 +126,6 @@ const ActualiteForm: React.FC<ActualiteFormProps> = ({
       resetForm();
       setImagePreview('');
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, mode, initialId]);
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -189,7 +181,6 @@ const ActualiteForm: React.FC<ActualiteFormProps> = ({
 
   const dialogTitle = mode === 'create' ? 'Nouvelle actualité' : "Modifier l'actualité";
 
-  /* ─── Step 0 : Informations générales ─── */
   const renderStep0 = () => (
     <div className="space-y-1">
       <FloatingInput
@@ -233,7 +224,6 @@ const ActualiteForm: React.FC<ActualiteFormProps> = ({
     </div>
   );
 
-  /* ─── Step 1 : Contenu ─── */
   const renderStep1 = () => (
     <div className="space-y-4">
       <FloatingTextarea
@@ -242,7 +232,7 @@ const ActualiteForm: React.FC<ActualiteFormProps> = ({
         value={formData.contenu}
         onChange={(e) => handleChange('contenu', e.target.value)}
         onBlur={() => handleBlur('contenu')}
-        rows={8}
+        rows={4}
         error={errors.contenu}
         hint={!errors.contenu ? `${formData.contenu.length} caractère(s)` : undefined}
       />
@@ -258,10 +248,8 @@ const ActualiteForm: React.FC<ActualiteFormProps> = ({
     </div>
   );
 
-  /* ─── Step 2 : Publication ─── */
   const renderStep2 = () => (
     <div className="space-y-4">
-      {/* Image */}
       <div className="space-y-2">
         <Label className="text-xs font-semibold text-ink-600 uppercase tracking-wide">
           Image de couverture
@@ -269,6 +257,8 @@ const ActualiteForm: React.FC<ActualiteFormProps> = ({
         <div className="flex items-start gap-3">
           {imagePreview && (
             <img
+              loading="lazy"
+              decoding="async"
               src={imagePreview}
               alt="Aperçu"
               className="w-28 h-20 object-cover rounded-md border border-ink-100 shrink-0"
@@ -307,7 +297,6 @@ const ActualiteForm: React.FC<ActualiteFormProps> = ({
         disabled={uploadingImage}
       />
 
-      {/* Statut + En vedette */}
       <div className="grid grid-cols-1 items-start gap-x-3 sm:grid-cols-2">
         <FloatingSelect
           label="Statut *"
@@ -344,10 +333,8 @@ const ActualiteForm: React.FC<ActualiteFormProps> = ({
           p-0
           gap-0
           overflow-hidden
-          [&>button]:hidden
         "
       >
-        {/* ─── Header + Stepper ─── */}
         <DialogHeader className="px-5 pt-4 pb-3 border-b bg-ink-50/80">
           <DialogTitle className="text-lg font-bold text-ink-900">{dialogTitle}</DialogTitle>
 
@@ -390,10 +377,8 @@ const ActualiteForm: React.FC<ActualiteFormProps> = ({
           </div>
         </DialogHeader>
 
-        {/* ─── Body ─── */}
         <div className="px-5 py-4 overflow-y-auto max-h-[58vh]">{stepRenderers[activeStep]()}</div>
 
-        {/* ─── Footer ─── */}
         <DialogFooter className="px-5 py-3 mb-4 mx-4 border-t bg-ink-50/80">
           <div className="flex items-center justify-between w-full">
             <span className="text-xs text-ink-400">

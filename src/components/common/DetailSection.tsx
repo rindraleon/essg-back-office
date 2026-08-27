@@ -1,24 +1,14 @@
 import React from 'react';
-import { cn } from '@/lib/utils';
-
-/* ═══════════════════════════════════════════════════════════════════════
-   Primitives de mise en page des dialogs de détail.
-
-   Regroupées ici pour garantir des espacements, des titres et une
-   hiérarchie identiques entre les fiches Ressource humaine, Projet et
-   Actualité — chaque dialog redéfinissait auparavant ses propres cartes.
-   ═══════════════════════════════════════════════════════════════════════ */
+import { cn } from '@/lib';
 
 interface DetailSectionProps {
   title: string;
   icon?: React.ReactNode;
-  /** Compteur affiché à droite du titre (nombre d'éléments listés). */
   count?: number;
   children: React.ReactNode;
   className?: string;
 }
 
-/** Carte de section : un titre, une règle, un contenu. */
 export const DetailSection: React.FC<DetailSectionProps> = ({
   title,
   icon,
@@ -45,20 +35,11 @@ export const DetailSection: React.FC<DetailSectionProps> = ({
 
 interface DetailFieldProps {
   label: string;
-  /** Valeur affichée ; le champ est masqué si elle est vide. */
   value?: React.ReactNode;
-  /** Force l'affichage même sans valeur (affiche alors un tiret). */
   showEmpty?: boolean;
-  /** Autorise la coupure des chaînes longues (emails, URLs). */
   breakAll?: boolean;
 }
 
-/**
- * Couple libellé / valeur.
- *
- * Un champ vide n'est pas rendu : afficher « Email : — » sur une fiche qui
- * n'en a pas alourdit la lecture sans rien apporter.
- */
 export const DetailField: React.FC<DetailFieldProps> = ({
   label,
   value,
@@ -66,7 +47,9 @@ export const DetailField: React.FC<DetailFieldProps> = ({
   breakAll = false,
 }) => {
   const isEmpty =
-    value === undefined || value === null || value === '' ||
+    value === undefined ||
+    value === null ||
+    value === '' ||
     (Array.isArray(value) && value.length === 0);
 
   if (isEmpty && !showEmpty) return null;
@@ -74,12 +57,7 @@ export const DetailField: React.FC<DetailFieldProps> = ({
   return (
     <div className="min-w-0">
       <p className="text-xs text-ink-500">{label}</p>
-      <p
-        className={cn(
-          'text-sm font-medium text-ink-900',
-          breakAll ? 'break-all' : 'break-words',
-        )}
-      >
+      <p className={cn('text-sm font-medium text-ink-900', breakAll ? 'break-all' : 'break-words')}>
         {isEmpty ? '—' : value}
       </p>
     </div>
@@ -88,11 +66,9 @@ export const DetailField: React.FC<DetailFieldProps> = ({
 
 interface TagListProps {
   items?: string[];
-  /** Message affiché lorsque la liste est vide (sinon rien n'est rendu). */
   emptyMessage?: string;
 }
 
-/** Liste d'étiquettes : compétences, langues, partenaires. */
 export const TagList: React.FC<TagListProps> = ({ items, emptyMessage }) => {
   if (!items || items.length === 0) {
     return emptyMessage ? <p className="text-sm text-ink-400">{emptyMessage}</p> : null;
@@ -116,7 +92,6 @@ interface BulletListProps {
   items?: string[];
 }
 
-/** Liste à puces pour les intitulés longs (formations, diplômes). */
 export const BulletList: React.FC<BulletListProps> = ({ items }) => {
   if (!items || items.length === 0) return null;
 

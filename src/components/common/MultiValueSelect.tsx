@@ -1,18 +1,12 @@
 import { Check, ChevronDown, Plus, Search, X } from 'lucide-react';
 import React, { useEffect, useId, useMemo, useRef, useState } from 'react';
-import { cn } from '@/lib/utils';
+import { cn } from '@/lib';
 
 interface MultiValueSelectProps {
   label: string;
-  /** Valeurs retenues, dans l'ordre choisi. Ce sont les chaînes stockées. */
   values: string[];
   onChange: (values: string[]) => void;
-  /** Propositions prêtes à cocher. L'utilisateur n'y est pas limité. */
   suggestions?: string[];
-  /**
-   * Autorise la saisie d'une valeur absente des propositions.
-   * Indispensable ici : chaque formation a ses conditions propres.
-   */
   allowCustom?: boolean;
   placeholder?: string;
   emptyMessage?: string;
@@ -22,7 +16,6 @@ interface MultiValueSelectProps {
   className?: string;
 }
 
-/** Comparaison tolérante : casse, accents et espaces multiples ignorés. */
 function normalize(value: string): string {
   return value
     .normalize('NFD')
@@ -32,23 +25,6 @@ function normalize(value: string): string {
     .trim();
 }
 
-/**
- * Sélection multiple de valeurs textuelles (§1.3).
- *
- * Différence avec `MultiSearchSelect` : celui-ci manipule des identifiants
- * d'entités chargées d'une API, alors que `MultiValueSelect` manipule les
- * chaînes elles-mêmes et accepte des valeurs libres. Les deux partagent le
- * même langage visuel (jetons, libellé flottant, chevron, liste déroulante)
- * pour que le formulaire reste homogène.
- *
- * Comportements couverts :
- *  - sélection/désélection d'une proposition ;
- *  - ajout d'une valeur libre (touche Entrée ou bouton « Ajouter ») ;
- *  - suppression individuelle d'un jeton (souris ou clavier) ;
- *  - dédoublonnage insensible à la casse et aux accents ;
- *  - valeurs venant du backend absentes des propositions : elles restent
- *    affichées comme jetons et sont conservées à l'enregistrement.
- */
 const MultiValueSelect: React.FC<MultiValueSelectProps> = ({
   label,
   values,
@@ -70,10 +46,6 @@ const MultiValueSelect: React.FC<MultiValueSelectProps> = ({
 
   const selectedKeys = useMemo(() => new Set(values.map(normalize)), [values]);
 
-  /**
-   * Propositions = suggestions + valeurs déjà retenues hors catalogue
-   * (données existantes du backend), filtrées par la recherche.
-   */
   const options = useMemo(() => {
     const merged = [...suggestions];
     for (const value of values) {
@@ -151,9 +123,8 @@ const MultiValueSelect: React.FC<MultiValueSelectProps> = ({
               className="inline-flex max-w-full items-center gap-1 rounded-md border border-brand-200 bg-brand-50 px-2 py-0.5 text-xs font-medium text-brand-700"
             >
               <span className="truncate">{value}</span>
-              <span
-                role="button"
-                tabIndex={-1}
+              <button
+                type="button"
                 aria-label={`Retirer ${value}`}
                 onClick={(event) => {
                   event.stopPropagation();
@@ -162,7 +133,7 @@ const MultiValueSelect: React.FC<MultiValueSelectProps> = ({
                 className="shrink-0 rounded hover:text-red-600"
               >
                 <X className="size-3" />
-              </span>
+              </button>
             </span>
           ))}
         </span>
@@ -207,7 +178,12 @@ const MultiValueSelect: React.FC<MultiValueSelectProps> = ({
             />
           </div>
 
-          <div id={listboxId} role="listbox" aria-multiselectable className="max-h-60 overflow-y-auto py-1">
+          <div
+            id={listboxId}
+            role="listbox"
+            aria-multiselectable
+            className="max-h-60 overflow-y-auto py-1"
+          >
             {canAddCustom && (
               <button
                 type="button"

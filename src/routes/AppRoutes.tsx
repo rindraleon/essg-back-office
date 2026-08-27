@@ -1,27 +1,25 @@
 import { Fingerprint } from 'lucide-react';
-import React from 'react';
+import React, { lazy, Suspense } from 'react';
 import { Route, Routes, Navigate, useLocation } from 'react-router-dom';
-import {
-  Login,
-  Dashboard,
-  Actualites,
-  RessourcesHumaines,
-  Utilisateurs,
-  Formations,
-  Projets,
-  Partenaires,
-  Contacts,
-  Admissions,
-  Profil,
-  ActivityLogs,
-  Parametres,
-} from '../pages';
-import { routesStatic } from '.';
-import { Layout } from '../components';
-import { useAuth } from '../contexts/AuthContext';
-import { isAdminRole } from '../constants/navigation';
+import routesStatic from './routes';
+import { Layout } from '@/components';
+import { useAuth } from '@/contexts';
+import { isAdminRole } from '@/constants';
 
-// Loading Spinner
+const Login = lazy(() => import('@/pages/LoginPage/Login'));
+const Dashboard = lazy(() => import('@/pages/DashboardPage/Dashboard'));
+const Actualites = lazy(() => import('@/pages/ActualitesPage/Actualites'));
+const RessourcesHumaines = lazy(() => import('@/pages/RessourcesHumainesPage/RessourcesHumaines'));
+const Utilisateurs = lazy(() => import('@/pages/UtilisateursPage/Utilisateurs'));
+const Formations = lazy(() => import('@/pages/FormationsPage/Formations'));
+const Projets = lazy(() => import('@/pages/ProjetsPage/Projets'));
+const Partenaires = lazy(() => import('@/pages/PartenairesPage/Partenaires'));
+const Contacts = lazy(() => import('@/pages/ContactsPage/Contacts'));
+const Admissions = lazy(() => import('@/pages/AdmissionsPage/Admissions'));
+const Profil = lazy(() => import('@/pages/ProfilPage/Profil'));
+const ActivityLogs = lazy(() => import('@/pages/ActivityLogsPage/ActivityLogs'));
+const Parametres = lazy(() => import('@/pages/ParametresPage/Parametres'));
+
 const LoadingScreen = () => (
   <div className="min-h-screen flex items-center justify-center bg-ink-950">
     <div className="flex flex-col items-center gap-4">
@@ -46,7 +44,6 @@ const LoadingScreen = () => (
   </div>
 );
 
-// Protected Route
 const ProtectedRoute = ({ children }: { children: React.JSX.Element }) => {
   const { isAuthenticated, isLoading } = useAuth();
   const location = useLocation();
@@ -74,8 +71,6 @@ const AdminRoute = ({ children }: { children: React.JSX.Element }) => {
     return <Navigate to={routesStatic.login} replace state={{ from: location }} />;
   }
 
-  // Redirection silencieuse vers le tableau de bord : aucun message d'erreur
-  // technique n'est affiché à un utilisateur non-admin.
   if (!isAdminRole(user?.role)) {
     return <Navigate to={routesStatic.dashboard} replace />;
   }
@@ -83,7 +78,6 @@ const AdminRoute = ({ children }: { children: React.JSX.Element }) => {
   return children;
 };
 
-// Public Route
 const PublicRoute = ({ children }: { children: React.JSX.Element }) => {
   const { isAuthenticated, isLoading } = useAuth();
 
@@ -96,158 +90,154 @@ const PublicRoute = ({ children }: { children: React.JSX.Element }) => {
 
 const AppRoutes = () => {
   return (
-    <Routes>
-      <Route
-        path={routesStatic.login}
-        element={
-          <PublicRoute>
-            <Login />
-          </PublicRoute>
-        }
-      />
+    <Suspense fallback={<LoadingScreen />}>
+      <Routes>
+        <Route
+          path={routesStatic.login}
+          element={
+            <PublicRoute>
+              <Login />
+            </PublicRoute>
+          }
+        />
 
-      <Route path="/" element={<Navigate to={routesStatic.login} replace />} />
+        <Route path="/" element={<Navigate to={routesStatic.login} replace />} />
 
-      <Route
-        path={routesStatic.dashboard}
-        element={
-          <Layout showSidebar>
-            <ProtectedRoute>
-              <Dashboard />
-            </ProtectedRoute>
-          </Layout>
-        }
-      />
+        <Route
+          path={routesStatic.dashboard}
+          element={
+            <Layout showSidebar>
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            </Layout>
+          }
+        />
 
-      <Route
-        path={routesStatic.actualites}
-        element={
-          <Layout showSidebar>
-            <ProtectedRoute>
-              <Actualites />
-            </ProtectedRoute>
-          </Layout>
-        }
-      />
+        <Route
+          path={routesStatic.actualites}
+          element={
+            <Layout showSidebar>
+              <ProtectedRoute>
+                <Actualites />
+              </ProtectedRoute>
+            </Layout>
+          }
+        />
 
-      <Route
-        path={routesStatic.ressourcesHumaines}
-        element={
-          <Layout showSidebar>
-            <ProtectedRoute>
-              <RessourcesHumaines />
-            </ProtectedRoute>
-          </Layout>
-        }
-      />
+        <Route
+          path={routesStatic.ressourcesHumaines}
+          element={
+            <Layout showSidebar>
+              <ProtectedRoute>
+                <RessourcesHumaines />
+              </ProtectedRoute>
+            </Layout>
+          }
+        />
 
-      {/*
-        Gestion des utilisateurs : réservée aux administrateurs.
-        Le menu est masqué dans le Sidebar (cf. constants/navigation.ts) ET
-        la route est protégée ici ; le backend refuse de son côté les appels
-        non-admin sur /users (@Roles('admin')).
-      */}
-      <Route
-        path={routesStatic.utilisateurs}
-        element={
-          <Layout showSidebar>
-            <AdminRoute>
-              <Utilisateurs />
-            </AdminRoute>
-          </Layout>
-        }
-      />
+        <Route
+          path={routesStatic.utilisateurs}
+          element={
+            <Layout showSidebar>
+              <AdminRoute>
+                <Utilisateurs />
+              </AdminRoute>
+            </Layout>
+          }
+        />
 
-      <Route
-        path={routesStatic.formations}
-        element={
-          <Layout showSidebar>
-            <ProtectedRoute>
-              <Formations />
-            </ProtectedRoute>
-          </Layout>
-        }
-      />
+        <Route
+          path={routesStatic.formations}
+          element={
+            <Layout showSidebar>
+              <ProtectedRoute>
+                <Formations />
+              </ProtectedRoute>
+            </Layout>
+          }
+        />
 
-      <Route
-        path={routesStatic.projets}
-        element={
-          <Layout showSidebar>
-            <ProtectedRoute>
-              <Projets />
-            </ProtectedRoute>
-          </Layout>
-        }
-      />
+        <Route
+          path={routesStatic.projets}
+          element={
+            <Layout showSidebar>
+              <ProtectedRoute>
+                <Projets />
+              </ProtectedRoute>
+            </Layout>
+          }
+        />
 
-      <Route
-        path={routesStatic.partenaires}
-        element={
-          <Layout showSidebar>
-            <ProtectedRoute>
-              <Partenaires />
-            </ProtectedRoute>
-          </Layout>
-        }
-      />
+        <Route
+          path={routesStatic.partenaires}
+          element={
+            <Layout showSidebar>
+              <ProtectedRoute>
+                <Partenaires />
+              </ProtectedRoute>
+            </Layout>
+          }
+        />
 
-      <Route
-        path={routesStatic.contacts}
-        element={
-          <Layout showSidebar>
-            <ProtectedRoute>
-              <Contacts />
-            </ProtectedRoute>
-          </Layout>
-        }
-      />
+        <Route
+          path={routesStatic.contacts}
+          element={
+            <Layout showSidebar>
+              <ProtectedRoute>
+                <Contacts />
+              </ProtectedRoute>
+            </Layout>
+          }
+        />
 
-      <Route
-        path={routesStatic.admissions}
-        element={
-          <Layout showSidebar>
-            <ProtectedRoute>
-              <Admissions />
-            </ProtectedRoute>
-          </Layout>
-        }
-      />
+        <Route
+          path={routesStatic.admissions}
+          element={
+            <Layout showSidebar>
+              <ProtectedRoute>
+                <Admissions />
+              </ProtectedRoute>
+            </Layout>
+          }
+        />
 
-      <Route
-        path={routesStatic.activityLogs}
-        element={
-          <Layout showSidebar>
-            <AdminRoute>
-              <ActivityLogs />
-            </AdminRoute>
-          </Layout>
-        }
-      />
+        <Route
+          path={routesStatic.activityLogs}
+          element={
+            <Layout showSidebar>
+              <AdminRoute>
+                <ActivityLogs />
+              </AdminRoute>
+            </Layout>
+          }
+        />
 
-      <Route
-        path={routesStatic.profil}
-        element={
-          <Layout showSidebar>
-            <ProtectedRoute>
-              <Profil />
-            </ProtectedRoute>
-          </Layout>
-        }
-      />
+        <Route
+          path={routesStatic.profil}
+          element={
+            <Layout showSidebar>
+              <ProtectedRoute>
+                <Profil />
+              </ProtectedRoute>
+            </Layout>
+          }
+        />
 
-      <Route
-        path={routesStatic.parametres}
-        element={
-          <Layout showSidebar>
-            <AdminRoute>
-              <Parametres />
-            </AdminRoute>
-          </Layout>
-        }
-      />
+        <Route
+          path={routesStatic.parametres}
+          element={
+            <Layout showSidebar>
+              <AdminRoute>
+                <Parametres />
+              </AdminRoute>
+            </Layout>
+          }
+        />
 
-      <Route path="*" element={<Navigate to={routesStatic.login} replace />} />
-    </Routes>
+        <Route path="*" element={<Navigate to={routesStatic.login} replace />} />
+      </Routes>
+    </Suspense>
   );
 };
 

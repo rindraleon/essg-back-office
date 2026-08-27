@@ -1,18 +1,11 @@
 import { RotateCcw, X } from 'lucide-react';
-// src/components/actualites/ActualiteFilters.tsx
 import React from 'react';
-import type { FilterOptions } from '../../types/actualite.types';
-import { categories, statuts } from '../../data/mockData';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import type { FilterOptions } from '@/types';
+import { ACTUALITE_CATEGORIES as categories, ACTUALITE_STATUTS as statuts } from '@/constants';
+import { Button } from '../ui/button';
+import { Input } from '../ui/input';
+import { Label } from '../ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 
 interface ActualiteFiltersProps {
   filters: FilterOptions;

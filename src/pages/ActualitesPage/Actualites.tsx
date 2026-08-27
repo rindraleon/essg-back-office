@@ -6,30 +6,29 @@ import {
   ActualiteTable,
   ActualiteViewDialog,
   ConfirmDialog,
-} from '../../components';
-import { useFilter } from '../../hooks/useFilter';
-import { usePagination, useScrollToTop } from '../../hooks';
-import type { ActualiteFormData, ActualiteItem } from '../../types';
+  ListPageHeader,
+} from '@/components';
 import {
+  useFilter,
+  usePagination,
+  useScrollToTop,
   useActualitesQuery,
   useCreateActualite,
   useDeleteActualite,
   useUpdateActualite,
-} from '../../hooks/queries';
-import { useTitle } from '@/hooks/useTitle';
-import ListPageHeader from '../../components/common/ListPageHeader';
+  useTitle,
+} from '@/hooks';
+import type { ActualiteFormData, ActualiteItem } from '@/types';
 
 const Actualites: React.FC = () => {
   useScrollToTop();
   useTitle('Actualités');
-  // Data state
   const { data = [] } = useActualitesQuery();
   const createMutation = useCreateActualite();
   const updateMutation = useUpdateActualite();
   const deleteMutation = useDeleteActualite();
   const [searchTerm, setSearchTerm] = useState('');
 
-  // UI state
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [formOpen, setFormOpen] = useState(false);
   const [formMode, setFormMode] = useState<'create' | 'edit'>('create');
@@ -38,7 +37,6 @@ const Actualites: React.FC = () => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [actualiteToDelete, setActualiteToDelete] = useState<ActualiteItem | null>(null);
 
-  // Hooks
   const { filters, filteredData, updateFilter, resetFilters, activeFilterCount } = useFilter({
     data,
     searchTerm,
@@ -53,8 +51,6 @@ const Actualites: React.FC = () => {
     resetPage,
   } = usePagination({ data: filteredData, initialRowsPerPage: 5 });
 
-
-  // Handlers
   const handleSearchChange = useCallback(
     (value: string) => {
       setSearchTerm(value);
@@ -142,7 +138,6 @@ const Actualites: React.FC = () => {
         onAction={handleOpenCreate}
       />
 
-      {/* Filters - Full Width Below */}
       {filtersOpen && (
         <div className="bg-white rounded-xl border border-ink-100 p-4 shadow-card">
           <ActualiteFilters
@@ -159,7 +154,6 @@ const Actualites: React.FC = () => {
         </div>
       )}
 
-      {/* Table */}
       <ActualiteTable
         data={paginatedData}
         totalCount={filteredData.length}
@@ -172,7 +166,6 @@ const Actualites: React.FC = () => {
         onDelete={handleDeleteRequest}
       />
 
-      {/* Form Dialog (Create / Edit) */}
       <ActualiteForm
         open={formOpen}
         onClose={() => setFormOpen(false)}
@@ -181,14 +174,12 @@ const Actualites: React.FC = () => {
         mode={formMode}
       />
 
-      {/* View Dialog */}
       <ActualiteViewDialog
         open={viewDialogOpen}
         onClose={() => setViewDialogOpen(false)}
         actualite={selectedActualite}
       />
 
-      {/* Delete Confirmation Dialog */}
       <ConfirmDialog
         open={deleteDialogOpen}
         title="Supprimer l'actualité"

@@ -6,17 +6,19 @@ import {
   FormationTable,
   FormationViewDialog,
   ConfirmDialog,
-} from '../../components';
-import { usePagination, useFormationFilter, useScrollToTop } from '../../hooks';
+  ListPageHeader,
+} from '@/components';
 import {
+  usePagination,
+  useFormationFilter,
+  useScrollToTop,
   useCreateFormation,
   useDeleteFormation,
   useFormationsQuery,
   useUpdateFormation,
-} from '../../hooks/queries';
-import type { FormationFormData, Formation } from '../../types';
-import { useTitle } from '@/hooks/useTitle';
-import ListPageHeader from '../../components/common/ListPageHeader';
+  useTitle,
+} from '@/hooks';
+import type { FormationFormData, Formation } from '@/types';
 
 const Formations: React.FC = () => {
   useScrollToTop();
@@ -27,7 +29,6 @@ const Formations: React.FC = () => {
   const deleteMutation = useDeleteFormation();
   const [searchTerm, setSearchTerm] = useState('');
 
-  // UI state
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [formOpen, setFormOpen] = useState(false);
   const [formMode, setFormMode] = useState<'create' | 'edit'>('create');
@@ -36,7 +37,6 @@ const Formations: React.FC = () => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [formationToDelete, setFormationToDelete] = useState<Formation | null>(null);
 
-  // Hooks
   const { filters, filteredData, updateFilter, resetFilters, activeFilterCount } =
     useFormationFilter({
       data,
@@ -52,7 +52,6 @@ const Formations: React.FC = () => {
     resetPage,
   } = usePagination({ data: filteredData, initialRowsPerPage: 5 });
 
-  // Handlers
   const handleSearchChange = useCallback(
     (value: string) => {
       setSearchTerm(value);
@@ -107,7 +106,6 @@ const Formations: React.FC = () => {
           await updateMutation.mutateAsync({ id: selectedFormation.id, data: formData });
           toast.success('Formation modifiée avec succès');
         }
-        // Close the dialog only after successful API call
         setFormOpen(false);
       } catch (error) {
         toast.error("Erreur lors de l'enregistrement");
@@ -141,7 +139,6 @@ const Formations: React.FC = () => {
         onAction={handleOpenCreate}
       />
 
-      {/* Filters - Full Width Below */}
       {filtersOpen && (
         <div className="rounded-xl border border-ink-100 bg-white p-4 shadow-card">
           <FormationFilters
@@ -158,7 +155,6 @@ const Formations: React.FC = () => {
         </div>
       )}
 
-      {/* Table */}
       <FormationTable
         data={paginatedData}
         totalCount={filteredData.length}
@@ -171,7 +167,6 @@ const Formations: React.FC = () => {
         onDelete={handleDeleteRequest}
       />
 
-      {/* Form Dialog (Create / Edit) */}
       <FormationForm
         open={formOpen}
         onClose={() => setFormOpen(false)}
@@ -180,14 +175,12 @@ const Formations: React.FC = () => {
         mode={formMode}
       />
 
-      {/* View Dialog */}
       <FormationViewDialog
         open={viewDialogOpen}
         onClose={() => setViewDialogOpen(false)}
         formation={selectedFormation}
       />
 
-      {/* Delete Confirmation Dialog */}
       <ConfirmDialog
         open={deleteDialogOpen}
         title="Supprimer la formation"

@@ -1,9 +1,11 @@
+import { GraduationCap, Loader2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import type { Admission, AdmissionStatus } from '../../types/admission.types';
-import { formatFullName } from '../../utils/name.utils';
+import { Button } from '../ui/button';
+import { Dialog, DialogBody, DialogContent, DialogFooter, DialogHeader } from '../ui/dialog';
+import { Input } from '../ui/input';
+import { Label } from '../ui/label';
+import type { Admission, AdmissionStatus } from '@/types';
+import { formatFullName } from '@/utils';
 
 interface AdmissionDecisionDialogProps {
   admission: Admission;
@@ -32,9 +34,11 @@ const AdmissionDecisionDialog = ({
   const [reponseDate, setReponseDate] = useState(admission.reponseDate ?? '');
   const [reponseHeure, setReponseHeure] = useState(admission.reponseHeure ?? '');
   const [reponseLieu, setReponseLieu] = useState(admission.reponseLieu ?? '');
-  const [reponseInstructions, setReponseInstructions] = useState(admission.reponseInstructions ?? '');
+  const [reponseInstructions, setReponseInstructions] = useState(
+    admission.reponseInstructions ?? ''
+  );
   const [reponseMessage, setReponseMessage] = useState(
-    admission.reponseMessage ?? admission.commentaire ?? '',
+    admission.reponseMessage ?? admission.commentaire ?? ''
   );
 
   useEffect(() => {
@@ -46,8 +50,6 @@ const AdmissionDecisionDialog = ({
     setReponseInstructions(admission.reponseInstructions ?? '');
     setReponseMessage(admission.reponseMessage ?? admission.commentaire ?? '');
   }, [open, admission]);
-
-  if (!open) return null;
 
   const accepted = statut === 'accepte';
 
@@ -64,16 +66,15 @@ const AdmissionDecisionDialog = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink-950/70 p-4">
-      <div className="max-h-[92vh] w-full max-w-lg overflow-y-auto rounded-xl bg-white shadow-xl">
-        <div className="border-b border-ink-100 px-6 py-4">
-          <h2 className="text-xl font-bold text-ink-900">Réponse au candidat</h2>
-          <p className="mt-1 text-sm text-ink-600">
-            {formatFullName(admission)} — {admission.formation}
-          </p>
-        </div>
+    <Dialog open={open} onOpenChange={(isOpen) => !isOpen && !submitting && onClose()}>
+      <DialogContent size="lg" showCloseButton={!submitting}>
+        <DialogHeader
+          icon={<GraduationCap aria-hidden="true" />}
+          title="Réponse au candidat"
+          description={`${formatFullName(admission)} — ${admission.formation}`}
+        />
 
-        <div className="space-y-4 p-6">
+        <DialogBody className="space-y-4">
           <label className="block text-sm font-medium text-ink-700">
             Décision
             <select
@@ -139,7 +140,9 @@ const AdmissionDecisionDialog = ({
           )}
 
           <div className="space-y-1.5">
-            <Label htmlFor="reponseMessage">{accepted ? 'Message personnalisé' : 'Message / commentaire'}</Label>
+            <Label htmlFor="reponseMessage">
+              {accepted ? 'Message personnalisé' : 'Message / commentaire'}
+            </Label>
             <textarea
               id="reponseMessage"
               value={reponseMessage}
@@ -154,18 +157,27 @@ const AdmissionDecisionDialog = ({
           <div className="rounded-lg border border-brand-100 bg-brand-50 p-3 text-xs text-brand-800">
             Vérifiez le contenu avant l'envoi. L'email part uniquement après confirmation.
           </div>
-        </div>
+        </DialogBody>
 
-        <div className="flex gap-3 border-t border-ink-100 px-6 py-4">
-          <Button type="button" variant="outline" className="flex-1" onClick={onClose} disabled={submitting}>
+        <DialogFooter>
+          <Button type="button" variant="outline" onClick={onClose} disabled={submitting}>
             Annuler
           </Button>
-          <Button type="button" className="flex-1" onClick={() => void handleSubmit()} disabled={submitting}>
-            {submitting ? 'Envoi...' : accepted ? 'Valider et envoyer' : 'Enregistrer et notifier'}
+          <Button
+            type="button"
+            onClick={() => void handleSubmit()}
+            disabled={submitting}
+            aria-busy={submitting}
+          >
+            {submitting && <Loader2 className="size-4 animate-spin" aria-hidden="true" />}
+            {(() => {
+              if (submitting) return 'Envoi en cours…';
+              return accepted ? 'Valider et envoyer' : 'Enregistrer et notifier';
+            })()}
           </Button>
-        </div>
-      </div>
-    </div>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 };
 

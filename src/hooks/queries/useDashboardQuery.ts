@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { getDashboardStats, getRecentActivities } from '../../services';
+import { getDashboardStats, getRecentActivities } from '@/services';
 import { queryKeys } from './keys';
 
 export function useDashboardStatsQuery() {

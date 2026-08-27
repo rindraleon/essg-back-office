@@ -1,13 +1,14 @@
-import { apiClient } from '../api/client/http';
-import type { Projet, ProjetFormData } from '../types/projet.types';
+import { apiClient } from '@/api';
+import type { Projet, ProjetFormData } from '@/types';
 
 const getAllProjets = async (): Promise<Projet[]> => {
-  const result = await apiClient.getList<Projet>('/projects', { page: 1, limit: 100 });
+  const result = await apiClient.getList<Projet>('/projects', {
+    page: 1,
+    limit: 100,
+    sortBy: 'creeLe',
+    sortOrder: 'DESC',
+  });
   return result.data;
-};
-
-const getProjetById = async (id: number): Promise<Projet> => {
-  return apiClient.get<Projet>(`/projects/${id}`);
 };
 
 const createProjet = async (data: ProjetFormData): Promise<Projet> => {
@@ -25,8 +26,11 @@ const deleteProjet = async (id: number): Promise<void> => {
 const uploadImage = async (file: File, folder = 'images'): Promise<string> => {
   const formData = new FormData();
   formData.append('file', file);
-  const result = await apiClient.post<{ url: string }>(`/upload/image?folder=${encodeURIComponent(folder)}`, formData);
+  const result = await apiClient.post<{ url: string }>(
+    `/upload/image?folder=${encodeURIComponent(folder)}`,
+    formData
+  );
   return result.url;
 };
 
-export { getAllProjets, getProjetById, createProjet, updateProjet, deleteProjet, uploadImage };
+export { getAllProjets, createProjet, updateProjet, deleteProjet, uploadImage };

@@ -1,17 +1,12 @@
+import { Folder, GraduationCap, Handshake, Mail, Newspaper, UserCheck, Users } from 'lucide-react';
 import {
-  Folder,
-  GraduationCap,
-  Handshake,
-  Mail,
-  Newspaper,
-  UserCheck,
-  Users,
-} from 'lucide-react';
-import { useScrollToTop } from '../../hooks/';
-import { useTitle } from '../../hooks/useTitle';
-import { StatCard, RecentActivity } from '../../components';
-import { useDashboardStatsQuery, useRecentActivitiesQuery } from '../../hooks/queries';
-import { routesStatic } from '../../routes';
+  useScrollToTop,
+  useTitle,
+  useDashboardStatsQuery,
+  useRecentActivitiesQuery,
+} from '@/hooks';
+import { StatCard, RecentActivity } from '@/components';
+import { routesStatic } from '@/routes';
 
 const Dashboard = () => {
   useScrollToTop();
@@ -91,9 +86,16 @@ const Dashboard = () => {
     <div className="mx-auto max-w-7xl py-6">
       <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {loading && !stats
-          ? ['users', 'formations', 'news', 'projects', 'partnerships', 'resources', 'admissions', 'contacts'].map(
-              (id) => <StatCard key={`skeleton-${id}`} title="" value="" loading />,
-            )
+          ? [
+              'users',
+              'formations',
+              'news',
+              'projects',
+              'partnerships',
+              'resources',
+              'admissions',
+              'contacts',
+            ].map((id) => <StatCard key={`skeleton-${id}`} title="" value="" loading />)
           : statCards.map((stat) => <StatCard key={stat.title} {...stat} />)}
       </div>
 

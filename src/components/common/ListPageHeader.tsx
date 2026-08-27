@@ -1,45 +1,27 @@
 import { Filter, Plus } from 'lucide-react';
 import React from 'react';
-import { Button } from '@/components/ui/button';
+import { Button } from '../ui/button';
 import SearchInput from './SearchInput';
-import { cn } from '@/lib/utils';
+import { cn } from '@/lib';
 
 interface ListPageHeaderProps {
-  /** Titre de la liste, ex. « Liste des partenaires ». */
   title: string;
-  /** Phrase courte décrivant la page (optionnelle, masquée sous `sm`). */
   description?: string;
-  /** Nombre de résultats après recherche/filtres. */
   totalCount: number;
-  /** Mot au singulier utilisé pour le compteur (« résultat » par défaut). */
   countLabel?: string;
   searchValue: string;
   onSearchChange: (value: string) => void;
   searchPlaceholder?: string;
-  /** Affiche le bouton Filtre (masqué si `onToggleFilters` est absent). */
   onToggleFilters?: () => void;
   filtersOpen?: boolean;
   activeFilterCount?: number;
-  /** Action principale (création). */
   actionLabel?: string;
   onAction?: () => void;
   actionIcon?: React.ReactNode;
-  /** Actions supplémentaires rendues après le bouton principal. */
   children?: React.ReactNode;
   className?: string;
 }
 
-/**
- * En-tête unifié des pages de liste du back-office (cf. cahier des charges §12).
- *
- * Structure : Titre + total → espace flexible → recherche → filtre → actions.
- *
- * Points clés :
- *  - le compteur est en `tabular-nums` et `whitespace-nowrap` : il ne provoque
- *    plus de saut de ligne quand il passe de 9 à 10 résultats ;
- *  - une seule ligne dès `lg`, empilement propre en dessous ;
- *  - tous les boutons (dont Filtre) partagent la même taille/rayon via <Button>.
- */
 const ListPageHeader: React.FC<ListPageHeaderProps> = ({
   title,
   description,
@@ -67,7 +49,6 @@ const ListPageHeader: React.FC<ListPageHeaderProps> = ({
         className
       )}
     >
-      {/* Titre + total : ne se comprime pas, ne passe pas à la ligne */}
       <div className="flex min-w-0 shrink-0 flex-col gap-0.5">
         <div className="flex min-w-0 items-baseline gap-2">
           <h2 className="truncate text-base font-semibold text-ink-900">{title}</h2>
@@ -84,10 +65,8 @@ const ListPageHeader: React.FC<ListPageHeaderProps> = ({
         )}
       </div>
 
-      {/* Espace flexible */}
       <div className="hidden flex-1 lg:block" />
 
-      {/* Recherche + filtre + actions */}
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
         <SearchInput
           value={searchValue}

@@ -1,7 +1,6 @@
-import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Button } from '../ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../ui/dialog';
 import type { ActivityLog } from '@/types';
-
 
 interface ActivityLogViewDialogProps {
   open: boolean;
@@ -16,7 +15,11 @@ function formatDate(value: string) {
   }).format(new Date(value));
 }
 
-export default function ActivityLogViewDialog({ open, onClose, log }: Readonly<ActivityLogViewDialogProps>) {
+export default function ActivityLogViewDialog({
+  open,
+  onClose,
+  log,
+}: Readonly<ActivityLogViewDialogProps>) {
   if (!log) return null;
 
   return (
@@ -41,7 +44,9 @@ export default function ActivityLogViewDialog({ open, onClose, log }: Readonly<A
           </div>
 
           <div>
-            <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-ink-400">Endpoint</p>
+            <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-ink-400">
+              Endpoint
+            </p>
             <code className="block break-all rounded-lg bg-ink-50 px-3 py-2 text-xs text-ink-700">
               {log.endpoint}
             </code>
@@ -49,7 +54,9 @@ export default function ActivityLogViewDialog({ open, onClose, log }: Readonly<A
 
           {log.metadata && (
             <div>
-              <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-ink-400">Métadonnées</p>
+              <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-ink-400">
+                Métadonnées
+              </p>
               <pre className="max-h-48 overflow-auto rounded-lg bg-ink-950 p-3 text-xs text-sage-100">
                 {JSON.stringify(log.metadata, null, 2)}
               </pre>

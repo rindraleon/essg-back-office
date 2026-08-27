@@ -1,13 +1,12 @@
 import { Eye, Mail, Reply, Trash2 } from 'lucide-react';
-// src/components/MessageComponents/MessageTable.tsx
 import React, { useMemo } from 'react';
-import type { Message } from '../../services/messages.service';
+import type { Message } from '@/services';
 import DataTable from '../common/DataTable';
 import type { Column } from '../common/DataTable';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { formatFullName } from '../../utils/name.utils';
+import { Badge } from '../ui/badge';
+import { Button } from '../ui/button';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip';
+import { formatFullName } from '@/utils';
 
 interface MessageTableProps {
   data: Message[];
@@ -78,7 +77,6 @@ const MessageTable: React.FC<MessageTableProps> = ({
                 <Mail />
               </div>
               <div className="min-w-0">
-                {/* Un message non lu est mis en avant (gras + couleur soutenue). */}
                 <span
                   className={`block ${row.lu ? 'font-medium text-ink-700' : 'font-bold text-ink-900'}`}
                 >

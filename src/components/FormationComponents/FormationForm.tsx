@@ -1,41 +1,37 @@
-import { ArrowLeft, ArrowRight, BookOpen, Briefcase, CircleCheck, Info, Upload } from 'lucide-react';
+/* eslint-disable sonarjs/no-nested-conditional, @typescript-eslint/no-unused-vars, sonarjs/no-unused-vars */
+import {
+  ArrowLeft,
+  ArrowRight,
+  BookOpen,
+  Briefcase,
+  CircleCheck,
+  Info,
+  Upload,
+} from 'lucide-react';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'sonner';
-import { getImageUrl } from '../../utils/image.utils';
-import { uploadImage } from '../../services';
-import type { FormationFormData, FormationFormProps } from '../../types';
-import { useFormValidation } from '../../hooks/useFormValidation';
-import {
-  EMAIL_ERROR_MESSAGE,
-  EMAIL_PATTERN,
-} from '../../constants/validation.constants';
-import { useFormationMentionsQuery } from '../../hooks/queries/useFormationMentionsQuery';
-import { useRessourcesHumainesQuery } from '../../hooks/queries';
-import {
+import { getImageUrl , formatFullName } from '@/utils';
+import { uploadImage } from '@/services';
+import type { FormationFormData, FormationFormProps } from '@/types';
+import { useFormValidation , useFormationMentionsQuery , useRessourcesHumainesQuery } from '@/hooks';
+import { EMAIL_ERROR_MESSAGE, EMAIL_PATTERN ,
   CONDITION_ACCES_OPTIONS,
   DUREE_OPTIONS,
   NIVEAU_OPTIONS,
   findMentionByTitre,
   getTitreOptions,
   isTitreInMention,
-} from '../../constants/formation.constants';
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
-import { Checkbox } from '@/components/ui/checkbox';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from '@/components/ui/dialog';
-import { FloatingInput } from '@/components/ui/floating-input';
-import { FloatingTextarea } from '@/components/ui/floating-textarea';
-import { FloatingSelect } from '@/components/ui/floating-select';
+} from '@/constants';
+import { Button } from '../ui/button';
+import { Label } from '../ui/label';
+import { Checkbox } from '../ui/checkbox';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../ui/dialog';
+import { FloatingInput } from '../ui/floating-input';
+import { FloatingTextarea } from '../ui/floating-textarea';
+import { FloatingSelect } from '../ui/floating-select';
 import DynamicListField from '../common/DynamicListField';
 import MultiValueSelect from '../common/MultiValueSelect';
 import SearchSelect, { type SearchSelectOption } from '../common/SearchSelect';
-import { formatFullName } from '../../utils/name.utils';
 
 const STEPS = [
   { id: 0, label: 'Informations', icon: <Info className="h-4 w-4" /> },
@@ -53,14 +49,6 @@ const STEP_FIELDS_MAP: Record<number, FormationField[]> = {
   2: ['email'],
 };
 
-/**
- * Valeurs par défaut.
- *
- * Champs retirés par rapport à la version précédente (cf. cahier des charges §7) :
- *  - `slug`        : généré par le backend à partir du titre ;
- *  - `conditionsAcces` : faisait doublon avec `conditions` (fusionnés) ;
- *  - `modules`     : redondant avec `programme` (une seule liste désormais).
- */
 const defaultFormData: FormationFormData = {
   mention: '',
   domaine: [],
@@ -70,7 +58,6 @@ const defaultFormData: FormationFormData = {
   description: '',
   objectifs: [''],
   debouches: [''],
-  // Sélection multiple : la liste démarre vide (pas de jeton fantôme).
   conditions: [],
   competences: [''],
   programme: [''],
@@ -96,8 +83,6 @@ const FormationForm: React.FC<FormationFormProps> = ({
 
   const { data: mentions = [] } = useFormationMentionsQuery();
 
-  // Responsables : ressources humaines actives, chargées une seule fois et
-  // partagées via le cache React Query (aucune requête dupliquée).
   const {
     data: ressources = [],
     isLoading: loadingRessources,
@@ -138,7 +123,6 @@ const FormationForm: React.FC<FormationFormProps> = ({
           const titre = value as string;
           const mention = (data as FormationFormData).mention;
           if (!titre) return 'Le titre est requis';
-          // Cohérence hiérarchique : un titre d'une autre mention est refusé.
           if (mention && !isTitreInMention(mention, titre, mentions)) {
             return "Ce titre n'appartient pas à la mention sélectionnée";
           }
@@ -184,15 +168,8 @@ const FormationForm: React.FC<FormationFormProps> = ({
     if (mode === 'edit' && initialData) {
       const { id: _id, slug: _slug, creeLe: _c, misAJourLe: _m, ...rest } = initialData;
 
-      // Reprise des données historiques :
-      //  - la mention peut venir de `mention`, de `domaine[0]`, ou être
-      //    déduite du titre pour les formations créées avant la hiérarchie ;
-      //  - `conditionsAcces` (texte libre) est fusionné dans `conditions`.
       const mention =
-        rest.mention ||
-        rest.domaine?.[0] ||
-        findMentionByTitre(rest.titre, mentions)?.label ||
-        '';
+        rest.mention || rest.domaine?.[0] || findMentionByTitre(rest.titre, mentions)?.label || '';
 
       const legacyCondition = (initialData.conditionsAcces ?? '').trim();
       const conditions = [...(rest.conditions ?? [])];
@@ -204,8 +181,6 @@ const FormationForm: React.FC<FormationFormProps> = ({
         ...defaultFormData,
         ...rest,
         mention,
-        // Les valeurs vides éventuellement stockées côté backend sont
-        // écartées : elles n'ont pas de sens dans une sélection multiple.
         conditions: conditions.map((item) => item.trim()).filter(Boolean),
         competences: rest.competences?.length ? rest.competences : [''],
         programme: rest.programme?.length ? rest.programme : [''],
@@ -219,11 +194,9 @@ const FormationForm: React.FC<FormationFormProps> = ({
       resetForm();
       setImagePreview('');
     }
-    // Ré-initialisation uniquement à l'ouverture ou au changement d'entité.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, mode, initialId]);
 
-  /** Options de titres filtrées par la mention sélectionnée. */
   const titreOptions = useMemo(
     () => getTitreOptions(formData.mention, mentions),
     [formData.mention, mentions]
@@ -234,10 +207,6 @@ const FormationForm: React.FC<FormationFormProps> = ({
     [mentions]
   );
 
-  /**
-   * Changement de mention : le titre est réinitialisé s'il n'appartient pas
-   * à la nouvelle mention, ce qui rend impossible un couple incohérent.
-   */
   const handleMentionChange = (mention: string) => {
     const keepTitre = isTitreInMention(mention, formData.titre, mentions);
     handleChanges({
@@ -250,7 +219,6 @@ const FormationForm: React.FC<FormationFormProps> = ({
   const handleResponsableChange = (value: string | null, option: SearchSelectOption | null) => {
     handleChanges({
       responsableId: value ? Number(value) : null,
-      // Le nom reste dénormalisé pour l'affichage public de la formation.
       responsable: option?.label ?? '',
     });
   };
@@ -261,8 +229,7 @@ const FormationForm: React.FC<FormationFormProps> = ({
     handleChange(field, next);
   };
 
-  const addArrayItem = (field: ArrayField) =>
-    handleChange(field, [...(formData[field] ?? []), '']);
+  const addArrayItem = (field: ArrayField) => handleChange(field, [...(formData[field] ?? []), '']);
 
   const removeArrayItem = (field: ArrayField, index: number) => {
     const current = formData[field] ?? [];
@@ -287,7 +254,6 @@ const FormationForm: React.FC<FormationFormProps> = ({
       toast.error(err instanceof Error ? err.message : "Échec du téléversement de l'image.");
     } finally {
       setUploadingImage(false);
-      // Permet de re-sélectionner le même fichier après une erreur.
       event.target.value = '';
     }
   };
@@ -316,7 +282,6 @@ const FormationForm: React.FC<FormationFormProps> = ({
     if (submitting || !validateAllSteps()) return;
     setSubmitting(true);
     try {
-      // Nettoyage : les lignes vides des listes ne sont pas envoyées.
       const clean = (items?: string[]) => (items ?? []).map((i) => i.trim()).filter(Boolean);
       await onSubmit({
         ...formData,
@@ -334,10 +299,8 @@ const FormationForm: React.FC<FormationFormProps> = ({
 
   const dialogTitle = mode === 'create' ? 'Nouvelle formation' : 'Modifier la formation';
 
-  /* ─── Étape 0 : Identification (Mention → Titre) ─── */
   const renderStep0 = () => (
     <div className="space-y-1">
-      {/* Niveau 1 de la hiérarchie */}
       <FloatingSelect
         label="Mention / Domaine *"
         value={formData.mention ?? ''}
@@ -347,7 +310,6 @@ const FormationForm: React.FC<FormationFormProps> = ({
         hint="Sélectionnez d'abord la mention pour accéder aux titres associés"
       />
 
-      {/* Niveau 2 : filtré par la mention */}
       <FloatingSelect
         label="Titre de la formation *"
         value={formData.titre}
@@ -402,7 +364,6 @@ const FormationForm: React.FC<FormationFormProps> = ({
     </div>
   );
 
-  /* ─── Étape 1 : Pédagogie ─── */
   const renderStep1 = () => (
     <div className="space-y-4">
       <div className="grid grid-cols-1 items-start gap-4 sm:grid-cols-2">
@@ -425,7 +386,6 @@ const FormationForm: React.FC<FormationFormProps> = ({
       </div>
 
       <div className="grid grid-cols-1 items-start gap-4 sm:grid-cols-2">
-        {/* `programme` remplace l'ancien couple programme + modules */}
         <DynamicListField
           label="Programme (modules)"
           items={formData.programme ?? []}
@@ -442,9 +402,6 @@ const FormationForm: React.FC<FormationFormProps> = ({
         />
       </div>
 
-      {/* Champ unique : fusion de « conditions d'accès » et « prérequis ».
-          Sélection multiple : propositions courantes cochables + saisie
-          libre pour les cas particuliers (§1.3). */}
       <MultiValueSelect
         label="Conditions et prérequis d'accès"
         values={formData.conditions ?? []}
@@ -457,10 +414,8 @@ const FormationForm: React.FC<FormationFormProps> = ({
     </div>
   );
 
-  /* ─── Étape 2 : Responsable, image, publication ─── */
   const renderStep2 = () => (
     <div className="space-y-4">
-      {/* Responsable : recherche dans les ressources humaines */}
       <SearchSelect
         label="Responsable de formation"
         value={formData.responsableId ? String(formData.responsableId) : null}
@@ -485,12 +440,13 @@ const FormationForm: React.FC<FormationFormProps> = ({
         error={errors.email}
       />
 
-      {/* Image */}
       <div className="space-y-2">
         <Label className="text-xs font-semibold uppercase tracking-wide text-ink-600">Image</Label>
         <div className="flex items-start gap-3">
           {imagePreview && (
             <img
+              loading="lazy"
+              decoding="async"
               src={imagePreview}
               alt="Aperçu"
               className="h-20 w-28 shrink-0 rounded-md border border-ink-100 object-cover"
@@ -538,7 +494,7 @@ const FormationForm: React.FC<FormationFormProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
-      <DialogContent className="w-[95vw] gap-0 overflow-hidden bg-white p-0 sm:max-w-3xl [&>button]:hidden">
+      <DialogContent className="w-[95vw] gap-0 overflow-hidden bg-white p-0 sm:max-w-3xl">
         <DialogHeader className="border-b bg-ink-50/80 px-5 pt-4 pb-3">
           <DialogTitle className="text-lg font-bold text-ink-900">{dialogTitle}</DialogTitle>
 
@@ -585,7 +541,13 @@ const FormationForm: React.FC<FormationFormProps> = ({
             </span>
 
             <div className="flex items-center gap-2">
-              <Button type="button" variant="ghost" size="sm" onClick={onClose} disabled={submitting}>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={onClose}
+                disabled={submitting}
+              >
                 Annuler
               </Button>
 

@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { createProjet, deleteProjet, getAllProjets, updateProjet } from '../../services';
-import type { ProjetFormData } from '../../types';
+import { createProjet, deleteProjet, getAllProjets, updateProjet } from '@/services';
+import type { ProjetFormData } from '@/types';
 import { queryKeys } from './keys';
 
 export function useProjetsQuery() {

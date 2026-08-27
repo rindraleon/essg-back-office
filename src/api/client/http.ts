@@ -12,11 +12,8 @@ const DEFAULT_API_URL = 'http://localhost:3000';
 const TOKEN_COOKIE_NAME = 'token_name';
 const REQUEST_TIMEOUT = 15_000;
 
-/** Blob enrichi des métadonnées d'affichage renvoyées par le backend. */
 export type DocumentBlob = Blob & {
-  /** Faux si le navigateur ne peut pas afficher ce type dans une iframe. */
   inlineViewable: boolean;
-  /** Type MIME réel, détecté à partir de la signature du fichier. */
   mimetype: string;
 };
 
@@ -65,8 +62,8 @@ function handleUnauthorized(requestUrl: string): void {
   if (isAuthProbe) return;
   try {
     clearAuthToken();
-  } catch {
-    /* ignore */
+  } catch (error) {
+    console.warn('Nettoyage du jeton impossible', error);
   }
   onAuthFailure?.();
   if (typeof window !== 'undefined' && window.location.pathname !== '/login') {
@@ -76,9 +73,11 @@ function handleUnauthorized(requestUrl: string): void {
 }
 
 function buildUrl(path: string, params?: PaginationParams): string {
-  const url = new URL(
-    path.startsWith('http') ? path : `${API_BASE_URL}${path.startsWith('/') ? path : `/${path}`}`
-  );
+  let resolvedPath = path;
+  if (!path.startsWith('http')) {
+    resolvedPath = path.startsWith('/') ? `${API_BASE_URL}${path}` : `${API_BASE_URL}/${path}`;
+  }
+  const url = new URL(resolvedPath);
   if (params) {
     for (const [key, value] of Object.entries(params)) {
       if (value === undefined || value === null || value === '') continue;
@@ -128,8 +127,6 @@ function toApiErrorFromStatus(status: number, payload: unknown, requestUrl: stri
     });
   }
   if (status === 409) {
-    // Doublon (email ou téléphone déjà utilisé). Le backend renvoie un
-    // message explicite et actionnable : on le transmet sans le remplacer.
     return new ApiError(fallback || 'Cette valeur est déjà utilisée.', {
       statusCode: status,
       kind: 'conflict',
@@ -301,18 +298,9 @@ export const apiClient = {
     await request<null>(url, { method: 'DELETE' });
   },
 
-  /**
-   * Récupère un document binaire (aperçu, téléchargement).
-   *
-   * Renvoie aussi les métadonnées utiles à l'affichage : type réel détecté
-   * par le backend et indicateur `inlineViewable` (un .docx ne peut pas être
-   * rendu dans une iframe, il faut proposer le téléchargement).
-   */
   async getBlob(url: string): Promise<DocumentBlob> {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), 30_000);
-    // Accept large : le back-office accepte PDF, Word et images en pièce
-    // jointe. Restreindre au PDF pouvait provoquer un 406 selon le serveur.
     const headers: Record<string, string> = {
       Accept:
         'application/pdf,image/*,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/octet-stream,application/json',
@@ -343,7 +331,6 @@ export const apiClient = {
         throw new ApiError('Le document est vide ou illisible.', { kind: 'not_found' });
       }
 
-      // L'en-tête est exposé par le backend via Access-Control-Expose-Headers.
       const inlineViewable = response.headers.get('X-Document-Inline-Viewable') !== 'false';
       return Object.assign(blob, {
         inlineViewable,

@@ -1,27 +1,18 @@
-import { Trash2, Upload } from 'lucide-react';
+import { CircleCheck, ImageUp, Loader2, Trash2, TriangleAlert, UserPlus } from 'lucide-react';
 import React, { useRef, useState, useEffect } from 'react';
 import { toast } from 'sonner';
-import { getImageUrl } from '../../utils/image.utils';
-import { toUpperName } from '../../utils/slug.utils';
-import { uploadAvatar } from '../../services';
-import type { User, UserFormData } from '../../types';
-import { useFormValidation } from '../../hooks/useFormValidation';
-import {
-  EMAIL_ERROR_MESSAGE,
-  EMAIL_PATTERN,
-} from '../../constants/validation.constants';
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
-import { Checkbox } from '@/components/ui/checkbox';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from '@/components/ui/dialog';
-import { FloatingInput } from '@/components/ui/floating-input';
-import { FloatingSelect } from '@/components/ui/floating-select';
+import { ACCEPTED_IMAGE_MIME_TYPES, MAX_IMAGE_UPLOAD_SIZE, isAcceptedImage , toUpperName } from '@/utils';
+import { uploadAvatar } from '@/services';
+import type { User, UserFormData } from '@/types';
+import { useFormValidation } from '@/hooks';
+import { EMAIL_ERROR_MESSAGE, EMAIL_PATTERN } from '@/constants';
+import { Button } from '../ui/button';
+import { Label } from '../ui/label';
+import { Checkbox } from '../ui/checkbox';
+import { Dialog, DialogBody, DialogContent, DialogFooter, DialogHeader } from '../ui/dialog';
+import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
+import { FloatingInput } from '../ui/floating-input';
+import { FloatingSelect } from '../ui/floating-select';
 
 interface UsersFormProps {
   open: boolean;
@@ -52,6 +43,7 @@ const UsersForm: React.FC<UsersFormProps> = ({ open, onClose, onSubmit, initialD
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [avatarError, setAvatarError] = useState<string>('');
 
   const { formData, errors, handleChange, handleBlur, validateAllSteps, setFormData, resetForm } =
     useFormValidation<UserFormData>({
@@ -84,41 +76,42 @@ const UsersForm: React.FC<UsersFormProps> = ({ open, onClose, onSubmit, initialD
         avatar: initialData.avatar,
         motDePasse: '',
       });
-      setAvatarPreview(initialData.avatar ? getImageUrl(initialData.avatar) : null);
+      setAvatarPreview(initialData.avatar ?? null);
+      setAvatarError('');
     } else {
       resetForm();
       setAvatarPreview(null);
       setAvatarFile(null);
+      setAvatarError('');
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, mode, initialId]);
 
   const handleAvatarChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (file) {
-      const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
-      if (!validTypes.includes(file.type)) {
-        toast.error("Format d'image non supporté. Utilisez JPG, PNG, GIF ou WebP");
-        return;
-      }
+    event.target.value = '';
+    if (!file) return;
 
-      if (file.size > 5 * 1024 * 1024) {
-        toast.error("L'image ne doit pas dépasser 5MB");
-        return;
-      }
-
-      setAvatarFile(file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setAvatarPreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
+    if (!isAcceptedImage(file)) {
+      setAvatarError('Format non supporté. Utilisez JPG, PNG, GIF ou WebP.');
+      return;
     }
+    if (file.size > MAX_IMAGE_UPLOAD_SIZE) {
+      setAvatarError("L'image ne doit pas dépasser 5 Mo.");
+      return;
+    }
+
+    setAvatarError('');
+    setAvatarFile(file);
+    const reader = new FileReader();
+    reader.onloadend = () => setAvatarPreview(reader.result as string);
+    reader.readAsDataURL(file);
   };
 
   const handleDeleteAvatar = () => {
     setAvatarFile(null);
     setAvatarPreview(null);
+    setAvatarError('');
     if (mode === 'edit' && initialData) {
       setFormData((prev) => ({ ...prev, avatar: undefined }));
     }
@@ -129,7 +122,7 @@ const UsersForm: React.FC<UsersFormProps> = ({ open, onClose, onSubmit, initialD
     const nom = formData.nom || '';
     const firstCharPrenom = prenom.length > 0 ? prenom.charAt(0) : '';
     const firstCharNom = nom.length > 0 ? nom.charAt(0) : '';
-    const initiales = `${firstCharPrenom}${firstCharNom}`.toUpperCase();
+    const initiales = `${firstCharNom}${firstCharPrenom}`.toUpperCase();
     if (initiales) return initiales;
     return '??';
   };
@@ -151,12 +144,14 @@ const UsersForm: React.FC<UsersFormProps> = ({ open, onClose, onSubmit, initialD
         if (mode === 'edit' && initialData) {
           const updatedUser = await uploadAvatar(initialData.id, avatarFile);
           setFormData((prev) => ({ ...prev, avatar: updatedUser.avatar }));
-          setAvatarPreview(updatedUser.avatar ? getImageUrl(updatedUser.avatar) : null);
+          setAvatarPreview(updatedUser.avatar ?? null);
           setAvatarFile(null);
         }
       } catch (error) {
-        console.error("Erreur lors de l'upload de l'avatar:", error);
-        toast.error("Erreur lors de l'upload de l'avatar");
+        const message =
+          error instanceof Error ? error.message : "Erreur lors de l'upload de l'avatar";
+        setAvatarError(message);
+        toast.error(message);
         setUploading(false);
         return;
       }
@@ -173,60 +168,46 @@ const UsersForm: React.FC<UsersFormProps> = ({ open, onClose, onSubmit, initialD
 
   const dialogTitle = mode === 'create' ? 'Nouvel utilisateur' : "Modifier l'utilisateur";
 
-  const buttonText = uploading ? 'Enregistrement...' : mode === 'create' ? 'Créer' : 'Enregistrer';
+  const getButtonText = (): string => {
+    if (uploading) return 'Enregistrement…';
+    return mode === 'create' ? 'Créer' : 'Enregistrer';
+  };
+  const buttonText = getButtonText();
 
   return (
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
-      <DialogContent
-        className="
-          sm:max-w-2xl
-          w-[95vw]
-          bg-white
-          p-0
-          gap-0
-          overflow-hidden
-          [&>button]:hidden
-        "
-      >
-        <DialogHeader className="px-5 pt-4 pb-3 border-b bg-ink-50/80">
-          <DialogTitle className="text-lg font-bold text-ink-900">{dialogTitle}</DialogTitle>
-        </DialogHeader>
+      <DialogContent size="xl" showCloseButton={!uploading}>
+        <DialogHeader
+          icon={<UserPlus aria-hidden="true" />}
+          title={dialogTitle}
+          description={
+            mode === 'create'
+              ? 'Créez un compte et définissez son rôle. Un email de bienvenue sera envoyé.'
+              : 'Modifiez les informations du compte. La photo est optimisée en WebP automatiquement.'
+          }
+        />
 
-        <div className="px-5 py-4 overflow-y-auto max-h-[58vh]">
-          <div className="space-y-4">
-            <div className="flex items-start gap-4">
+        <DialogBody>
+          <div className="space-y-5">
+            <div className="flex flex-col items-start gap-4 sm:flex-row">
               <div className="flex flex-col items-center gap-2">
                 <div className="relative">
-                  <div
-                    className="w-24 h-24 rounded-full bg-ink-100 flex items-center justify-center overflow-hidden border-2 border-ink-300"
-                    style={{ backgroundColor: avatarPreview ? 'transparent' : undefined }}
-                  >
-                    {avatarPreview ? (
-                      <img
-                        src={avatarPreview}
-                        alt="Avatar"
-                        className="w-full h-full object-cover"
-                        onError={() => setAvatarPreview(null)}
-                      />
-                    ) : (
-                      <span className="text-2xl font-semibold text-ink-600">{getInitials()}</span>
-                    )}
-                  </div>
+                  <Avatar size="xl" className="ring-1 ring-ink-200">
+                    <AvatarImage src={avatarPreview} alt="Photo du compte" />
+                    <AvatarFallback className="text-2xl">{getInitials()}</AvatarFallback>
+                  </Avatar>
                   {avatarPreview && (
-                    <button
+                    <Button
                       type="button"
+                      variant="destructive"
+                      size="icon-sm"
                       onClick={handleDeleteAvatar}
-                      className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 shadow-sm"
-                      style={{
-                        width: 24,
-                        height: 24,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                      }}
+                      disabled={uploading}
+                      aria-label="Retirer la photo"
+                      className="absolute -top-1 -right-1 size-7 rounded-full bg-white shadow-soft"
                     >
-                      <Trash2 style={{ fontSize: 14 }} />
-                    </button>
+                      <Trash2 className="size-3.5" aria-hidden="true" />
+                    </Button>
                   )}
                 </div>
 
@@ -234,9 +215,10 @@ const UsersForm: React.FC<UsersFormProps> = ({ open, onClose, onSubmit, initialD
                   <input
                     ref={fileInputRef}
                     type="file"
-                    accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
+                    accept={ACCEPTED_IMAGE_MIME_TYPES.join(',')}
                     onChange={handleAvatarChange}
                     className="hidden"
+                    aria-label="Choisir une photo pour ce compte"
                   />
                   <Button
                     type="button"
@@ -244,26 +226,35 @@ const UsersForm: React.FC<UsersFormProps> = ({ open, onClose, onSubmit, initialD
                     size="sm"
                     onClick={() => fileInputRef.current?.click()}
                     disabled={uploading}
-                    className="gap-1.5 bg-white text-xs h-8"
                   >
-                    <Upload className="h-3.5 w-3.5" />
+                    {uploading ? (
+                      <Loader2 className="size-3.5 animate-spin" aria-hidden="true" />
+                    ) : (
+                      <ImageUp className="size-3.5" aria-hidden="true" />
+                    )}
                     {avatarPreview ? 'Changer' : 'Ajouter'}
                   </Button>
-                  <span className="text-[10px] text-ink-400">JPG, PNG, GIF, WebP — max 5 Mo</span>
+                  <span className="text-xs text-ink-400">JPG, PNG, GIF, WebP — 5 Mo max</span>
+                  <p aria-live="polite" className="min-h-4 max-w-40 text-center text-xs">
+                    {avatarError ? (
+                      <span className="inline-flex items-center gap-1 text-destructive">
+                        <TriangleAlert className="size-3.5" aria-hidden="true" />
+                        {avatarError}
+                      </span>
+                    ) : (
+                      avatarFile && (
+                        <span className="inline-flex items-center gap-1 text-brand-700">
+                          <CircleCheck className="size-3.5" aria-hidden="true" />
+                          Prête à être envoyée
+                        </span>
+                      )
+                    )}
+                  </p>
                 </div>
               </div>
 
               <div className="min-w-0 flex-1 space-y-1">
                 <div className="grid grid-cols-1 items-start gap-x-3 sm:grid-cols-2">
-                  <FloatingInput
-                    id="prenom"
-                    label="Prénom *"
-                    autoComplete="given-name"
-                    value={formData.prenom}
-                    onChange={(e) => handleChange('prenom', e.target.value)}
-                    onBlur={() => handleBlur('prenom')}
-                    error={errors.prenom}
-                  />
                   <FloatingInput
                     id="nom"
                     label="Nom *"
@@ -272,6 +263,15 @@ const UsersForm: React.FC<UsersFormProps> = ({ open, onClose, onSubmit, initialD
                     onChange={(e) => handleChange('nom', toUpperName(e.target.value))}
                     onBlur={() => handleBlur('nom')}
                     error={errors.nom}
+                  />
+                  <FloatingInput
+                    id="prenom"
+                    label="Prénom *"
+                    autoComplete="given-name"
+                    value={formData.prenom}
+                    onChange={(e) => handleChange('prenom', e.target.value)}
+                    onBlur={() => handleBlur('prenom')}
+                    error={errors.prenom}
                   />
                 </div>
                 <FloatingInput
@@ -320,30 +320,16 @@ const UsersForm: React.FC<UsersFormProps> = ({ open, onClose, onSubmit, initialD
               </Label>
             </div>
           </div>
-        </div>
+        </DialogBody>
 
-        <DialogFooter className="px-5 py-3 mb-4 mx-4 border-t bg-ink-50/80">
-          <div className="flex items-center justify-end gap-2 w-full">
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={onClose}
-              disabled={uploading}
-              className="text-ink-500 h-8"
-            >
-              Annuler
-            </Button>
-            <Button
-              type="button"
-              size="sm"
-              onClick={handleSubmit}
-              disabled={uploading}
-              className="gap-1 h-8 bg-brand-600 hover:bg-brand-700"
-            >
-              {buttonText}
-            </Button>
-          </div>
+        <DialogFooter>
+          <Button type="button" variant="outline" onClick={onClose} disabled={uploading}>
+            Annuler
+          </Button>
+          <Button type="button" onClick={handleSubmit} disabled={uploading} aria-busy={uploading}>
+            {uploading && <Loader2 className="size-4 animate-spin" aria-hidden="true" />}
+            {buttonText}
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

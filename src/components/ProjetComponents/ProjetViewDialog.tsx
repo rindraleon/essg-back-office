@@ -11,11 +11,11 @@ import {
 } from 'lucide-react';
 import React from 'react';
 import MapPicker from '../common/MapPicker';
-import type { Projet } from '../../types/projet.types';
-import { getTypeColor, formatDateLong } from '../../utils/projet.utils';
-import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Badge } from '@/components/ui/badge';
+import type { Projet } from '@/types';
+import { getTypeColor, formatDateLong } from '@/utils';
+import { Button } from '../ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../ui/dialog';
+import { Badge } from '../ui/badge';
 import CoverImage from '../common/CoverImage';
 import ImageGallery from '../common/ImageGallery';
 import { DetailSection, TagList } from '../common/DetailSection';
@@ -61,15 +61,12 @@ const ProjetViewDialog: React.FC<ProjetViewDialogProps> = ({ open, onClose, proj
 
   const typeColor = getTypeColor(projet.type);
 
-  // ✅ Condition corrigée : accepte 0 comme valeur valide
   const hasLocation =
     projet.latitude !== null &&
     projet.latitude !== undefined &&
     projet.longitude !== null &&
     projet.longitude !== undefined;
 
-  // La galerie exclut la photo de couverture : elle est déjà affichée en
-  // tête de fiche, la répéter dans le carrousel n'apporterait rien.
   const galerie = (projet.galerie ?? []).filter(
     (image) => image?.trim() && image.trim() !== projet.image?.trim()
   );
@@ -80,6 +77,7 @@ const ProjetViewDialog: React.FC<ProjetViewDialogProps> = ({ open, onClose, proj
   return (
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
       <DialogContent
+        showCloseButton={false}
         className="
           !w-[96vw]
           !max-w-[calc(100%-1rem)]
@@ -93,12 +91,10 @@ const ProjetViewDialog: React.FC<ProjetViewDialogProps> = ({ open, onClose, proj
           bg-gradient-to-br from-white via-ink-50 to-ink-100
           p-0
           shadow-[0_24px_80px_rgba(15,23,42,0.35)]
-          [&>button]:hidden
         "
       >
         <div className="grid h-full min-h-0 lg:grid-cols-[360px_minmax(0,1fr)]">
           <aside className="hidden min-h-0 flex-col border-r border-ink-100 bg-ink-950 p-5 text-white lg:flex">
-            {/* Photo de couverture : image principale, distincte de la galerie */}
             <CoverImage src={projet.image} alt={projet.titre} dark />
 
             <div className="mt-5 space-y-4">
@@ -112,7 +108,6 @@ const ProjetViewDialog: React.FC<ProjetViewDialogProps> = ({ open, onClose, proj
                   {projet.type}
                 </Badge>
 
-                {/* Statut : même information que sur le site public. */}
                 <Badge className="rounded-full bg-white/10 px-3 py-1 text-white">
                   {projet.statut ?? 'En cours'}
                 </Badge>
@@ -193,9 +188,7 @@ const ProjetViewDialog: React.FC<ProjetViewDialogProps> = ({ open, onClose, proj
                 </div>
               </div>
 
-              {/* ── Contenu principal ── */}
               <div className="grid gap-5 xl:grid-cols-[1.1fr_0.9fr]">
-                {/* Colonne principale */}
                 <div className="space-y-5">
                   <DetailSection title="Description" icon={<Info className="size-4" />}>
                     <p className="whitespace-pre-wrap break-words text-sm leading-7 text-ink-600">
@@ -237,10 +230,6 @@ const ProjetViewDialog: React.FC<ProjetViewDialogProps> = ({ open, onClose, proj
                     </DetailSection>
                   )}
 
-                  {/*
-                    Galerie du projet : carrousel autonome, séparé de la photo
-                    de couverture affichée en tête de fiche.
-                  */}
                   {galerie.length > 0 && (
                     <DetailSection
                       title="Galerie du projet"
@@ -252,7 +241,6 @@ const ProjetViewDialog: React.FC<ProjetViewDialogProps> = ({ open, onClose, proj
                   )}
                 </div>
 
-                {/* Colonne secondaire */}
                 <div className="space-y-4">
                   {hasAddressBlock && (
                     <DetailSection
@@ -285,7 +273,6 @@ const ProjetViewDialog: React.FC<ProjetViewDialogProps> = ({ open, onClose, proj
               </div>
             </div>
 
-            {/* Footer fixe */}
             <div className="flex shrink-0 items-center justify-end border-t border-ink-100 bg-white px-5 py-4 lg:px-6">
               <Button type="button" onClick={onClose} variant="outline" className="rounded-xl">
                 Fermer

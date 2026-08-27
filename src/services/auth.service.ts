@@ -1,5 +1,5 @@
-import { apiClient, clearAuthToken } from '../api/client/http';
-import type { LoginResponse, User } from '../types/auth.types';
+import { apiClient, clearAuthToken } from '@/api';
+import type { LoginResponse, User } from '@/types';
 
 export const login = async (email: string, password: string): Promise<LoginResponse> => {
   return apiClient.post<LoginResponse>('/auth/login', { email, password });

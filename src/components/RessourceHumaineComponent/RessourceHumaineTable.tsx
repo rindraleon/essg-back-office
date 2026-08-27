@@ -1,14 +1,13 @@
 import { Eye, Pencil, Trash2 } from 'lucide-react';
 import React from 'react';
-import { getImageUrl } from '../../utils/image.utils';
-import type { RessourceHumaineItem } from '../../types/ressource-humaine.types';
+import { getImageUrl , formatFullName, getPersonInitials } from '@/utils';
+import type { RessourceHumaineItem } from '@/types';
 import DataTable from '../common/DataTable';
 import type { Column } from '../common/DataTable';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { formatFullName, getPersonInitials } from '../../utils/name.utils';
+import { Badge } from '../ui/badge';
+import { Button } from '../ui/button';
+import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip';
 
 interface RessourceHumaineTableProps {
   data: RessourceHumaineItem[];
@@ -39,7 +38,7 @@ const RessourceHumaineTable: React.FC<RessourceHumaineTableProps> = ({
       label: 'Photo',
       minWidth: 60,
       render: (row) => (
-        <Avatar className="h-9 w-9">
+        <Avatar className="h-9 w-8">
           {row.photo ? (
             <AvatarImage src={getImageUrl(row.photo)} alt={formatFullName(row)} />
           ) : (
@@ -56,17 +55,14 @@ const RessourceHumaineTable: React.FC<RessourceHumaineTableProps> = ({
       minWidth: 180,
       render: (row) => (
         <div>
-          <span className="font-semibold text-ink-900">
-            {formatFullName(row)}
-          </span>
-          {/* <p className="text-xs text-ink-500 line-clamp-1 mt-0.5">{row.poste}</p> */}
+          <span className="font-semibold text-ink-900">{formatFullName(row)}</span>
         </div>
       ),
     },
     {
       id: 'poste',
       label: 'Poste',
-      minWidth: 140,
+      minWidth: 120,
       render: (row) => <Badge variant="outline">{row.poste}</Badge>,
     },
     {
@@ -81,16 +77,6 @@ const RessourceHumaineTable: React.FC<RessourceHumaineTableProps> = ({
       minWidth: 120,
       render: (row) => <span className="text-sm text-ink-600">{row.telephone || '-'}</span>,
     },
-    // {
-    //   id: 'actif',
-    //   label: 'Statut',
-    //   minWidth: 90,
-    //   render: (row) => (
-    //     <Badge variant={row.actif ? 'default' : 'secondary'}>
-    //       {row.actif ? 'Actif' : 'Inactif'}
-    //     </Badge>
-    //   ),
-    // },
     {
       id: 'actions',
       label: 'Actions',

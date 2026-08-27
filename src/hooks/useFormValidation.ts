@@ -41,6 +41,52 @@ export interface UseFormValidationReturn<T> {
   resetForm: () => void;
 }
 
+function isEmptyValue(value: unknown): boolean {
+  return value === undefined || value === null || value === '';
+}
+
+function validateRequiredField(value: unknown, fieldName: string): string | undefined {
+  if (isEmptyValue(value) || (typeof value === 'string' && !value.trim())) {
+    return `Le champ ${fieldName} est requis`;
+  }
+  return undefined;
+}
+
+function validateLength(
+  value: unknown,
+  config: FieldConfig<unknown>
+): string | undefined {
+  if (typeof value !== 'string') return undefined;
+  if (config.minLength && value.length < config.minLength.value) {
+    return config.minLength.message;
+  }
+  if (config.maxLength && value.length > config.maxLength.value) {
+    return config.maxLength.message;
+  }
+  return undefined;
+}
+
+function validatePattern(value: unknown, config: FieldConfig<unknown>): string | undefined {
+  if (config.pattern && typeof value === 'string' && !config.pattern.regex.test(value)) {
+    return config.pattern.message;
+  }
+  return undefined;
+}
+
+function validateCustomRules<T extends Record<string, unknown> | object>(
+  value: unknown,
+  data: T,
+  config: FieldConfig<unknown>
+): string | undefined {
+  const asRecord = data as unknown as Record<string, unknown>;
+  if (config.custom) return config.custom(value, asRecord);
+  for (const rule of config.rules ?? []) {
+    const error = rule.validate(value, asRecord);
+    if (error) return error;
+  }
+  return undefined;
+}
+
 function computeFieldError<T extends Record<string, unknown> | object>(
   field: keyof T,
   data: T,
@@ -52,51 +98,15 @@ function computeFieldError<T extends Record<string, unknown> | object>(
   const value = data[field];
   const fieldName = String(field);
 
-  if (config.required) {
-    if (value === undefined || value === null || value === '') {
-      return `Le champ ${fieldName} est requis`;
-    }
-    if (typeof value === 'string' && !value.trim()) {
-      return `Le champ ${fieldName} est requis`;
-    }
-  }
+  if (config.required) return validateRequiredField(value, fieldName);
 
-  if (!config.required && (value === undefined || value === null || value === '')) {
-    return undefined;
-  }
+  if (isEmptyValue(value)) return undefined;
 
-  if (config.minLength && typeof value === 'string') {
-    if (value.length < config.minLength.value) {
-      return config.minLength.message;
-    }
-  }
-
-  if (config.maxLength && typeof value === 'string') {
-    if (value.length > config.maxLength.value) {
-      return config.maxLength.message;
-    }
-  }
-
-  if (config.pattern && typeof value === 'string') {
-    if (!config.pattern.regex.test(value)) {
-      return config.pattern.message;
-    }
-  }
-
-  const asRecord = data as unknown as Record<string, unknown>;
-
-  if (config.custom) {
-    return config.custom(value as T[keyof T], asRecord);
-  }
-
-  if (config.rules) {
-    for (const rule of config.rules) {
-      const error = rule.validate(value as T[keyof T], asRecord);
-      if (error) return error;
-    }
-  }
-
-  return undefined;
+  return (
+    validateLength(value, config as FieldConfig<unknown>) ??
+    validatePattern(value, config as FieldConfig<unknown>) ??
+    validateCustomRules(value, data, config as FieldConfig<unknown>)
+  );
 }
 
 export function useFormValidation<T extends object>(
@@ -110,7 +120,7 @@ export function useFormValidation<T extends object>(
     validateOnBlur = true,
   } = options;
 
-  const [formData, setFormDataState] = useState<T>(defaultValues);
+  const [formData, setFormData] = useState<T>(defaultValues);
   const [errors, setErrors] = useState<Record<string, string | undefined>>({});
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [activeStep, setActiveStep] = useState(0);
@@ -207,7 +217,7 @@ export function useFormValidation<T extends object>(
 
   const handleChange = useCallback(
     (field: keyof T, value: unknown) => {
-      setFormDataState((prev) => {
+      setFormData((prev) => {
         const next = { ...prev, [field]: value } as T;
         applyChangeErrors(next, [field]);
         return next;
@@ -218,7 +228,7 @@ export function useFormValidation<T extends object>(
 
   const handleChanges = useCallback(
     (patch: Partial<T>) => {
-      setFormDataState((prev) => {
+      setFormData((prev) => {
         const next = { ...prev, ...patch };
         applyChangeErrors(next, Object.keys(patch) as (keyof T)[]);
         return next;
@@ -243,15 +253,8 @@ export function useFormValidation<T extends object>(
     [formData, validators, validateOnBlur]
   );
 
-  // `setFormDataState` accepte déjà une valeur ou une fonction de mise à
-  // jour : le test `typeof data === 'function'` était inutile (les deux
-  // branches étaient identiques).
-  const setFormData = useCallback((data: T | ((prev: T) => T)) => {
-    setFormDataState(data);
-  }, []);
-
   const resetForm = useCallback(() => {
-    setFormDataState(defaultValues);
+    setFormData(defaultValues);
     setErrors({});
     setTouched({});
     setActiveStep(0);

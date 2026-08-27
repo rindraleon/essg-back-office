@@ -1,5 +1,5 @@
-import { apiClient } from '../api/client/http';
-import type { ActualiteItem } from '../types/actualite.types';
+import { apiClient } from '@/api';
+import type { ActualiteItem } from '@/types';
 
 type NewsApiItem = Omit<ActualiteItem, 'statut'> & {
   statut?: boolean | ActualiteItem['statut'];
@@ -7,12 +7,9 @@ type NewsApiItem = Omit<ActualiteItem, 'statut'> & {
 };
 
 function mapActualite(item: NewsApiItem): ActualiteItem {
-  const statut: ActualiteItem['statut'] =
-    item.statut === true || item.statut === 'publie'
-      ? 'publie'
-      : item.statut === 'archive'
-        ? 'archive'
-        : 'brouillon';
+  let statut: ActualiteItem['statut'] = 'brouillon';
+  if (item.statut === true || item.statut === 'publie') statut = 'publie';
+  if (item.statut === 'archive') statut = 'archive';
 
   return {
     ...item,
@@ -22,13 +19,13 @@ function mapActualite(item: NewsApiItem): ActualiteItem {
 }
 
 const getAllActualites = async (): Promise<ActualiteItem[]> => {
-  const result = await apiClient.getList<NewsApiItem>('/news', { page: 1, limit: 100 });
+  const result = await apiClient.getList<NewsApiItem>('/news', {
+    page: 1,
+    limit: 100,
+    sortBy: 'creeLe',
+    sortOrder: 'DESC',
+  });
   return result.data.map(mapActualite);
-};
-
-const getActualiteById = async (id: string): Promise<ActualiteItem> => {
-  const item = await apiClient.get<NewsApiItem>(`/news/${id}`);
-  return mapActualite(item);
 };
 
 const createActualite = async (data: Partial<ActualiteItem>): Promise<ActualiteItem> => {
@@ -39,7 +36,10 @@ const createActualite = async (data: Partial<ActualiteItem>): Promise<ActualiteI
   return mapActualite(item);
 };
 
-const updateActualite = async (id: string, data: Partial<ActualiteItem>): Promise<ActualiteItem> => {
+const updateActualite = async (
+  id: string,
+  data: Partial<ActualiteItem>
+): Promise<ActualiteItem> => {
   const item = await apiClient.put<NewsApiItem>(`/news/${id}`, {
     ...data,
     statut: data.statut === 'publie',
@@ -51,4 +51,4 @@ const deleteActualite = async (id: string): Promise<void> => {
   await apiClient.delete(`/news/${id}`);
 };
 
-export { getAllActualites, getActualiteById, createActualite, updateActualite, deleteActualite };
+export { getAllActualites, createActualite, updateActualite, deleteActualite };

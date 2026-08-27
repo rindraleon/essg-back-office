@@ -4,8 +4,8 @@ import {
   deletePartenaire,
   getAllPartenaires,
   updatePartenaire,
-} from '../../services';
-import type { PartenaireFormData } from '../../types';
+} from '@/services';
+import type { PartenaireFormData } from '@/types';
 import { queryKeys } from './keys';
 
 export function usePartenairesQuery() {

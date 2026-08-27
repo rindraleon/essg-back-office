@@ -1,29 +1,34 @@
-import { Card, CardContent } from '@/components/compat/mui';
-import React, { useState, useCallback } from 'react';
-import { toast } from 'sonner';
-import {
+import { CompatCard as Card, CompatCardContent as CardContent ,
   ProjetFilters,
   ProjetForm,
   ProjetTable,
   ProjetViewDialog,
   ConfirmDialog,
-  ListPageHeader
-} from '../../components';
-import { usePagination, useProjetFilter, useScrollToTop,useTitle,useCreateProjet, useDeleteProjet, useProjetsQuery, useUpdateProjet} from '../../hooks';
-import type { ProjetFormData, Projet } from '../../types';
-
+  ListPageHeader,
+} from '@/components';
+import React, { useState, useCallback } from 'react';
+import { toast } from 'sonner';
+import {
+  usePagination,
+  useProjetFilter,
+  useScrollToTop,
+  useTitle,
+  useCreateProjet,
+  useDeleteProjet,
+  useProjetsQuery,
+  useUpdateProjet,
+} from '@/hooks';
+import type { ProjetFormData, Projet } from '@/types';
 
 const Projets: React.FC = () => {
   useScrollToTop();
   useTitle('Projets');
-  // Data state
   const { data = [] } = useProjetsQuery();
   const createMutation = useCreateProjet();
   const updateMutation = useUpdateProjet();
   const deleteMutation = useDeleteProjet();
   const [searchTerm, setSearchTerm] = useState('');
 
-  // UI state
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [formOpen, setFormOpen] = useState(false);
   const [formMode, setFormMode] = useState<'create' | 'edit'>('create');
@@ -32,7 +37,6 @@ const Projets: React.FC = () => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [projetToDelete, setProjetToDelete] = useState<Projet | null>(null);
 
-  // Hooks
   const { filters, filteredData, updateFilter, resetFilters, activeFilterCount } = useProjetFilter({
     data,
     searchTerm,
@@ -47,7 +51,6 @@ const Projets: React.FC = () => {
     resetPage,
   } = usePagination({ data: filteredData, initialRowsPerPage: 5 });
 
-  // Handlers
   const handleSearchChange = useCallback(
     (value: string) => {
       setSearchTerm(value);
@@ -120,7 +123,6 @@ const Projets: React.FC = () => {
     setFiltersOpen((prev) => !prev);
   }, []);
 
-
   return (
     <div className="mx-auto max-w-7xl py-4 space-y-2 mx-auto min-w-0">
       <ListPageHeader
@@ -136,7 +138,6 @@ const Projets: React.FC = () => {
         onAction={handleOpenCreate}
       />
 
-      {/* Filters - Full Width Below */}
       {filtersOpen && (
         <Card variant="outlined">
           <CardContent>
@@ -152,7 +153,6 @@ const Projets: React.FC = () => {
         </Card>
       )}
 
-      {/* Table */}
       <ProjetTable
         data={paginatedData}
         totalCount={filteredData.length}
@@ -165,7 +165,6 @@ const Projets: React.FC = () => {
         onDelete={handleDeleteRequest}
       />
 
-      {/* Form Dialog (Create / Edit) */}
       <ProjetForm
         open={formOpen}
         onClose={() => setFormOpen(false)}
@@ -174,14 +173,12 @@ const Projets: React.FC = () => {
         mode={formMode}
       />
 
-      {/* View Dialog */}
       <ProjetViewDialog
         open={viewDialogOpen}
         onClose={() => setViewDialogOpen(false)}
         projet={selectedProjet}
       />
 
-      {/* Delete Confirmation Dialog */}
       <ConfirmDialog
         open={deleteDialogOpen}
         title="Supprimer le projet"

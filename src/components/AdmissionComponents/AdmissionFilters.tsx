@@ -1,16 +1,9 @@
 import { RotateCcw, X } from 'lucide-react';
-// src/components/AdmissionComponents/AdmissionFilters.tsx
 import React from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import { Button } from '../ui/button';
+import { Input } from '../ui/input';
+import { Label } from '../ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 
 interface AdmissionFiltersProps {
   filters: {
@@ -50,7 +43,7 @@ const AdmissionFilters: React.FC<AdmissionFiltersProps> = ({
           </Button>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
           <div className="space-y-2">
             <Label>Niveau</Label>
             <Select
@@ -111,12 +104,25 @@ const AdmissionFilters: React.FC<AdmissionFiltersProps> = ({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="dateDebut">Date début</Label>
+            <Label htmlFor="dateDebut">Date de début</Label>
             <Input
               id="dateDebut"
               type="date"
               value={filters.dateDebut || ''}
-              onChange={(e) => onUpdateFilter('dateDebut', e.target.value || '')}
+              max={filters.dateFin || undefined}
+              onChange={(event) => onUpdateFilter('dateDebut', event.target.value || '')}
+              className="bg-white"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="dateFin">Date de fin</Label>
+            <Input
+              id="dateFin"
+              type="date"
+              value={filters.dateFin || ''}
+              min={filters.dateDebut || undefined}
+              onChange={(event) => onUpdateFilter('dateFin', event.target.value || '')}
               className="bg-white"
             />
           </div>

@@ -23,7 +23,6 @@ export const PROJET_TYPE_COLORS: Record<
 export const DEFAULT_FORM_DATA = {
   titre: '',
   type: 'Recherche' as const,
-  // Un projet est créé en cours : le marquer terminé est une action explicite.
   statut: 'En cours' as const,
   date: new Date().toISOString().split('T')[0],
   description: '',

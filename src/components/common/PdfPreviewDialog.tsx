@@ -12,9 +12,10 @@ import {
   X,
 } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { ApiError } from '@/api/types/api';
-import type { DocumentBlob } from '@/api/client/http';
+import { Button } from '../ui/button';
+import { Dialog, DialogContent } from '../ui/dialog';
+import { ApiError } from '@/api';
+import type { DocumentBlob } from '@/api';
 import { getDocument, GlobalWorkerOptions } from 'pdfjs-dist';
 import type { PDFDocumentProxy, PDFPageProxy } from 'pdfjs-dist';
 
@@ -190,28 +191,18 @@ const PdfPreviewDialog = ({
     link.remove();
   }, [objectUrl, fileName]);
 
-  useEffect(() => {
-    if (!open) return;
-    const onKey = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') onClose();
-    };
-    document.addEventListener('keydown', onKey);
-    return () => document.removeEventListener('keydown', onKey);
-  }, [open, onClose]);
-
-  if (!open) return null;
-
   const canZoom = Boolean(objectUrl) && kind !== 'unsupported';
   const showViewer = Boolean(objectUrl) && !loading && !error;
   const showPdfToolbar = kind === 'pdf' && pdf;
 
   return (
-    <dialog
-      className="fixed inset-0 z-[70] flex items-center justify-center bg-ink-950/80 p-3 sm:p-6"
-      open
-      aria-label={title}
-    >
-      <div className="flex h-[92vh] w-full max-w-5xl flex-col overflow-hidden rounded-xl bg-white shadow-xl">
+    <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
+      <DialogContent
+        size="full"
+        showCloseButton={false}
+        aria-label={title}
+        className="h-[92dvh] max-h-[92dvh] sm:max-w-5xl"
+      >
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-ink-100 px-4 py-3">
           <h2 className="max-w-[45%] truncate text-base font-bold text-ink-900 sm:text-lg">
             {title}
@@ -365,6 +356,8 @@ const PdfPreviewDialog = ({
           {showViewer && kind === 'image' && (
             <div className="flex min-h-full items-center justify-center p-4">
               <img
+                loading="lazy"
+                decoding="async"
                 src={objectUrl as string}
                 alt={title}
                 className="mx-auto max-h-full bg-white shadow-sm"
@@ -398,8 +391,8 @@ const PdfPreviewDialog = ({
             </div>
           )}
         </div>
-      </div>
-    </dialog>
+      </DialogContent>
+    </Dialog>
   );
 };
 

@@ -1,7 +1,7 @@
 import { ChevronRight, Home } from 'lucide-react';
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { routesStatic } from '../../routes';
+import { routesStatic } from '@/routes';
 
 interface BreadcrumbItem {
   to: string;
@@ -11,7 +11,7 @@ interface BreadcrumbItem {
 
 const Breadcrumb: React.FC = () => {
   const location = useLocation();
-  const pathnames = location.pathname.split('/').filter((x) => x);
+  const pathnames = location.pathname.split('/').filter(Boolean);
 
   const breadcrumbMap: Record<string, string> = {
     home: 'Accueil',

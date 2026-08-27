@@ -1,4 +1,3 @@
-/** Une ligne d'expérience professionnelle du parcours. */
 export interface ExperienceProfessionnelle {
   poste: string;
   organisation?: string;
@@ -17,7 +16,6 @@ export interface RessourceHumaineItem {
   adresse?: string;
   photo?: string;
 
-  /* ── Parcours structuré, alimenté par l'import de CV (OCR) ── */
   experiences?: ExperienceProfessionnelle[];
   formations?: string[];
   diplomes?: string[];

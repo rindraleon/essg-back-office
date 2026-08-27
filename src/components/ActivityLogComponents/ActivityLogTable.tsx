@@ -1,8 +1,7 @@
 import { Eye } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from '../ui/button';
 import DataTable, { type Column } from '../common/DataTable';
 import type { ActivityLog } from '@/types';
-
 
 interface ActivityLogTableProps {
   data: ActivityLog[];
@@ -15,7 +14,6 @@ interface ActivityLogTableProps {
   emptyMessage?: string;
 }
 
-/** Libellés métier des actions (aucun terme technique en colonne). */
 const ACTION_LABELS: Record<string, string> = {
   create: 'Création',
   update: 'Modification',
@@ -23,7 +21,6 @@ const ACTION_LABELS: Record<string, string> = {
   status: 'Changement de statut',
 };
 
-/** Libellés métier des modules. */
 const MODULE_LABELS: Record<string, string> = {
   users: 'Utilisateurs',
   admissions: 'Admissions',

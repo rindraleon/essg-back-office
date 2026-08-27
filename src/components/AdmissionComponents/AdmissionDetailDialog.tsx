@@ -7,15 +7,14 @@ import {
   Mail,
   Trash2,
   User as UserIcon,
-  X,
 } from 'lucide-react';
 import React from 'react';
-import type { Admission, AdmissionFile } from '../../types/admission.types';
-import { ADMISSION_FILE_TYPE_LABELS } from '../../types/admission.types';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { formatFullName } from '../../utils/name.utils';
-import { formatFileSize, getFileExtension } from '../../utils/admission.utils';
+import type { Admission, AdmissionFile } from '@/types';
+import { ADMISSION_FILE_TYPE_LABELS } from '@/types';
+import { Badge } from '../ui/badge';
+import { Button } from '../ui/button';
+import { Dialog, DialogBody, DialogContent, DialogFooter, DialogHeader } from '../ui/dialog';
+import { formatFullName , formatFileSize, getFileExtension } from '@/utils';
 
 interface AdmissionDetailDialogProps {
   admission: Admission;
@@ -89,8 +88,6 @@ const AdmissionDetailDialog: React.FC<AdmissionDetailDialogProps> = ({
   onPreviewFile,
   onDeleteFile,
 }) => {
-  if (!open) return null;
-
   const files = admission.files ?? [];
   const statutBadge = (
     <Badge variant={getStatusColor(admission.statut)} className="text-xs">
@@ -99,27 +96,17 @@ const AdmissionDetailDialog: React.FC<AdmissionDetailDialogProps> = ({
   );
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink-900/70 p-4">
-      <div className="max-h-[92vh] w-full max-w-4xl overflow-y-auto rounded-2xl bg-white shadow-2xl">
-        <div className="sticky top-0 z-10 flex items-center justify-between border-b border-ink-100 bg-white px-6 py-4">
-          <div className="min-w-0">
-            <h2 className="text-xl font-bold text-ink-900">Détails de la candidature</h2>
-            <p className="truncate text-sm text-ink-500">
-              Référence ESSG-{admission.id} · Déposée le{' '}
-              {new Date(admission.creeLe).toLocaleDateString('fr-FR')}
-            </p>
-          </div>
-          <button
-            onClick={onClose}
-            className="rounded-lg p-2 text-ink-400 transition-colors hover:bg-ink-100 hover:text-ink-600"
-            type="button"
-            aria-label="Fermer"
-          >
-            <X className="size-5" />
-          </button>
-        </div>
+    <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
+      <DialogContent size="2xl">
+        <DialogHeader
+          icon={<FileText aria-hidden="true" />}
+          title="Détails de la candidature"
+          description={`Référence ESSG-${admission.id} · Déposée le ${new Date(
+            admission.creeLe
+          ).toLocaleDateString('fr-FR')}`}
+        />
 
-        <div className="space-y-8 p-6">
+        <DialogBody className="space-y-8">
           <Section icon={<UserIcon className="size-4" />} title="Informations personnelles">
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <Field label="Nom complet" value={formatFullName(admission)} />
@@ -129,6 +116,9 @@ const AdmissionDetailDialog: React.FC<AdmissionDetailDialogProps> = ({
                 label="Date de naissance"
                 value={new Date(admission.dateNaissance).toLocaleDateString('fr-FR')}
               />
+              <Field label="Lieu de naissance" value={admission.lieuNaissance} />
+              <Field label="Nationalité" value={admission.nationalite} />
+              <Field label="Sexe" value={admission.sexe} />
               <div className="md:col-span-2">
                 <Field label="Adresse" value={admission.adresse} />
               </div>
@@ -137,14 +127,23 @@ const AdmissionDetailDialog: React.FC<AdmissionDetailDialogProps> = ({
 
           <Section icon={<GraduationCap className="size-4" />} title="Informations académiques">
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <Field label="Formation souhaitée" value={admission.formation} />
               <Field label="Niveau" value={admission.niveau} />
-              <Field label="Dernier diplôme obtenu" value={admission.diplomePrecedent} />
+              <Field label="Mention" value={admission.mention} />
               <Field
-                label="Numéro d'inscription au baccalauréat"
-                value={admission.numeroBaccalaureat}
+                label="Parcours / formation"
+                value={admission.formation || admission.parcours}
               />
-              <Field label="Établissement de la Licence" value={admission.licenceEtablissement} />
+              <Field label="Type de Bac" value={admission.bacType} />
+              <Field label="Série du Bac" value={admission.bacSerie} />
+              <Field label="Catégorie du Bac" value={admission.bacCategorie} />
+              <Field label="Numéro d'inscription au Bac" value={admission.numeroBaccalaureat} />
+              <Field label="Année d'obtention du Bac" value={admission.bacAnneeObtention} />
+              <Field label="Centre d'examen du Bac" value={admission.bacCentreExamen} />
+              <Field
+                label="Ancien établissement"
+                value={admission.ancienEtablissement || admission.licenceEtablissement}
+              />
+              <Field label="Numéro matricule" value={admission.numeroMatricule} />
               <Field label="Mention de la Licence" value={admission.licenceMention} />
               <Field
                 label="Année d'obtention de la Licence"
@@ -222,19 +221,19 @@ const AdmissionDetailDialog: React.FC<AdmissionDetailDialogProps> = ({
               Les fichiers sont consultables directement dans le back-office.
             </p>
           </Section>
+        </DialogBody>
 
-          <div className="flex flex-col gap-3 border-t border-ink-100 pt-4 sm:flex-row">
-            <Button onClick={onEditStatus} className="flex-1 bg-brand-600 hover:bg-brand-700">
-              <BadgeCheck className="mr-2 size-4" />
-              Modifier le statut
-            </Button>
-            <Button onClick={onClose} variant="outline" className="flex-1">
-              Fermer
-            </Button>
-          </div>
-        </div>
-      </div>
-    </div>
+        <DialogFooter>
+          <Button onClick={onClose} variant="outline">
+            Fermer
+          </Button>
+          <Button onClick={onEditStatus}>
+            <BadgeCheck className="size-4" aria-hidden="true" />
+            Modifier le statut
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 };
 

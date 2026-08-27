@@ -1,12 +1,11 @@
 import { Eye, Pencil, Trash2 } from 'lucide-react';
-// src/components/actualites/ActualiteTable.tsx
 import React from 'react';
-import type { ActualiteItem } from '../../types/actualite.types';
+import type { ActualiteItem } from '@/types';
 import DataTable from '../common/DataTable';
 import type { Column } from '../common/DataTable';
 import StatusBadge from '../common/StatusBadge';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { Badge } from '../ui/badge';
+import { Button } from '../ui/button';
 
 interface ActualiteTableProps {
   data: ActualiteItem[];

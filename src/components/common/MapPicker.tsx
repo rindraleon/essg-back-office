@@ -1,10 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Locate, MapPin, Pencil } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
-import 'leaflet/dist/leaflet.css';
-import { FloatingInput } from '@/components/ui/floating-input';
-import { Button } from '@/components/ui/button';
+import { FloatingInput } from '../ui/floating-input';
+import { Button } from '../ui/button';
 
 delete (L.Icon.Default.prototype as any)._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -37,11 +37,11 @@ const MapPicker: React.FC<MapPickerProps> = ({
   onLocationChange,
   label = 'Sélectionner un emplacement sur la carte',
 }) => {
-  const lat = typeof latitude === 'string' ? parseFloat(latitude) : latitude;
-  const lng = typeof longitude === 'string' ? parseFloat(longitude) : longitude;
+  const lat = typeof latitude === 'string' ? Number.parseFloat(latitude) : latitude;
+  const lng = typeof longitude === 'string' ? Number.parseFloat(longitude) : longitude;
 
   const [position, setPosition] = useState<[number, number]>(
-    lat && lng ? [lat, lng] : [48.8566, 2.3522] // Paris par défaut
+    lat && lng ? [lat, lng] : [48.8566, 2.3522]
   );
   const [manualLat, setManualLat] = useState<string>('');
   const [manualLng, setManualLng] = useState<string>('');
@@ -57,8 +57,8 @@ const MapPicker: React.FC<MapPickerProps> = ({
 
   const handleManualLatChange = (value: string) => {
     setManualLat(value);
-    const lat = parseFloat(value);
-    if (!isNaN(lat) && lat >= -90 && lat <= 90) {
+    const lat = Number.parseFloat(value);
+    if (!Number.isNaN(lat) && lat >= -90 && lat <= 90) {
       const lng = position[1];
       setPosition([lat, lng]);
       onLocationChange(lat, lng);
@@ -69,7 +69,7 @@ const MapPicker: React.FC<MapPickerProps> = ({
   const handleManualLngChange = (value: string) => {
     setManualLng(value);
     const lng = Number.parseFloat(value);
-    if (!isNaN(lng) && lng >= -180 && lng <= 180) {
+    if (!Number.isNaN(lng) && lng >= -180 && lng <= 180) {
       const lat = position[0];
       setPosition([lat, lng]);
       onLocationChange(lat, lng);

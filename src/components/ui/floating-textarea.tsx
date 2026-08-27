@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { cn } from '@/lib/utils';
+import { cn } from '@/lib';
 
 export interface FloatingTextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
   label: string;
@@ -32,7 +32,9 @@ const FloatingTextarea = React.forwardRef<HTMLTextAreaElement, FloatingTextareaP
           htmlFor={id}
           className={cn(
             'pointer-events-none absolute left-3 origin-[0] transition-all duration-200',
-            hasValue ? 'top-0 bg-white px-1 text-xs font-bold text-brand-700' : 'top-5 text-sm text-ink-400',
+            hasValue
+              ? 'top-0 bg-white px-1 text-xs font-bold text-brand-700'
+              : 'top-5 text-sm text-ink-400',
             'peer-focus:top-0 peer-focus:bg-white peer-focus:px-1 peer-focus:text-xs peer-focus:font-bold',
             'peer-[:not(:placeholder-shown)]:top-0 peer-[:not(:placeholder-shown)]:bg-white peer-[:not(:placeholder-shown)]:px-1 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:font-bold',
             error ? 'text-red-500 peer-focus:text-red-500' : 'peer-focus:text-brand-700'

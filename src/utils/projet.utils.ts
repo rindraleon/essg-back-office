@@ -1,14 +1,10 @@
-import { PROJET_TYPE_COLORS } from '../constants/projet.constants';
-import type { Projet } from '../types/projet.types';
+import { PROJET_TYPE_COLORS } from '@/constants';
+import type { Projet } from '@/types';
 
 export const getTypeColor = (
   type: string
 ): 'primary' | 'secondary' | 'success' | 'warning' | 'info' => {
   return PROJET_TYPE_COLORS[type] || 'info';
-};
-
-export const formatDate = (dateString: string): string => {
-  return new Date(dateString).toLocaleDateString('fr-FR');
 };
 
 export const normalizeSourceUrl = (url: string): string => {

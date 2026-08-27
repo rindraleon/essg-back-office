@@ -6,7 +6,7 @@ import {
   searchMessages,
   updateMessage,
   type PaginationQuery,
-} from '../../services';
+} from '@/services';
 import { queryKeys } from './keys';
 
 export function useRecentMessagesQuery(limit = 4, enabled = true) {
@@ -32,10 +32,7 @@ export function useMessagesQuery(query: PaginationQuery & { q?: string } = {}) {
 
   return useQuery({
     queryKey: queryKeys.messages.list(params),
-    queryFn: () =>
-      params.q
-        ? searchMessages(params.q, params)
-        : getAllMessages(params),
+    queryFn: () => (params.q ? searchMessages(params.q, params) : getAllMessages(params)),
   });
 }
 
@@ -52,15 +49,8 @@ export function useMarkMessageRead() {
 export function useReplyToMessage() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({
-      id,
-      sujet,
-      message,
-    }: {
-      id: number;
-      sujet?: string;
-      message: string;
-    }) => replyToMessage(id, { sujet, message }),
+    mutationFn: ({ id, sujet, message }: { id: number; sujet?: string; message: string }) =>
+      replyToMessage(id, { sujet, message }),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: queryKeys.messages.all });
     },

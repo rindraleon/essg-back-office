@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { getSettings, updateSettings } from '../../services/settings.service';
+import { getSettings, updateSettings } from '@/services';
 import { queryKeys } from './keys';
 
 export function useSettingsQuery() {

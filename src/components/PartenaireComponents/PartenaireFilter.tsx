@@ -1,17 +1,11 @@
 import { RotateCcw, X } from 'lucide-react';
 import React from 'react';
-import type { PartenaireFilterOptions } from '../../types/partenaire.types';
-import { PARTENAIRE_TYPES } from '../../constants/partenaire.constants';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import type { PartenaireFilterOptions } from '@/types';
+import { PARTENAIRE_TYPES } from '@/constants';
+import { Button } from '../ui/button';
+import { Input } from '../ui/input';
+import { Label } from '../ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 
 interface PartenaireFiltersProps {
   filters: PartenaireFilterOptions;

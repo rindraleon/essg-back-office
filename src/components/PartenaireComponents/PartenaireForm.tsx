@@ -1,27 +1,17 @@
 import { ArrowLeft, ArrowRight, Briefcase, CircleCheck, Globe, Info, Upload } from 'lucide-react';
 import React, { useRef, useState, useEffect } from 'react';
 import { toast } from 'sonner';
-import { getImageUrl } from '../../utils/image.utils';
-import { toUpperName } from '../../utils/slug.utils';
-import { uploadImage } from '../../services';
-import type { Partenaire, PartenaireFormData } from '../../types';
-import {
-  PARTENAIRE_TYPES,
-  DEFAULT_PARTENAIRE_FORM_DATA,
-} from '../../constants/partenaire.constants';
-import { useFormValidation } from '../../hooks/useFormValidation';
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from '@/components/ui/dialog';
-import { FloatingInput } from '@/components/ui/floating-input';
-import { FloatingTextarea } from '@/components/ui/floating-textarea';
-import { FloatingSelect } from '@/components/ui/floating-select';
+import { getImageUrl , toUpperName } from '@/utils';
+import { uploadImage } from '@/services';
+import type { Partenaire, PartenaireFormData } from '@/types';
+import { PARTENAIRE_TYPES, DEFAULT_PARTENAIRE_FORM_DATA } from '@/constants';
+import { useFormValidation } from '@/hooks';
+import { Button } from '../ui/button';
+import { Label } from '../ui/label';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../ui/dialog';
+import { FloatingInput } from '../ui/floating-input';
+import { FloatingTextarea } from '../ui/floating-textarea';
+import { FloatingSelect } from '../ui/floating-select';
 
 interface PartenaireFormProps {
   open: boolean;
@@ -105,8 +95,6 @@ const PartenaireForm: React.FC<PartenaireFormProps> = ({
       setFormData({
         nom: initialData.nom || '',
         type: initialData.type || 'Entreprise',
-        // Le secteur provient désormais correctement de l'API
-        // (cf. correctif dans services/partenaires.service.ts).
         secteur: initialData.secteur ?? '',
         dateDebut: initialData.dateDebut || new Date().toISOString().split('T')[0],
         description: initialData.description || '',
@@ -140,7 +128,6 @@ const PartenaireForm: React.FC<PartenaireFormProps> = ({
       toast.error(message);
     } finally {
       setUploadingImage(false);
-      // Permet de re-sélectionner le même fichier après une erreur.
       e.target.value = '';
     }
   };
@@ -173,8 +160,6 @@ const PartenaireForm: React.FC<PartenaireFormProps> = ({
     if (submitting || !validateAllSteps()) return;
     setSubmitting(true);
     try {
-      // L'upload du logo est déjà effectué par `uploadImage` : le formulaire
-      // n'envoie qu'une URL, plus de FormData ni d'input d'URL manuelle.
       await onSubmit(formData);
     } finally {
       setSubmitting(false);
@@ -183,7 +168,6 @@ const PartenaireForm: React.FC<PartenaireFormProps> = ({
 
   const dialogTitle = mode === 'create' ? 'Nouveau partenaire' : 'Modifier le partenaire';
 
-  /* ─── Step 0 : Informations générales ─── */
   const renderStep0 = () => (
     <div className="space-y-4">
       <FloatingInput
@@ -226,7 +210,6 @@ const PartenaireForm: React.FC<PartenaireFormProps> = ({
     </div>
   );
 
-  /* ─── Step 1 : Détails ─── */
   const renderStep1 = () => (
     <div className="space-y-4">
       <FloatingTextarea
@@ -240,12 +223,13 @@ const PartenaireForm: React.FC<PartenaireFormProps> = ({
         hint={!errors.description ? `${formData.description.length} caractère(s)` : undefined}
       />
 
-      {/* Logo */}
       <div className="space-y-2">
         <Label className="text-xs font-semibold text-ink-600 uppercase tracking-wide">Logo</Label>
         <div className="flex items-start gap-3">
           {logoPreview && (
             <img
+              loading="lazy"
+              decoding="async"
               src={logoPreview}
               alt="Aperçu"
               className="w-20 h-20 object-cover rounded-md border border-ink-100 shrink-0"
@@ -273,12 +257,10 @@ const PartenaireForm: React.FC<PartenaireFormProps> = ({
             <span className="text-[10px] text-ink-400">JPG, PNG, GIF, WebP — max 5 Mo</span>
           </div>
         </div>
-
       </div>
     </div>
   );
 
-  /* ─── Step 2 : Publication ─── */
   const renderStep2 = () => (
     <div className="space-y-1">
       <FloatingInput
@@ -314,10 +296,8 @@ const PartenaireForm: React.FC<PartenaireFormProps> = ({
           p-0
           gap-0
           overflow-hidden
-          [&>button]:hidden
         "
       >
-        {/* ─── Header + Stepper ─── */}
         <DialogHeader className="px-5 pt-4 pb-3 border-b bg-ink-50/80">
           <DialogTitle className="text-lg font-bold text-ink-900">{dialogTitle}</DialogTitle>
 
@@ -360,10 +340,8 @@ const PartenaireForm: React.FC<PartenaireFormProps> = ({
           </div>
         </DialogHeader>
 
-        {/* ─── Body ─── */}
         <div className="px-5 py-4 overflow-y-auto max-h-[58vh]">{stepRenderers[activeStep]()}</div>
 
-        {/* ─── Footer ─── */}
         <DialogFooter className="px-5 py-3 mb-4 mx-4 border-t bg-ink-50/80">
           <div className="flex items-center justify-between w-full">
             <span className="text-xs text-ink-400">
@@ -395,22 +373,12 @@ const PartenaireForm: React.FC<PartenaireFormProps> = ({
               )}
 
               {activeStep < STEPS.length - 1 ? (
-                <Button
-                  type="button"
-                  size="sm"
-                  onClick={handleNext}
-                  disabled={submitting}
-                >
+                <Button type="button" size="sm" onClick={handleNext} disabled={submitting}>
                   Suivant
                   <ArrowRight className="h-3.5 w-3.5" />
                 </Button>
               ) : (
-                <Button
-                  type="button"
-                  size="sm"
-                  onClick={handleSubmit}
-                  disabled={submitting}
-                >
+                <Button type="button" size="sm" onClick={handleSubmit} disabled={submitting}>
                   <CircleCheck className="h-3.5 w-3.5" />
                   {submitting ? 'Enregistrement…' : mode === 'create' ? 'Créer' : 'Enregistrer'}
                 </Button>

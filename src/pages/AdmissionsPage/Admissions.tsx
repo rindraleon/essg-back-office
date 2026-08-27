@@ -1,29 +1,36 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from 'react';
+import { Download, LoaderCircle } from 'lucide-react';
 import { toast } from 'sonner';
-import { Button } from '@/components/ui/button';
-import { ApiError } from '@/api/types/api';
-import ListPageHeader from '../../components/common/ListPageHeader';
-import {
+import { Button ,
+  ListPageHeader,
   AdmissionFilters,
   ConfirmDialog,
   AdmissionTable,
   AdmissionDetailDialog,
   AdmissionDecisionDialog,
-  PdfPreviewDialog,
-} from '../../components';
-import { useDebounce, useScrollToTop } from '../../hooks';
+} from '@/components';
+import { ApiError } from '@/api';
 import {
+  useDebounce,
+  useScrollToTop,
   useAdmissionDetailQuery,
   useAdmissionsQuery,
   useDeleteAdmission,
   useDeleteAdmissionFile,
   useUpdateAdmissionStatus,
-} from '../../hooks/queries';
-import { getAdmissionFileBlob } from '../../services/admissions.service';
-import { useTitle } from '../../hooks/useTitle';
-import type { Admission, AdmissionFile, AdmissionStatus } from '../../types/admission.types';
-import { ADMISSION_FILE_TYPE_LABELS } from '../../types/admission.types';
-import { formatFullName } from '../../utils/name.utils';
+  useTitle,
+} from '@/hooks';
+import { getAdmissionFileBlob } from '@/services';
+import { ADMISSION_PARCOURS } from '@/constants';
+import { exportAdmissionsByParcours, formatFullName } from '@/utils';
+import {
+  type Admission,
+  type AdmissionFile,
+  type AdmissionStatus,
+  ADMISSION_FILE_TYPE_LABELS,
+} from '@/types';
+
+const PdfPreviewDialog = lazy(() => import('@/components/common/PdfPreviewDialog'));
 
 const ITEMS_PER_PAGE = 10;
 
@@ -38,6 +45,7 @@ const Admissions = () => {
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [showStatusModal, setShowStatusModal] = useState(false);
   const [updating, setUpdating] = useState(false);
+  const [exporting, setExporting] = useState(false);
   const [detailId, setDetailId] = useState<number | null>(null);
   const [preview, setPreview] = useState<{ admission: Admission; file: AdmissionFile } | null>(
     null
@@ -54,15 +62,17 @@ const Admissions = () => {
   const [filterNiveau, setFilterNiveau] = useState('all');
   const [filterFormation, setFilterFormation] = useState('all');
   const [filterDateDebut, setFilterDateDebut] = useState('');
+  const [filterDateFin, setFilterDateFin] = useState('');
 
   const activeFilterCount = [
     filterStatus !== 'all',
     filterNiveau !== 'all',
     filterFormation !== 'all',
     Boolean(filterDateDebut),
+    Boolean(filterDateFin),
   ].filter(Boolean).length;
 
-  const { data, isError, error, refetch } = useAdmissionsQuery({
+  const { data, isLoading, isError, error, refetch } = useAdmissionsQuery({
     page: currentPage + 1,
     limit: rowsPerPage,
     q: debouncedSearch || undefined,
@@ -70,6 +80,9 @@ const Admissions = () => {
     niveau: filterNiveau,
     formation: filterFormation,
     dateDebut: filterDateDebut || undefined,
+    dateFin: filterDateFin || undefined,
+    sortBy: 'creeLe',
+    sortOrder: 'DESC',
   });
   const updateStatusMutation = useUpdateAdmissionStatus();
   const deleteMutation = useDeleteAdmission();
@@ -85,15 +98,22 @@ const Admissions = () => {
   );
   const formations = useMemo(
     () =>
-      Array.from(new Set(admissions.map((item) => item.formation))).sort((a, b) =>
-        a.localeCompare(b)
-      ),
+      Array.from(
+        new Set([...ADMISSION_PARCOURS, ...admissions.map((item) => item.formation)])
+      ).sort((a, b) => a.localeCompare(b)),
     [admissions]
   );
 
   useEffect(() => {
     setCurrentPage(0);
-  }, [debouncedSearch, filterStatus, filterNiveau, filterFormation, filterDateDebut]);
+  }, [
+    debouncedSearch,
+    filterStatus,
+    filterNiveau,
+    filterFormation,
+    filterDateDebut,
+    filterDateFin,
+  ]);
 
   const handleResetFilters = useCallback(() => {
     setSearchTerm('');
@@ -101,6 +121,7 @@ const Admissions = () => {
     setFilterNiveau('all');
     setFilterFormation('all');
     setFilterDateDebut('');
+    setFilterDateFin('');
     setCurrentPage(0);
   }, []);
 
@@ -172,13 +193,39 @@ const Admissions = () => {
     }
   };
 
+  const handleExport = async () => {
+    if (filterFormation === 'all') {
+      toast.error("Sélectionnez d'abord un parcours dans les filtres.");
+      setFiltersOpen(true);
+      return;
+    }
+    setExporting(true);
+    try {
+      const count = await exportAdmissionsByParcours(filterFormation, {
+        q: debouncedSearch || undefined,
+        statut: filterStatus,
+        niveau: filterNiveau,
+        dateDebut: filterDateDebut || undefined,
+        dateFin: filterDateFin || undefined,
+      });
+      toast.success(
+        `${count} candidature${count !== 1 ? 's' : ''} exportée${count !== 1 ? 's' : ''}.`
+      );
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Impossible de générer l'export Excel.");
+    } finally {
+      setExporting(false);
+    }
+  };
+
   function getEmptyMessage(): string | undefined {
     const hasSearch = Boolean(searchTerm.trim());
     const hasFilters =
       filterStatus !== 'all' ||
       filterNiveau !== 'all' ||
       filterFormation !== 'all' ||
-      Boolean(filterDateDebut.trim());
+      Boolean(filterDateDebut.trim()) ||
+      Boolean(filterDateFin.trim());
 
     if (hasSearch || hasFilters) {
       return 'Aucune admission ne correspond à votre recherche ou aux filtres appliqués.';
@@ -197,7 +244,27 @@ const Admissions = () => {
         searchPlaceholder="Rechercher par nom, prénom, email, téléphone..."
         onToggleFilters={() => setFiltersOpen((prev) => !prev)}
         filtersOpen={filtersOpen}
-      />
+        activeFilterCount={activeFilterCount}
+      >
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => void handleExport()}
+          disabled={exporting || filterFormation === 'all'}
+          title={
+            filterFormation === 'all'
+              ? "Sélectionnez d'abord un parcours"
+              : `Exporter ${filterFormation}`
+          }
+        >
+          {exporting ? (
+            <LoaderCircle className="size-4 animate-spin" />
+          ) : (
+            <Download className="size-4" />
+          )}
+          Exporter Excel
+        </Button>
+      </ListPageHeader>
 
       <AdmissionFilters
         filters={{
@@ -206,12 +273,14 @@ const Admissions = () => {
           niveau: filterNiveau,
           formation: filterFormation,
           dateDebut: filterDateDebut,
+          dateFin: filterDateFin,
         }}
         onUpdateFilter={(key, value) => {
           if (key === 'status') setFilterStatus(value);
           if (key === 'niveau') setFilterNiveau(value);
           if (key === 'formation') setFilterFormation(value);
           if (key === 'dateDebut') setFilterDateDebut(value);
+          if (key === 'dateFin') setFilterDateFin(value);
         }}
         onResetFilters={handleResetFilters}
         activeFilterCount={activeFilterCount}
@@ -235,6 +304,7 @@ const Admissions = () => {
         totalCount={totalItems}
         page={currentPage}
         rowsPerPage={rowsPerPage}
+        loading={isLoading}
         onPageChange={setCurrentPage}
         onRowsPerPageChange={(rows) => {
           setRowsPerPage(rows);
@@ -284,20 +354,18 @@ const Admissions = () => {
         />
       )}
 
-      {preview &&
-        (() => {
-          const title = `${ADMISSION_FILE_TYPE_LABELS[preview.file.type] ?? 'Document'} — ${formatFullName(preview.admission)}`;
-          return (
-            <PdfPreviewDialog
-              open={true}
-              title={title}
-              fileName={preview.file.originalName || 'document'}
-              loadDocument={loadPreview}
-              onClose={() => setPreview(null)}
-              showDownload={false}
-            />
-          );
-        })()}
+      {preview && (
+        <Suspense fallback={null}>
+          <PdfPreviewDialog
+            open={true}
+            title={`${ADMISSION_FILE_TYPE_LABELS[preview.file.type] ?? 'Document'} — ${formatFullName(preview.admission)}`}
+            fileName={preview.file.originalName || 'document'}
+            loadDocument={loadPreview}
+            onClose={() => setPreview(null)}
+            showDownload={true}
+          />
+        </Suspense>
+      )}
 
       <ConfirmDialog
         open={Boolean(fileToDelete)}

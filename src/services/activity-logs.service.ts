@@ -1,8 +1,8 @@
 import type { ActivityLog, ActivityLogQuery, ActivityLogsListResponse } from '@/types';
-import { apiClient } from '../api/client/http';
+import { apiClient } from '@/api';
 
 export const getActivityLogs = async (
-  query: ActivityLogQuery = {},
+  query: ActivityLogQuery = {}
 ): Promise<ActivityLogsListResponse> => {
   const result = await apiClient.getList<ActivityLog>('/activity-logs', {
     page: query.page ?? 1,
@@ -29,11 +29,6 @@ export const getActivityLogs = async (
   };
 };
 
-export const getActivityLogById = async (id: number): Promise<ActivityLog> => {
-  return apiClient.get<ActivityLog>(`/activity-logs/${id}`);
-};
-
 export default {
   getActivityLogs,
-  getActivityLogById,
 };

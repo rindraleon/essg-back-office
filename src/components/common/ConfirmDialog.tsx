@@ -1,7 +1,9 @@
-import { CircleAlert, Info, TriangleAlert } from 'lucide-react';
+import { CircleAlert, Info, Loader2, TriangleAlert } from 'lucide-react';
 import React from 'react';
-import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Button } from '../ui/button';
+import { Dialog, DialogBody, DialogContent, DialogFooter, DialogHeader } from '../ui/dialog';
+
+type ConfirmSeverity = 'warning' | 'error' | 'info';
 
 interface ConfirmDialogProps {
   open: boolean;
@@ -9,10 +11,33 @@ interface ConfirmDialogProps {
   message: React.ReactNode;
   confirmLabel?: string;
   cancelLabel?: string;
-  onConfirm: () => void;
+  onConfirm: () => void | Promise<void>;
   onCancel: () => void;
-  severity?: 'warning' | 'error' | 'info';
+  severity?: ConfirmSeverity;
+  loading?: boolean;
+  loadingLabel?: string;
 }
+
+const SEVERITY_STYLES: Record<
+  ConfirmSeverity,
+  { icon: React.ReactNode; iconWrapper: string; confirmVariant: 'default' | 'destructive' }
+> = {
+  error: {
+    icon: <CircleAlert aria-hidden="true" />,
+    iconWrapper: 'bg-destructive/10 text-destructive',
+    confirmVariant: 'destructive',
+  },
+  warning: {
+    icon: <TriangleAlert aria-hidden="true" />,
+    iconWrapper: 'bg-sage-100 text-sage-700',
+    confirmVariant: 'default',
+  },
+  info: {
+    icon: <Info aria-hidden="true" />,
+    iconWrapper: 'bg-brand-50 text-brand-700',
+    confirmVariant: 'default',
+  },
+};
 
 const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
   open,
@@ -23,64 +48,51 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
   onConfirm,
   onCancel,
   severity = 'warning',
+  loading = false,
+  loadingLabel,
 }) => {
-  const getIcon = () => {
-    const iconClass = 'h-5 w-5';
-    switch (severity) {
-      case 'error':
-        return <CircleAlert className={`${iconClass} text-red-500`} />;
-      case 'warning':
-        return <TriangleAlert className={`${iconClass} text-sage-500`} />;
-      case 'info':
-        return <Info className={`${iconClass} text-brand-500`} />;
-      default:
-        return <TriangleAlert className={`${iconClass} text-sage-500`} />;
+  const [pending, setPending] = React.useState(false);
+  const busy = loading || pending;
+  const { icon, iconWrapper, confirmVariant } = SEVERITY_STYLES[severity];
+
+  const handleConfirm = async () => {
+    if (busy) return;
+    try {
+      setPending(true);
+      await onConfirm();
+    } finally {
+      setPending(false);
     }
   };
 
   return (
-    <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onCancel()}>
-      <DialogContent
-        className="
-          !max-w-[calc(100%-1rem)]
-          sm:!max-w-md
-          gap-0
-          overflow-hidden
-          rounded-2xl
-          border border-ink-100
-          bg-white
-          p-0
-          shadow-lg
-          [&>button]:hidden
-        "
-      >
-        <div className="flex min-h-0 flex-col">
-          <DialogHeader className="shrink-0 border-b border-ink-100 bg-white px-5 py-4 lg:px-6">
-            <div className="flex items-start justify-between gap-4">
-              <div className="min-w-0">
-                <DialogTitle className="flex items-center gap-2 text-xl font-bold text-ink-900">
-                  {getIcon()}
-                  {title}
-                </DialogTitle>
-              </div>
-            </div>
-          </DialogHeader>
+    <Dialog
+      open={open}
+      onOpenChange={(isOpen) => {
+        if (!isOpen && !busy) onCancel();
+      }}
+    >
+      <DialogContent size="md" showCloseButton={!busy} role="alertdialog">
+        <DialogHeader icon={icon} iconClassName={iconWrapper} title={title} />
 
-          <div className="px-6 py-4">
-            <div className="text-base leading-relaxed text-ink-700">{message}</div>
-          </div>
+        <DialogBody className="space-y-3">
+          <div className="text-sm leading-relaxed text-ink-700">{message}</div>
+        </DialogBody>
 
-          <div className="flex shrink-0 items-center justify-end border-t border-ink-100 bg-white px-5 py-4 lg:px-6">
-            <div className="flex justify-end gap-2">
-              <Button onClick={onCancel} variant="outline" className="rounded-xl">
-                {cancelLabel}
-              </Button>
-              <Button onClick={onConfirm} className="rounded-xl">
-                {confirmLabel}
-              </Button>
-            </div>
-          </div>
-        </div>
+        <DialogFooter>
+          <Button variant="outline" onClick={onCancel} disabled={busy}>
+            {cancelLabel}
+          </Button>
+          <Button
+            variant={confirmVariant}
+            onClick={() => void handleConfirm()}
+            disabled={busy}
+            aria-busy={busy}
+          >
+            {busy && <Loader2 className="size-4 animate-spin" aria-hidden="true" />}
+            {busy ? (loadingLabel ?? 'Traitement en cours…') : confirmLabel}
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

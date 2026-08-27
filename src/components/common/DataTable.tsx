@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { Inbox } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from '../ui/button';
 
 export interface Column<T> {
   id: string;
@@ -43,14 +43,10 @@ function DataTableInner<T>({
   const getRowKey = (row: T, index: number): string | number =>
     rowKey ? (rowKey.get(row) ?? index) : index;
 
-  // Colonne d'actions (id === 'actions') — placée en pied de carte sur mobile
   const actionColumn = columns.find((col) => col.id === 'actions') ?? null;
 
-  // Colonnes « information » (tout sauf les actions)
   const infoColumns = columns.filter((col) => col.id !== 'actions');
 
-  // Si la première colonne est compacte (avatar/photo), on la fusionne avec la
-  // suivante pour composer le « titre principal » de la carte mobile.
   const firstColumnSmall = (columns[0]?.minWidth ?? 0) < 120;
   const headerColumns = infoColumns.slice(0, firstColumnSmall ? 2 : 1);
   const bodyColumns = infoColumns.slice(headerColumns.length);
@@ -64,7 +60,6 @@ function DataTableInner<T>({
 
   return (
     <div className="min-w-0 space-y-3">
-      {/* ---------- Vue Desktop : tableau classique ---------- */}
       <div className="hidden max-w-full overflow-hidden rounded-xl border border-ink-100 bg-white shadow-card lg:block">
         <div className="overflow-x-auto">
           <table className="w-full">
@@ -106,7 +101,6 @@ function DataTableInner<T>({
         </div>
       </div>
 
-      {/* ---------- Vue Mobile : chaque ligne devient une carte ---------- */}
       <div className="space-y-3 lg:hidden">
         {data.length === 0 ? (
           <div className="rounded-xl border border-ink-100 bg-white shadow-card">
@@ -118,7 +112,6 @@ function DataTableInner<T>({
               key={getRowKey(row, index)}
               className="overflow-hidden rounded-xl border border-ink-100 bg-white shadow-card transition-all duration-200 hover:border-brand-200 hover:shadow-card-hover"
             >
-              {/* Titre principal */}
               <div className="flex items-start gap-3 px-4 pt-4">
                 {headerColumns.map((column) => (
                   <div key={column.id} className="min-w-0 flex-1">
@@ -127,7 +120,6 @@ function DataTableInner<T>({
                 ))}
               </div>
 
-              {/* Informations secondaires */}
               {bodyColumns.length > 0 && (
                 <div className="grid grid-cols-2 gap-x-4 gap-y-3 px-4 pt-4">
                   {bodyColumns.map((column) => (
@@ -143,7 +135,6 @@ function DataTableInner<T>({
                 </div>
               )}
 
-              {/* Actions */}
               {actionColumn && (
                 <div className="mt-3 flex items-center justify-end gap-1 border-t border-ink-100 bg-ink-50/60 px-4 py-2.5">
                   {actionColumn.render(row)}
@@ -154,7 +145,6 @@ function DataTableInner<T>({
         )}
       </div>
 
-      {/* ---------- Pagination ---------- */}
       {totalCount > 0 && (
         <div className="flex flex-col gap-3 rounded-xl border border-ink-100 bg-white px-4 py-3 shadow-card sm:flex-row sm:items-center sm:justify-between">
           <div className="flex flex-wrap items-center gap-3">
@@ -163,7 +153,6 @@ function DataTableInner<T>({
               {totalCount}
             </span>
 
-            {/* Sélecteur d'éléments par page (réutilise onRowsPerPageChange) */}
             <label className="flex items-center gap-2 text-xs text-ink-500">
               Lignes
               <select

@@ -1,10 +1,10 @@
 import { ImagePlus, LoaderCircle, Trash2, Upload } from 'lucide-react';
 import { useRef, useState } from 'react';
 import { toast } from 'sonner';
-import { uploadImage } from '../../services';
-import { getImageUrl } from '../../utils/image.utils';
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
+import { uploadImage } from '@/services';
+import { getImageUrl } from '@/utils';
+import { Button } from '../ui/button';
+import { Label } from '../ui/label';
 
 interface MultiImageUploadProps {
   label?: string;
@@ -27,7 +27,7 @@ export default function MultiImageUpload({
   max = 12,
   disabled = false,
   folder = 'images',
-}: MultiImageUploadProps) {
+}: Readonly<MultiImageUploadProps>) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
@@ -61,7 +61,7 @@ export default function MultiImageUpload({
       }
       onChange([...value, ...uploaded]);
       toast.success(
-        uploaded.length > 1 ? `${uploaded.length} images ajoutées` : 'Image ajoutée à la galerie',
+        uploaded.length > 1 ? `${uploaded.length} images ajoutées` : 'Image ajoutée à la galerie'
       );
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Échec du téléversement d'une image.");
@@ -86,8 +86,17 @@ export default function MultiImageUpload({
       {value.length > 0 && (
         <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
           {value.map((url) => (
-            <div key={url} className="group relative aspect-[4/3] overflow-hidden rounded-lg border border-ink-100">
-              <img src={getImageUrl(url)} alt="" className="h-full w-full object-cover" />
+            <div
+              key={url}
+              className="group relative aspect-[4/3] overflow-hidden rounded-lg border border-ink-100"
+            >
+              <img
+                loading="lazy"
+                decoding="async"
+                src={getImageUrl(url)}
+                alt=""
+                className="h-full w-full object-cover"
+              />
               <button
                 type="button"
                 onClick={() => onChange(value.filter((item) => item !== url))}
@@ -130,7 +139,11 @@ export default function MultiImageUpload({
           onClick={() => inputRef.current?.click()}
           className="h-8 gap-1.5 bg-white text-xs"
         >
-          {uploading ? <LoaderCircle className="h-3.5 w-3.5 animate-spin" /> : <ImagePlus className="h-3.5 w-3.5" />}
+          {uploading ? (
+            <LoaderCircle className="h-3.5 w-3.5 animate-spin" />
+          ) : (
+            <ImagePlus className="h-3.5 w-3.5" />
+          )}
           {uploading ? 'Téléversement...' : 'Ajouter des images'}
         </Button>
         <p className="flex items-center gap-1 text-[10px] text-ink-400">

@@ -1,5 +1,5 @@
-import { apiClient } from '../api/client/http';
-import type { User } from '../types/auth.types';
+import { apiClient } from '@/api';
+import type { User } from '@/types';
 
 export interface UsersListResponse {
   data: User[];
@@ -9,27 +9,18 @@ export interface UsersListResponse {
 }
 
 export const getAllUsers = async (page = 1, limit = 10): Promise<UsersListResponse> => {
-  const result = await apiClient.getList<User>('/users', { page, limit });
+  const result = await apiClient.getList<User>('/users', {
+    page,
+    limit,
+    sortBy: 'creeLe',
+    sortOrder: 'DESC',
+  });
   return {
     data: result.data,
     total: result.meta.total,
     page: result.meta.page,
     limit: result.meta.limit,
   };
-};
-
-export const searchUsers = async (query: string, page = 1, limit = 10): Promise<UsersListResponse> => {
-  const result = await apiClient.getList<User>('/users/search', { q: query, page, limit });
-  return {
-    data: result.data,
-    total: result.meta.total,
-    page: result.meta.page,
-    limit: result.meta.limit,
-  };
-};
-
-export const getUserById = async (id: number): Promise<User> => {
-  return apiClient.get<User>(`/users/${id}`);
 };
 
 interface CreateUserData {
@@ -58,7 +49,7 @@ interface UpdateUserData {
 
 export const updateUser = async (id: number, userData: UpdateUserData): Promise<User> => {
   const filteredData = Object.fromEntries(
-    Object.entries(userData).filter(([, value]) => value !== undefined),
+    Object.entries(userData).filter(([, value]) => value !== undefined)
   );
   return apiClient.put<User>(`/users/${id}`, filteredData);
 };

@@ -1,9 +1,9 @@
 import { Database, Link2, Plus, Trash2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { FloatingInput } from '@/components/ui/floating-input';
-import { Label } from '@/components/ui/label';
-import { isValidSourceUrl, normalizeSourceUrl } from '../../utils/projet.utils';
-import type { ProjectSource } from '../../types/projet.types';
+import { Button } from '../ui/button';
+import { FloatingInput } from '../ui/floating-input';
+import { Label } from '../ui/label';
+import { isValidSourceUrl, normalizeSourceUrl } from '@/utils';
+import type { ProjectSource } from '@/types';
 
 interface SourcesFieldProps {
   value: ProjectSource[];

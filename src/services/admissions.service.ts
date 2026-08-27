@@ -1,5 +1,5 @@
-import { apiClient } from '../api/client/http';
-import type { Admission, AdmissionFile, AdmissionStatus } from '../types/admission.types';
+import { apiClient } from '@/api';
+import type { Admission, AdmissionStatus } from '@/types';
 
 export interface AdmissionQuery {
   page?: number;
@@ -9,6 +9,7 @@ export interface AdmissionQuery {
   niveau?: string;
   formation?: string;
   dateDebut?: string;
+  dateFin?: string;
   sortBy?: string;
   sortOrder?: 'ASC' | 'DESC';
 }
@@ -32,6 +33,7 @@ export const getAllAdmissions = async (
     niveau: query.niveau && query.niveau !== 'all' ? query.niveau : undefined,
     formation: query.formation && query.formation !== 'all' ? query.formation : undefined,
     dateDebut: query.dateDebut || undefined,
+    dateFin: query.dateFin || undefined,
     sortBy: query.sortBy ?? 'creeLe',
     sortOrder: query.sortOrder ?? 'DESC',
   });
@@ -42,13 +44,6 @@ export const getAllAdmissions = async (
     limit: result.meta.limit,
     totalPages: result.meta.totalPages,
   };
-};
-
-export const searchAdmissions = async (
-  q: string,
-  query: AdmissionQuery = {}
-): Promise<AdmissionsListResponse> => {
-  return getAllAdmissions({ ...query, q });
 };
 
 export const getAdmissionById = async (id: number): Promise<Admission> => {
@@ -75,10 +70,6 @@ export const updateAdmissionStatus = async (
   return apiClient.patch<Admission>(`/admissions/${id}/status`, payload);
 };
 
-export const getAdmissionFiles = async (id: number): Promise<AdmissionFile[]> => {
-  return apiClient.get<AdmissionFile[]>(`/admissions/${id}/files`);
-};
-
 export const getAdmissionFileBlob = async (
   id: number,
   fileId: number,
@@ -94,9 +85,4 @@ export const deleteAdmissionFile = async (id: number, fileId: number): Promise<v
 
 export const deleteAdmission = async (id: number): Promise<void> => {
   await apiClient.delete(`/admissions/${id}`);
-};
-
-export const getRecentAdmissions = async (limit = 4): Promise<Admission[]> => {
-  const result = await getAllAdmissions({ page: 1, limit, sortBy: 'creeLe', sortOrder: 'DESC' });
-  return result.data;
 };

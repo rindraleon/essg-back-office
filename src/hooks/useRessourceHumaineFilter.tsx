@@ -1,9 +1,5 @@
-// src/hooks/useRessourceHumaineFilter.ts
 import { useState, useMemo, useCallback } from 'react';
-import type {
-  RessourceHumaineItem,
-  RessourceHumaineFilterOptions,
-} from '../types/ressource-humaine.types';
+import type { RessourceHumaineItem, RessourceHumaineFilterOptions } from '@/types';
 
 const initialFilters: RessourceHumaineFilterOptions = {
   poste: '',
@@ -47,7 +43,6 @@ export function useRessourceHumaineFilter({
   const filteredData = useMemo(() => {
     let result = [...data];
 
-    // Search filter
     if (searchTerm) {
       const term = searchTerm.toLowerCase();
       result = result.filter(
@@ -58,12 +53,10 @@ export function useRessourceHumaineFilter({
       );
     }
 
-    // Poste filter
     if (filters.poste) {
       result = result.filter((item) => item.poste === filters.poste);
     }
 
-    // Actif filter
     if (filters.actif) {
       const isActive = filters.actif === 'true';
       result = result.filter((item) => item.actif === isActive);

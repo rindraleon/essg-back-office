@@ -1,15 +1,9 @@
 import { RotateCcw, X } from 'lucide-react';
 import React from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import { Button } from '../ui/button';
+import { Input } from '../ui/input';
+import { Label } from '../ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 
 export interface ContactFilterValues {
   sujet: string;
@@ -49,7 +43,10 @@ const ContactFilters: React.FC<ContactFiltersProps> = ({
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <div className="space-y-2">
           <Label>Sujet</Label>
-          <Select value={filters.sujet} onValueChange={(value) => onUpdateFilter('sujet', value || 'all')}>
+          <Select
+            value={filters.sujet}
+            onValueChange={(value) => onUpdateFilter('sujet', value || 'all')}
+          >
             <SelectTrigger className="w-full bg-white">
               <SelectValue placeholder="Tous" />
             </SelectTrigger>
@@ -65,7 +62,10 @@ const ContactFilters: React.FC<ContactFiltersProps> = ({
 
         <div className="space-y-2">
           <Label>Statut de lecture</Label>
-          <Select value={filters.statut} onValueChange={(value) => onUpdateFilter('statut', value || 'all')}>
+          <Select
+            value={filters.statut}
+            onValueChange={(value) => onUpdateFilter('statut', value || 'all')}
+          >
             <SelectTrigger className="w-full bg-white">
               <SelectValue placeholder="Tous" />
             </SelectTrigger>

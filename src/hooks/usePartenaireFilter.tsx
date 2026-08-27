@@ -1,7 +1,7 @@
 import { useState, useMemo, useCallback } from 'react';
-import type { Partenaire, PartenaireFilterOptions } from '../types/partenaire.types';
-import { INITIAL_PARTENAIRE_FILTERS } from '../constants/partenaire.constants';
-import { filterBySearchTerm } from '../utils/partenaire.utils';
+import type { Partenaire, PartenaireFilterOptions } from '@/types';
+import { INITIAL_PARTENAIRE_FILTERS } from '@/constants';
+import { filterPartnersBySearchTerm as filterBySearchTerm } from '@/utils';
 
 interface UsePartenaireFilterProps {
   data: Partenaire[];
@@ -39,19 +39,16 @@ export function usePartenaireFilter({
   const filteredData = useMemo(() => {
     let result = filterBySearchTerm(data, searchTerm);
 
-    // Type filter
     if (filters.type) {
       result = result.filter((item) => item.type === filters.type);
     }
 
-    // Secteur filter
     if (filters.secteur) {
       result = result.filter((item) =>
         item.secteur.toLowerCase().includes(filters.secteur.toLowerCase())
       );
     }
 
-    // Date range filter
     if (filters.dateDebut) {
       result = result.filter((item) => item.dateDebut >= filters.dateDebut);
     }

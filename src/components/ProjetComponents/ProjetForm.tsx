@@ -1,29 +1,21 @@
 import { ArrowLeft, ArrowRight, Briefcase, CircleCheck, Globe, Info, Upload } from 'lucide-react';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'sonner';
-import { uploadImage } from '../../services';
-import { getImageUrl } from '../../utils/image.utils';
-import { isValidSourceUrl } from '../../utils/projet.utils';
-import type { Projet, ProjetFormData, ProjectSource } from '../../types/projet.types';
+import { uploadImage } from '@/services';
+import { getImageUrl, isValidSourceUrl } from '@/utils';
+import type { Projet, ProjetFormData, ProjectSource } from '@/types';
 import SourcesField from './SourcesField';
-import { PROJET_TYPES, PROJET_STATUTS, DEFAULT_FORM_DATA } from '../../constants/projet.constants';
-import { useFormValidation } from '../../hooks/useFormValidation';
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from '@/components/ui/dialog';
-import { FloatingInput } from '@/components/ui/floating-input';
-import { FloatingTextarea } from '@/components/ui/floating-textarea';
-import { FloatingSelect } from '@/components/ui/floating-select';
+import { PROJET_TYPES, PROJET_STATUTS, DEFAULT_FORM_DATA } from '@/constants';
+import { useFormValidation , usePartenairesQuery } from '@/hooks';
+import { Button } from '../ui/button';
+import { Label } from '../ui/label';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../ui/dialog';
+import { FloatingInput } from '../ui/floating-input';
+import { FloatingTextarea } from '../ui/floating-textarea';
+import { FloatingSelect } from '../ui/floating-select';
 import MultiImageUpload from '../common/MultiImageUpload';
 import MultiSearchSelect from '../common/MultiSearchSelect';
 import type { SearchSelectOption } from '../common/SearchSelect';
-import { usePartenairesQuery } from '../../hooks/queries';
 
 interface ProjetFormProps {
   open: boolean;
@@ -68,7 +60,6 @@ const ProjetForm: React.FC<ProjetFormProps> = ({ open, onClose, onSubmit, initia
   const [imagePreview, setImagePreview] = useState<string>('');
   const [uploadingImage, setUploadingImage] = useState(false);
 
-  // Liste des partenaires disponibles (cache React Query partagé).
   const {
     data: partenaires = [],
     isLoading: loadingPartenaires,
@@ -215,7 +206,6 @@ const ProjetForm: React.FC<ProjetFormProps> = ({ open, onClose, onSubmit, initia
 
   const dialogTitle = mode === 'create' ? 'Nouveau projet' : 'Modifier le projet';
 
-  /* ─── Step 0 : Informations générales ─── */
   const renderStep0 = () => (
     <div className="space-y-1">
       <FloatingInput
@@ -236,7 +226,6 @@ const ProjetForm: React.FC<ProjetFormProps> = ({ open, onClose, onSubmit, initia
           options={[...PROJET_TYPES]}
           error={errors.type}
         />
-        {/* Statut : repris tel quel par le site public (carte, détail, filtre). */}
         <FloatingSelect
           label="Statut *"
           value={formData.statut}
@@ -260,7 +249,6 @@ const ProjetForm: React.FC<ProjetFormProps> = ({ open, onClose, onSubmit, initia
     </div>
   );
 
-  /* ─── Step 1 : Détails ─── */
   const renderStep1 = () => (
     <div className="space-y-4">
       <FloatingTextarea
@@ -269,19 +257,17 @@ const ProjetForm: React.FC<ProjetFormProps> = ({ open, onClose, onSubmit, initia
         value={formData.description}
         onChange={(e) => handleChange('description', e.target.value)}
         onBlur={() => handleBlur('description')}
-        rows={5}
+        rows={3}
         error={errors.description}
         hint={!errors.description ? `${formData.description.length} caractère(s)` : undefined}
       />
 
-      {/* Partenaires : Select alimenté dynamiquement par l'API */}
       <MultiSearchSelect
         label="Partenaires"
         values={(formData.partenaireIds ?? []).map(String)}
         onChange={(ids, options) =>
           handleChanges({
             partenaireIds: ids.map(Number),
-            // Les noms restent synchronisés pour l'affichage public.
             partenaires: options.map((option) => option.label),
           })
         }
@@ -302,10 +288,8 @@ const ProjetForm: React.FC<ProjetFormProps> = ({ open, onClose, onSubmit, initia
     </div>
   );
 
-  /* ─── Step 2 : Publication ─── */
   const renderStep2 = () => (
     <div className="space-y-4">
-      {/* Image */}
       <div className="space-y-2">
         <Label className="text-xs font-semibold text-ink-600 uppercase tracking-wide">
           Image de couverture
@@ -313,6 +297,8 @@ const ProjetForm: React.FC<ProjetFormProps> = ({ open, onClose, onSubmit, initia
         <div className="flex items-start gap-3">
           {imagePreview && (
             <img
+              loading="lazy"
+              decoding="async"
               src={imagePreview}
               alt="Aperçu"
               className="w-28 h-20 object-cover rounded-md border border-ink-100 shrink-0"
@@ -351,7 +337,6 @@ const ProjetForm: React.FC<ProjetFormProps> = ({ open, onClose, onSubmit, initia
         disabled={uploadingImage}
       />
 
-      {/* Localisation */}
       <div className="space-y-3">
         <div className="flex items-center gap-1.5 mb-2">
           <Globe className="h-4 w-4 text-ink-400" />
@@ -426,10 +411,8 @@ const ProjetForm: React.FC<ProjetFormProps> = ({ open, onClose, onSubmit, initia
           p-0
           gap-0
           overflow-hidden
-          [&>button]:hidden
         "
       >
-        {/* ─── Header + Stepper ─── */}
         <DialogHeader className="px-5 pt-4 pb-3 border-b bg-ink-50/80">
           <DialogTitle className="text-lg font-bold text-ink-900">{dialogTitle}</DialogTitle>
 
@@ -437,11 +420,13 @@ const ProjetForm: React.FC<ProjetFormProps> = ({ open, onClose, onSubmit, initia
             {STEPS.map((step, index) => {
               const isCompleted = index < activeStep;
               const isActive = index === activeStep;
-              const buttonClassName = isActive
-                ? 'bg-brand-600 text-white shadow-sm'
-                : isCompleted
-                  ? 'bg-brand-50 text-brand-700 hover:bg-brand-100'
-                  : 'bg-ink-100 text-ink-400';
+              let buttonClassName = 'bg-ink-100 text-ink-400';
+
+              if (isActive) {
+                buttonClassName = 'bg-brand-600 text-white shadow-sm';
+              } else if (isCompleted) {
+                buttonClassName = 'bg-brand-50 text-brand-700 hover:bg-brand-100';
+              }
 
               return (
                 <React.Fragment key={step.id}>
@@ -471,10 +456,8 @@ const ProjetForm: React.FC<ProjetFormProps> = ({ open, onClose, onSubmit, initia
           </div>
         </DialogHeader>
 
-        {/* ─── Body ─── */}
         <div className="px-5 py-4 overflow-y-auto max-h-[58vh]">{stepRenderers[activeStep]()}</div>
 
-        {/* ─── Footer ─── */}
         <DialogFooter className="px-5 py-3 mb-4 mx-4 border-t bg-ink-50/80">
           <div className="flex items-center justify-between w-full">
             <span className="text-xs text-ink-400">

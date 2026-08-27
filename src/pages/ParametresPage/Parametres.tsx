@@ -1,11 +1,9 @@
 import { GraduationCap, LoaderCircle } from 'lucide-react';
 import React, { useState } from 'react';
 import { toast } from 'sonner';
-import { ApiError } from '@/api/types/api';
-import { useSettingsQuery, useUpdateSettings } from '../../hooks/queries';
-import { useTitle } from '../../hooks/useTitle';
-import useScrollToTop from '../../hooks/useScrollToTop';
-import { Button } from '@/components/ui/button';
+import { ApiError } from '@/api';
+import { useSettingsQuery, useUpdateSettings, useTitle, useScrollToTop } from '@/hooks';
+import { Button } from '@/components';
 
 const Parametres: React.FC = () => {
   useScrollToTop();

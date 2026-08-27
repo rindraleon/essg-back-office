@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback } from 'react';
-import type { Formation, FormationFilterOptions } from '../types/formation.types';
+import type { Formation, FormationFilterOptions } from '@/types';
 
 const initialFilters: FormationFilterOptions = {
   niveau: '',
@@ -42,7 +42,6 @@ const useFormationFilter = ({
   const filteredData = useMemo(() => {
     let result = [...data];
 
-    // Search filter
     if (searchTerm) {
       const term = searchTerm.toLowerCase();
       result = result.filter(
@@ -53,17 +52,14 @@ const useFormationFilter = ({
       );
     }
 
-    // Niveau filter
     if (filters.niveau) {
       result = result.filter((item) => item.niveau === filters.niveau);
     }
 
-    // Domaine filter
     if (filters.domaine) {
       result = result.filter((item) => item.domaine.includes(filters.domaine));
     }
 
-    // En vedette filter
     if (filters.enVedette !== '') {
       const isFeatured = filters.enVedette === 'true';
       result = result.filter((item) => item.enVedette === isFeatured);

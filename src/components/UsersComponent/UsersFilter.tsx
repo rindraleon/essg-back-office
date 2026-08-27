@@ -1,15 +1,9 @@
 import { RotateCcw, Search, X } from 'lucide-react';
 import React from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import { Button } from '../ui/button';
+import { Input } from '../ui/input';
+import { Label } from '../ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 
 export interface UserFilters {
   search: string;
@@ -60,7 +54,7 @@ const UsersFilter: React.FC<UsersFilterProps> = ({
           </div>
 
           <div className="space-y-2">
-            <Label>Rôle</Label>
+            <Label htmlFor="role">Rôle</Label>
             <Select
               value={filters.role}
               onValueChange={(value) => onUpdateFilter('role', value || '')}
@@ -77,7 +71,7 @@ const UsersFilter: React.FC<UsersFilterProps> = ({
           </div>
 
           <div className="space-y-2">
-            <Label>Statut</Label>
+            <Label htmlFor="statut">Statut</Label>
             <Select
               value={filters.statut}
               onValueChange={(value) => onUpdateFilter('statut', value || '')}

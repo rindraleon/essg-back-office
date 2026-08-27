@@ -1,11 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import {
-  createActualite,
-  deleteActualite,
-  getAllActualites,
-  updateActualite,
-} from '../../services';
-import type { ActualiteItem } from '../../types';
+import { createActualite, deleteActualite, getAllActualites, updateActualite } from '@/services';
+import type { ActualiteItem } from '@/types';
 import { queryKeys } from './keys';
 
 export function useActualitesQuery() {

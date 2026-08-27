@@ -1,11 +1,10 @@
 import { Eye, Pencil, Star, Trash2 } from 'lucide-react';
-// src/components/FormationComponents/FormationTable.tsx
 import React from 'react';
-import type { Formation } from '../../types/formation.types';
+import type { Formation } from '@/types';
 import DataTable from '../common/DataTable';
 import type { Column } from '../common/DataTable';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { Badge } from '../ui/badge';
+import { Button } from '../ui/button';
 
 interface FormationTableProps {
   data: Formation[];
@@ -77,12 +76,7 @@ const FormationTable: React.FC<FormationTableProps> = ({
       label: 'Vedette',
       minWidth: 100,
       align: 'center',
-      render: (row) =>
-        row.enVedette ? (
-          <Star />
-        ) : (
-          <span className="text-sm text-ink-400">-</span>
-        ),
+      render: (row) => (row.enVedette ? <Star /> : <span className="text-sm text-ink-400">-</span>),
     },
     {
       id: 'actions',

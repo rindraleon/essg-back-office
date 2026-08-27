@@ -1,8 +1,7 @@
-// src/hooks/useProjetFilter.ts
 import { useState, useMemo, useCallback } from 'react';
-import type { Projet, ProjetFilterOptions } from '../types/projet.types';
-import { INITIAL_FILTERS } from '../constants/projet.constants';
-import { filterBySearchTerm } from '../utils/projet.utils';
+import type { Projet, ProjetFilterOptions } from '@/types';
+import { INITIAL_FILTERS } from '@/constants';
+import { filterProjectsBySearchTerm as filterBySearchTerm } from '@/utils';
 
 interface UseProjetFilterProps {
   data: Projet[];
@@ -37,12 +36,10 @@ export function useProjetFilter({ data, searchTerm }: UseProjetFilterProps): Use
   const filteredData = useMemo(() => {
     let result = filterBySearchTerm(data, searchTerm);
 
-    // Type filter
     if (filters.type) {
       result = result.filter((item) => item.type === filters.type);
     }
 
-    // Date range filter
     if (filters.dateDebut) {
       result = result.filter((item) => item.date >= filters.dateDebut);
     }

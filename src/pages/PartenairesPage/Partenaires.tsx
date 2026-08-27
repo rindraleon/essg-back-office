@@ -6,17 +6,19 @@ import {
   PartenaireTable,
   PartenaireViewDialog,
   ConfirmDialog,
-} from '../../components';
-import { usePagination, usePartenaireFilter, useScrollToTop } from '../../hooks';
-import type { PartenaireFormData, Partenaire } from '../../types';
+  ListPageHeader,
+} from '@/components';
 import {
+  usePagination,
+  usePartenaireFilter,
+  useScrollToTop,
   useCreatePartenaire,
   useDeletePartenaire,
   usePartenairesQuery,
   useUpdatePartenaire,
-} from '../../hooks/queries';
-import { useTitle } from '@/hooks/useTitle';
-import ListPageHeader from '../../components/common/ListPageHeader';
+  useTitle,
+} from '@/hooks';
+import type { PartenaireFormData, Partenaire } from '@/types';
 
 const Partenaires: React.FC = () => {
   useScrollToTop();
@@ -120,7 +122,6 @@ const Partenaires: React.FC = () => {
   const handleToggleFilters = useCallback(() => {
     setFiltersOpen((prev) => !prev);
   }, []);
-
 
   return (
     <div className="mx-auto max-w-7xl py-4 space-y-2 mx-auto min-w-0">

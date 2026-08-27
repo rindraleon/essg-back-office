@@ -1,12 +1,3 @@
-/**
- * Hiérarchie pédagogique ESSG : Mention (niveau 1) → Titre de formation (niveau 2).
- *
- * Miroir de `backend-essg/src/formations/formation-mentions.constant.ts`.
- * Le backend expose la même liste via `GET /formations/mentions` ; ces
- * constantes servent de valeur par défaut immédiate (pas de flash de contenu
- * au montage du formulaire) et de repli si l'API est indisponible.
- */
-
 export interface FormationMention {
   code: string;
   label: string;
@@ -47,11 +38,6 @@ export const FORMATION_MENTIONS: FormationMention[] = [
   },
 ];
 
-export const MENTION_OPTIONS = FORMATION_MENTIONS.map((mention) => ({
-  value: mention.label,
-  label: mention.label,
-}));
-
 function normalize(value: string): string {
   return value
     .normalize('NFD')
@@ -61,8 +47,7 @@ function normalize(value: string): string {
     .trim();
 }
 
-/** Retrouve une mention par libellé, code ou ancienne valeur de `domaine`. */
-export function findMention(
+function findMention(
   value: string | undefined | null,
   mentions: FormationMention[] = FORMATION_MENTIONS
 ): FormationMention | undefined {
@@ -73,7 +58,6 @@ export function findMention(
   );
 }
 
-/** Retrouve la mention à laquelle appartient un titre de formation. */
 export function findMentionByTitre(
   titre: string | undefined | null,
   mentions: FormationMention[] = FORMATION_MENTIONS
@@ -83,7 +67,6 @@ export function findMentionByTitre(
   return mentions.find((mention) => mention.titres.some((item) => normalize(item) === needle));
 }
 
-/** Options de titres filtrées par la mention sélectionnée. */
 export function getTitreOptions(
   mentionValue: string | undefined | null,
   mentions: FormationMention[] = FORMATION_MENTIONS
@@ -93,7 +76,6 @@ export function getTitreOptions(
   return mention.titres.map((titre) => ({ value: titre, label: titre }));
 }
 
-/** Vrai si le titre appartient bien à la mention (contrôle de cohérence). */
 export function isTitreInMention(
   mentionValue: string | undefined | null,
   titre: string | undefined | null,
@@ -117,13 +99,6 @@ export const DUREE_OPTIONS = [
   { label: '5 ans', value: '5 ans' },
 ];
 
-/**
- * Conditions et prérequis d'accès proposés dans le formulaire de formation.
- *
- * Ce ne sont que des propositions : le champ accepte toute valeur libre, et
- * les conditions déjà enregistrées côté backend qui n'apparaissent pas ici
- * restent affichées et conservées.
- */
 export const CONDITION_ACCES_OPTIONS = [
   'Baccalauréat série C ou D',
   'Baccalauréat toutes séries',

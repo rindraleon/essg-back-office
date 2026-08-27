@@ -1,13 +1,12 @@
 import { Eye, Pencil, Trash2 } from 'lucide-react';
-// src/components/ProjetComponents/ProjetTable.tsx
 import React, { useMemo } from 'react';
-import type { Projet } from '../../types/projet.types';
-import { getTypeColor, formatDate } from '../../utils/projet.utils';
+import type { Projet } from '@/types';
+import { getTypeColor, formatDate } from '@/utils';
 import DataTable from '../common/DataTable';
 import type { Column } from '../common/DataTable';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Badge } from '../ui/badge';
+import { Button } from '../ui/button';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip';
 
 interface ProjetTableProps {
   data: Projet[];

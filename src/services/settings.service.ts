@@ -1,4 +1,4 @@
-import { apiClient } from '../api/client/http';
+import { apiClient } from '@/api';
 
 export interface Settings {
   id: number;

@@ -1,19 +1,8 @@
 import { Button as ButtonPrimitive } from '@base-ui/react/button';
 import { cva, type VariantProps } from 'class-variance-authority';
 
-import { cn } from '@/lib/utils';
+import { cn } from '@/lib';
 
-/**
- * Bouton unique du back-office ESSG.
- *
- * Règles du design system (cf. cahier des charges §9) :
- *  - rayon `rounded-md` pour TOUTES les tailles (plus de rounded-lg/full) ;
- *  - hauteurs normalisées : sm=32px, default=36px, lg=40px ;
- *  - même typographie (text-sm / font-medium) et mêmes états
- *    hover / focus-visible / disabled quelle que soit la variante ;
- *  - les pages ne doivent plus surcharger `h-*` ni `rounded-*` : si un besoin
- *    apparaît, ajouter une variante ici plutôt qu'une classe ponctuelle.
- */
 const buttonVariants = cva(
   [
     'group/button inline-flex shrink-0 items-center justify-center gap-1.5',
@@ -37,11 +26,8 @@ const buttonVariants = cva(
         link: 'text-primary underline-offset-4 hover:underline',
       },
       size: {
-        /** Taille standard : formulaires, barres d'outils, actions de page. */
         default: 'h-9 px-3.5',
-        /** Actions compactes : lignes de tableau, filtres secondaires. */
         sm: 'h-8 px-3 text-[0.8125rem]',
-        /** Actions principales : CTA d'en-tête de page. */
         lg: 'h-10 px-4',
         icon: 'size-9',
         'icon-sm': 'size-8',

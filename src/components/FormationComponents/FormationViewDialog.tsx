@@ -1,10 +1,10 @@
 import { Clock, GraduationCap, Image, Mail, Sparkles, User, X } from 'lucide-react';
 import React from 'react';
-import { getImageUrl } from '../../utils/image.utils';
-import type { Formation } from '../../types/formation.types';
-import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Badge } from '@/components/ui/badge';
+import { getImageUrl } from '@/utils';
+import type { Formation } from '@/types';
+import { Button } from '../ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../ui/dialog';
+import { Badge } from '../ui/badge';
 
 interface FormationViewDialogProps {
   open: boolean;
@@ -18,6 +18,7 @@ const FormationViewDialog: React.FC<FormationViewDialogProps> = ({ open, onClose
   return (
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
       <DialogContent
+        showCloseButton={false}
         className="
           !w-[96vw]
           !max-w-[calc(100%-1rem)]
@@ -31,18 +32,17 @@ const FormationViewDialog: React.FC<FormationViewDialogProps> = ({ open, onClose
           bg-white
           p-0
           shadow-[0_24px_80px_rgba(15,23,42,0.35)]
-          [&>button]:hidden
         "
       >
         <div className="grid h-full min-h-0 lg:grid-cols-[360px_minmax(0,1fr)]">
-          {/* Colonne gauche desktop */}
           <aside className="hidden min-h-0 flex-col border-r border-ink-100 bg-ink-950 p-5 text-white lg:flex">
-            {/* Image 16/9 en haut gauche */}
             <div className="w-full self-start">
               <div className="overflow-hidden rounded-2xl border border-white/10 bg-ink-800 shadow-[0_12px_30px_rgba(0,0,0,0.35)]">
                 <div className="aspect-[16/9] w-full bg-ink-800">
                   {formation.image ? (
                     <img
+                      loading="lazy"
+                      decoding="async"
                       src={getImageUrl(formation.image)}
                       alt={formation.titre}
                       className="h-full w-full object-cover"
@@ -62,7 +62,6 @@ const FormationViewDialog: React.FC<FormationViewDialogProps> = ({ open, onClose
               </div>
             </div>
 
-            {/* Texte séparé de l'image pour meilleure lisibilité */}
             <div className="mt-5 space-y-4">
               <div className="flex items-center justify-between gap-3">
                 <Badge className="rounded-full bg-white/10 px-3 py-1 text-white">
@@ -139,9 +138,7 @@ const FormationViewDialog: React.FC<FormationViewDialogProps> = ({ open, onClose
             </div>
           </aside>
 
-          {/* Colonne droite */}
           <section className="flex min-h-0 flex-col">
-            {/* Header */}
             <DialogHeader className="shrink-0 border-b border-ink-100 bg-white px-5 py-4 lg:px-6">
               <div className="flex items-start justify-between gap-4">
                 <div className="min-w-0">
@@ -164,14 +161,14 @@ const FormationViewDialog: React.FC<FormationViewDialogProps> = ({ open, onClose
               </div>
             </DialogHeader>
 
-            {/* Body scrollable */}
             <div className="min-h-0 flex-1 overflow-y-auto px-5 py-5 lg:px-6">
-              {/* Version mobile */}
               <div className="mb-5 lg:hidden">
                 <div className="overflow-hidden rounded-2xl border border-ink-100 bg-white shadow-sm">
                   <div className="aspect-[16/9] w-full bg-ink-100">
                     {formation.image ? (
                       <img
+                        loading="lazy"
+                        decoding="async"
                         src={getImageUrl(formation.image)}
                         alt={formation.titre}
                         className="h-full w-full object-cover"
@@ -225,7 +222,6 @@ const FormationViewDialog: React.FC<FormationViewDialogProps> = ({ open, onClose
               </div>
 
               <div className="grid gap-5 xl:grid-cols-[1.1fr_0.9fr]">
-                {/* Colonne principale */}
                 <div className="space-y-5">
                   <div className="rounded-2xl border border-ink-100 bg-white p-5 shadow-sm">
                     <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-ink-700">
@@ -248,7 +244,6 @@ const FormationViewDialog: React.FC<FormationViewDialogProps> = ({ open, onClose
                   )}
                 </div>
 
-                {/* Colonne secondaire */}
                 <div className="grid content-start gap-4 sm:grid-cols-2 xl:grid-cols-1">
                   {formation.objectifs && formation.objectifs.length > 0 && (
                     <div className="rounded-2xl border border-ink-100 bg-white p-4 shadow-sm">
@@ -327,7 +322,6 @@ const FormationViewDialog: React.FC<FormationViewDialogProps> = ({ open, onClose
               </div>
             </div>
 
-            {/* Footer */}
             <div className="flex shrink-0 items-center justify-end border-t border-ink-100 bg-white px-5 py-4 lg:px-6">
               <Button type="button" onClick={onClose} variant="outline" className="rounded-xl">
                 Fermer

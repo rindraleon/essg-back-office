@@ -1,4 +1,4 @@
-import { apiClient } from '../api/client/http';
+import { apiClient } from '@/api';
 
 export interface Message {
   id: number;
@@ -38,7 +38,10 @@ export interface PaginationQuery {
   dateFin?: string;
 }
 
-function toLegacy<T>(result: { data: T[]; meta: { total: number; page: number; limit: number } }): PaginationResponse<T> {
+function toLegacy<T>(result: {
+  data: T[];
+  meta: { total: number; page: number; limit: number };
+}): PaginationResponse<T> {
   return {
     data: result.data,
     total: result.meta.total,
@@ -61,21 +64,19 @@ function toMessageParams(query: PaginationQuery, q?: string) {
   };
 }
 
-export const getAllMessages = async (query: PaginationQuery = {}): Promise<PaginationResponse<Message>> => {
+export const getAllMessages = async (
+  query: PaginationQuery = {}
+): Promise<PaginationResponse<Message>> => {
   const result = await apiClient.getList<Message>('/messages', toMessageParams(query));
   return toLegacy(result);
 };
 
 export const searchMessages = async (
   q: string,
-  query: PaginationQuery = {},
+  query: PaginationQuery = {}
 ): Promise<PaginationResponse<Message>> => {
   const result = await apiClient.getList<Message>('/messages/search', toMessageParams(query, q));
   return toLegacy(result);
-};
-
-export const getMessageById = async (id: number): Promise<Message> => {
-  return apiClient.get<Message>(`/messages/${id}`);
 };
 
 export const updateMessage = async (id: number, lu: boolean): Promise<Message> => {
@@ -84,15 +85,11 @@ export const updateMessage = async (id: number, lu: boolean): Promise<Message> =
 
 export const replyToMessage = async (
   id: number,
-  payload: { sujet?: string; message: string },
+  payload: { sujet?: string; message: string }
 ): Promise<Message> => {
   return apiClient.post<Message>(`/messages/${id}/reply`, payload);
 };
 
 export const deleteMessage = async (id: number): Promise<void> => {
   await apiClient.delete(`/messages/${id}`);
-};
-
-export const getRecentMessages = async (limit = 4): Promise<PaginationResponse<Message>> => {
-  return getAllMessages({ page: 1, limit, sortBy: 'creeLe', sortOrder: 'DESC' });
 };

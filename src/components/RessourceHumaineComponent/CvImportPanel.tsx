@@ -16,36 +16,21 @@ import {
   analyzeCv,
   type OcrProgress,
   type OcrResult,
-} from '../../services/ocr.service';
-import type { RessourceHumaineFormData } from '../../types/ressource-humaine.types';
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
+} from '@/services';
+import type { RessourceHumaineFormData } from '@/types';
+import { Button } from '../ui/button';
+import { Label } from '../ui/label';
 
 interface CvImportPanelProps {
-  /**
-   * Applique les données extraites au formulaire.
-   * `champs` liste les clés effectivement renseignées par l'OCR, afin que le
-   * formulaire puisse les signaler visuellement à l'utilisateur.
-   */
   onApply: (
     data: Partial<RessourceHumaineFormData>,
-    champs: Set<keyof RessourceHumaineFormData>,
+    champs: Set<keyof RessourceHumaineFormData>
   ) => void;
   disabled?: boolean;
 }
 
 type Status = 'idle' | 'analyzing' | 'done' | 'error';
 
-/**
- * Import de CV avec OCR (cahier des charges §8).
- *
- * Workflow : Upload → OCR → extraction → préremplissage → vérification par
- * l'utilisateur → envoi au backend.
- *
- * L'analyse est 100 % locale (tesseract.js + pdf.js) : aucun document n'est
- * transmis à un service tiers. Les données extraites ne sont JAMAIS envoyées
- * directement : elles remplissent le formulaire, que l'utilisateur valide.
- */
 const CvImportPanel: React.FC<CvImportPanelProps> = ({ onApply, disabled = false }) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const [status, setStatus] = useState<Status>('idle');
@@ -69,9 +54,7 @@ const CvImportPanel: React.FC<CvImportPanelProps> = ({ onApply, disabled = false
       toast.success('CV analysé — vérifiez les données avant enregistrement');
     } catch (error) {
       const message =
-        error instanceof OcrError
-          ? error.message
-          : "L'analyse du document a échoué. Réessayez.";
+        error instanceof OcrError ? error.message : "L'analyse du document a échoué. Réessayez.";
       setErrorMessage(message);
       setStatus('error');
       toast.error(message);
@@ -90,14 +73,6 @@ const CvImportPanel: React.FC<CvImportPanelProps> = ({ onApply, disabled = false
     handleFile(event.dataTransfer.files?.[0]);
   };
 
-  /**
-   * Génère les champs du formulaire à partir des données extraites.
-   *
-   * Chaque élément détecté (expérience, diplôme, compétence, langue...) donne
-   * lieu à un input dédié : l'utilisateur obtient un formulaire déjà structuré
-   * qu'il n'a plus qu'à relire et corriger. Rien n'est envoyé au backend à ce
-   * stade — la soumission reste une action explicite.
-   */
   const applyToForm = () => {
     if (!result) return;
     const { parsed } = result;
@@ -105,10 +80,9 @@ const CvImportPanel: React.FC<CvImportPanelProps> = ({ onApply, disabled = false
     const patch: Partial<RessourceHumaineFormData> = {};
     const champs = new Set<keyof RessourceHumaineFormData>();
 
-    /** N'écrit que les valeurs réellement détectées (jamais de champ vide). */
     const set = <K extends keyof RessourceHumaineFormData>(
       key: K,
-      value: RessourceHumaineFormData[K] | undefined,
+      value: RessourceHumaineFormData[K] | undefined
     ) => {
       if (value === undefined) return;
       if (Array.isArray(value) && value.length === 0) return;
@@ -117,15 +91,12 @@ const CvImportPanel: React.FC<CvImportPanelProps> = ({ onApply, disabled = false
       champs.add(key);
     };
 
-    /* Identité et contact */
     set('nom', parsed.nom?.toLocaleUpperCase('fr-FR'));
     set('prenom', parsed.prenom);
     set('email', parsed.email);
     set('telephone', parsed.telephone);
     set('adresse', parsed.adresse);
     set('poste', parsed.poste);
-
-    /* Parcours : un input est généré par entrée détectée */
     set('experiences', parsed.experiences);
     set('formations', parsed.formations);
     set('diplomes', parsed.diplomes);
@@ -136,7 +107,7 @@ const CvImportPanel: React.FC<CvImportPanelProps> = ({ onApply, disabled = false
 
     const total = champs.size;
     toast.success(
-      `${total} champ${total > 1 ? 's' : ''} prérempli${total > 1 ? 's' : ''} — vérifiez avant d'enregistrer`,
+      `${total} champ${total > 1 ? 's' : ''} prérempli${total > 1 ? 's' : ''} — vérifiez avant d'enregistrer`
     );
   };
 
@@ -168,7 +139,6 @@ const CvImportPanel: React.FC<CvImportPanelProps> = ({ onApply, disabled = false
         className="hidden"
       />
 
-      {/* ─── État initial : zone de dépôt ─── */}
       {status === 'idle' && (
         <button
           type="button"
@@ -196,7 +166,6 @@ const CvImportPanel: React.FC<CvImportPanelProps> = ({ onApply, disabled = false
         </button>
       )}
 
-      {/* ─── État : analyse en cours ─── */}
       {status === 'analyzing' && (
         <div className="space-y-2 rounded-md border border-ink-100 bg-white p-3">
           <div className="flex items-center gap-2 text-sm text-ink-700">
@@ -206,24 +175,17 @@ const CvImportPanel: React.FC<CvImportPanelProps> = ({ onApply, disabled = false
               {progress.percent}%
             </span>
           </div>
-          {/* Barre de progression : hauteur fixe, aucun décalage de layout */}
-          <div
+          <progress
             className="h-1.5 w-full overflow-hidden rounded-full bg-ink-100"
-            role="progressbar"
-            aria-valuenow={progress.percent}
-            aria-valuemin={0}
-            aria-valuemax={100}
+            value={progress.percent}
+            max={100}
           >
-            <div
-              className="h-full rounded-full bg-brand-600 transition-[width] duration-300 ease-out motion-reduce:transition-none"
-              style={{ width: `${progress.percent}%` }}
-            />
-          </div>
+            {progress.percent}%
+          </progress>
           <p className="truncate text-xs text-ink-400">{file?.name}</p>
         </div>
       )}
 
-      {/* ─── État : erreur ─── */}
       {status === 'error' && (
         <div className="space-y-2 rounded-md border border-red-200 bg-red-50 p-3">
           <p className="flex items-start gap-2 text-sm text-red-700">
@@ -247,7 +209,6 @@ const CvImportPanel: React.FC<CvImportPanelProps> = ({ onApply, disabled = false
         </div>
       )}
 
-      {/* ─── État : succès ─── */}
       {status === 'done' && result && (
         <div className="space-y-2.5 rounded-md border border-ink-100 bg-white p-3">
           <div className="flex items-start justify-between gap-2">
@@ -266,7 +227,6 @@ const CvImportPanel: React.FC<CvImportPanelProps> = ({ onApply, disabled = false
             </button>
           </div>
 
-          {/* Récapitulatif de ce qui a été détecté */}
           <dl className="grid grid-cols-2 gap-x-3 gap-y-1.5 text-xs sm:grid-cols-3">
             <Detected label="Nom" value={result.parsed.nom} />
             <Detected label="Prénom" value={result.parsed.prenom} />
@@ -332,7 +292,6 @@ const CvImportPanel: React.FC<CvImportPanelProps> = ({ onApply, disabled = false
   );
 };
 
-/** Ligne du récapitulatif : valeur détectée ou mention « non détecté ». */
 const Detected: React.FC<{ label: string; value?: string }> = ({ label, value }) => (
   <div className="min-w-0">
     <dt className="text-ink-400">{label}</dt>

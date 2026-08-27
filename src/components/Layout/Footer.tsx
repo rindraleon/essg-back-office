@@ -1,12 +1,13 @@
+/* eslint-disable sonarjs/super-linear-regex */
 import { ExternalLink, Globe, Link2 } from 'lucide-react';
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import LogoITDC from '../../assets/files/images/logo/itdc_logo.png';
-import type { FooterProps, SocialItem } from '../../types/footer.types';
-import { FloatingInput } from '@/components/ui/floating-input';
-import { Button } from '@/components/ui/button';
+import type { FooterProps, SocialItem } from '@/types';
+import { FloatingInput } from '../ui/floating-input';
+import { Button } from '../ui/button';
 
-function SocialIcon({ kind }: Readonly<{ kind?: SocialItem['kind'] }>) {
+function SocialIcon({ kind }: Readonly<{ kind: SocialItem['kind'] }>) {
   switch (kind) {
     case 'web':
       return <Link2 className="size-5" />;
@@ -47,7 +48,7 @@ const Footer: React.FC<FooterProps> = (props: Readonly<FooterProps>) => {
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
 
-  const handleSubscribe = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubscribe = async (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
     setMessage(null);
 
@@ -61,8 +62,6 @@ const Footer: React.FC<FooterProps> = (props: Readonly<FooterProps>) => {
       if (onSubscribe) {
         await onSubscribe(email);
       } else {
-        // template behaviour: log it (developers should override onSubscribe)
-
         console.info('Subscribe (template):', email);
       }
       setMessage('Merci ! Vérifie ta boîte mail.');
@@ -79,7 +78,6 @@ const Footer: React.FC<FooterProps> = (props: Readonly<FooterProps>) => {
     <footer className="bg-ink-900 text-ink-100">
       <div className="max-w-7xl mx-auto px-6 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-          {/* Brand */}
           <div className="space-y-4">
             <Link to="/" className="inline-flex items-center gap-3">
               <img
@@ -112,7 +110,6 @@ const Footer: React.FC<FooterProps> = (props: Readonly<FooterProps>) => {
             </div>
           </div>
 
-          {/* Links */}
           <div className="md:col-span-2 grid grid-cols-2 gap-6">
             <div>
               <h4 className="text-sm font-semibold text-ink-100 uppercase tracking-wider">
@@ -159,7 +156,6 @@ const Footer: React.FC<FooterProps> = (props: Readonly<FooterProps>) => {
             </div>
           </div>
 
-          {/* Newsletter */}
           <div className="space-y-3">
             <h4 className="text-sm font-semibold text-ink-100 uppercase tracking-wider">
               Newsletter

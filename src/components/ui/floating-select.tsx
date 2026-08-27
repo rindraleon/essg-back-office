@@ -1,13 +1,7 @@
 import * as React from 'react';
-import { cn } from '@/lib/utils';
+import { cn } from '@/lib';
 import type { SelectRootChangeEventDetails } from '@base-ui/react/select';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './select';
 
 export interface FloatingSelectProps {
   label: string;
@@ -56,7 +50,9 @@ const FloatingSelect: React.FC<FloatingSelectProps> = ({
       <span
         className={cn(
           'pointer-events-none absolute left-3 origin-[0] transition-all duration-200',
-          hasValue ? 'top-0 bg-white px-1 text-xs font-bold text-brand-700' : 'top-[1.35rem] text-sm text-ink-400',
+          hasValue
+            ? 'top-0 bg-white px-1 text-xs font-bold text-brand-700'
+            : 'top-[1.35rem] text-sm text-ink-400',
           error && 'text-red-500'
         )}
       >

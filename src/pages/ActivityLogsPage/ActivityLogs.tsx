@@ -1,17 +1,16 @@
 import { useCallback, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 import { RotateCcw, X } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
 import {
+  Button,
+  Label,
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { ActivityLogTable, ActivityLogViewDialog, ListPageHeader } from '../../components';
-import { useDebounce, useScrollToTop,useTitle, useActivityLogsQuery } from '../../hooks';
+ ActivityLogTable, ActivityLogViewDialog, ListPageHeader } from '@/components';
+import { useDebounce, useScrollToTop, useTitle, useActivityLogsQuery } from '@/hooks';
 import type { ActivityLog } from '@/types';
 
 const MODULES = [
@@ -54,15 +53,17 @@ const ActivityLogs = () => {
       sortBy: 'createdAt',
       sortOrder: 'DESC' as const,
     }),
-    [page, rowsPerPage, debouncedSearch, moduleFilter, methodFilter, successFilter],
+    [page, rowsPerPage, debouncedSearch, moduleFilter, methodFilter, successFilter]
   );
 
   const { data, isLoading, isError, error, refetch } = useActivityLogsQuery(query);
   const logs = data?.data ?? [];
   const totalItems = data?.total ?? 0;
-  const activeFilterCount = [moduleFilter !== 'all', methodFilter !== 'all', successFilter !== 'all'].filter(
-    Boolean,
-  ).length;
+  const activeFilterCount = [
+    moduleFilter !== 'all',
+    methodFilter !== 'all',
+    successFilter !== 'all',
+  ].filter(Boolean).length;
 
   const handleSearchChange = useCallback((value: string) => {
     setSearchTerm(value);
@@ -106,7 +107,7 @@ const ActivityLogs = () => {
             </div>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
               <div className="space-y-2">
-                <Label>Module</Label>
+                <Label htmlFor={''}>Module</Label>
                 <Select
                   value={moduleFilter}
                   onValueChange={(value) => {
@@ -130,7 +131,7 @@ const ActivityLogs = () => {
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label>Méthode</Label>
+                <Label htmlFor={''}>Méthode</Label>
                 <Select
                   value={methodFilter}
                   onValueChange={(value) => {
@@ -154,7 +155,7 @@ const ActivityLogs = () => {
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label>Résultat</Label>
+                <Label htmlFor={''}>Résultat</Label>
                 <Select
                   value={successFilter}
                   onValueChange={(value) => {
@@ -177,7 +178,12 @@ const ActivityLogs = () => {
             </div>
             {activeFilterCount > 0 && (
               <div className="mt-3 flex justify-end">
-                <Button size="sm" variant="destructive" onClick={handleResetFilters} className="text-xs">
+                <Button
+                  size="sm"
+                  variant="destructive"
+                  onClick={handleResetFilters}
+                  className="text-xs"
+                >
                   <RotateCcw className="mr-1 h-3 w-3" />
                   Réinitialiser tout
                 </Button>
@@ -205,11 +211,14 @@ const ActivityLogs = () => {
       )}
 
       {(() => {
-        const emptyMessage = isLoading
-          ? 'Chargement...'
-          : searchTerm || activeFilterCount > 0
-            ? 'Aucun résultat trouvé'
-            : 'Aucune action enregistrée';
+        const hasActiveFiltersOrSearch = searchTerm || activeFilterCount > 0;
+        let emptyMessage = 'Aucune action enregistrée';
+
+        if (isLoading) {
+          emptyMessage = 'Chargement...';
+        } else if (hasActiveFiltersOrSearch) {
+          emptyMessage = 'Aucun résultat trouvé';
+        }
 
         return (
           <ActivityLogTable
@@ -228,7 +237,11 @@ const ActivityLogs = () => {
         );
       })()}
 
-      <ActivityLogViewDialog open={Boolean(selectedLog)} onClose={() => setSelectedLog(null)} log={selectedLog} />
+      <ActivityLogViewDialog
+        open={Boolean(selectedLog)}
+        onClose={() => setSelectedLog(null)}
+        log={selectedLog}
+      />
     </div>
   );
 };

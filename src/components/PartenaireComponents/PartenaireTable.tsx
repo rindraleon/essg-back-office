@@ -1,16 +1,15 @@
 import { Eye, Pencil, Trash2 } from 'lucide-react';
 import React, { useMemo } from 'react';
-import { getImageUrl, isRemoteImage } from '../../utils/image.utils';
-import type { Partenaire } from '../../types/partenaire.types';
+import { getImageUrl, isRemoteImage , formatDate } from '@/utils';
+import type { Partenaire } from '@/types';
 
-import { PARTENAIRE_TYPE_COLORS } from '../../constants/partenaire.constants';
+import { PARTENAIRE_TYPE_COLORS } from '@/constants';
 import DataTable from '../common/DataTable';
 import type { Column } from '../common/DataTable';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { formatDate } from '@/utils';
+import { Badge } from '../ui/badge';
+import { Button } from '../ui/button';
+import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip';
 
 interface PartenaireTableProps {
   data: Partenaire[];

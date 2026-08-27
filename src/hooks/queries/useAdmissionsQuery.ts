@@ -6,8 +6,8 @@ import {
   getAllAdmissions,
   updateAdmissionStatus,
   type AdmissionQuery,
-} from '../../services/admissions.service';
-import type { AdmissionStatus } from '../../types/admission.types';
+} from '@/services';
+import type { AdmissionStatus } from '@/types';
 import { queryKeys } from './keys';
 
 export function useRecentAdmissionsQuery(limit = 4, enabled = true) {

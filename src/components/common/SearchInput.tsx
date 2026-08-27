@@ -1,7 +1,7 @@
 import React from 'react';
 import { Search } from 'lucide-react';
-import { Input } from '@/components/ui/input';
-import { cn } from '@/lib/utils';
+import { Input } from '../ui/input';
+import { cn } from '@/lib';
 
 interface SearchInputProps {
   value: string;
@@ -17,7 +17,12 @@ const SearchInput: React.FC<SearchInputProps> = ({
   className = '',
 }) => {
   return (
-    <div className={cn('relative w-full min-w-0 max-w-md sm:w-[22rem] sm:max-w-none sm:shrink-0', className)}>
+    <div
+      className={cn(
+        'relative w-full min-w-0 max-w-md sm:w-[22rem] sm:max-w-none sm:shrink-0',
+        className
+      )}
+    >
       <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-400" />
       <Input
         type="text"

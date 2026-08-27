@@ -1,11 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import {
-  createFormation,
-  deleteFormation,
-  getAllFormations,
-  updateFormation,
-} from '../../services';
-import type { FormationFormData } from '../../types';
+import { createFormation, deleteFormation, getAllFormations, updateFormation } from '@/services';
+import type { FormationFormData } from '@/types';
 import { queryKeys } from './keys';
 
 export function useFormationsQuery() {

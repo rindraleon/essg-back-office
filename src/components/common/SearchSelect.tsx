@@ -1,16 +1,12 @@
 import { AlertCircle, Check, ChevronDown, Loader2, Search, X } from 'lucide-react';
 import React, { useEffect, useId, useMemo, useRef, useState } from 'react';
-import useDebounce from '../../hooks/useDebounce';
-import { cn } from '@/lib/utils';
+import useDebounce from '@/hooks/useDebounce';
+import { cn } from '@/lib';
 
 export interface SearchSelectOption {
-  /** Valeur envoyée au backend (identifiant). */
   value: string;
-  /** Libellé principal affiché. */
   label: string;
-  /** Ligne secondaire (poste, type, email...). */
   description?: string;
-  /** URL d'avatar/logo éventuel. */
   image?: string;
 }
 
@@ -21,30 +17,16 @@ interface SearchSelectProps {
   options: SearchSelectOption[];
   isLoading?: boolean;
   error?: string;
-  /** Erreur de chargement des options (distincte de l'erreur de validation). */
   loadError?: string | null;
   onRetry?: () => void;
   placeholder?: string;
   emptyMessage?: string;
   hint?: string;
   disabled?: boolean;
-  /** Autorise l'effacement de la sélection. */
   clearable?: boolean;
   className?: string;
 }
 
-/**
- * Select avec recherche (autocomplete) réutilisable.
- *
- * Utilisé pour le responsable de formation (recherche dans les ressources
- * humaines) et pour tout champ relationnel du back-office.
- *
- * Gère explicitement les quatre états attendus : loading, error, empty, success.
- * Le filtrage est fait en mémoire sur une liste déjà chargée (les référentiels
- * du back-office sont petits) : cela évite une requête par frappe tout en
- * gardant une recherche instantanée. Le `useDebounce` évite les re-rendus
- * inutiles pendant la saisie.
- */
 const SearchSelect: React.FC<SearchSelectProps> = ({
   label,
   value,
@@ -82,7 +64,6 @@ const SearchSelect: React.FC<SearchSelectProps> = ({
     );
   }, [options, debouncedQuery]);
 
-  // Fermeture au clic extérieur.
   useEffect(() => {
     if (!open) return;
     const handleClick = (event: MouseEvent) => {
@@ -102,7 +83,6 @@ const SearchSelect: React.FC<SearchSelectProps> = ({
   const openMenu = () => {
     if (disabled) return;
     setOpen(true);
-    // Focus différé : le champ n'est monté qu'à l'ouverture.
     requestAnimationFrame(() => inputRef.current?.focus());
   };
 
@@ -144,7 +124,6 @@ const SearchSelect: React.FC<SearchSelectProps> = ({
 
   return (
     <div className={cn('relative w-full pt-2', className)} ref={containerRef}>
-      {/* Déclencheur */}
       <button
         type="button"
         onClick={() => (open ? setOpen(false) : openMenu())}
@@ -164,6 +143,8 @@ const SearchSelect: React.FC<SearchSelectProps> = ({
       >
         {selected?.image && (
           <img
+            loading="lazy"
+            decoding="async"
             src={selected.image}
             alt=""
             className="size-6 shrink-0 rounded-full object-cover"
@@ -180,15 +161,14 @@ const SearchSelect: React.FC<SearchSelectProps> = ({
         {isLoading && <Loader2 className="size-4 shrink-0 animate-spin text-ink-400" />}
 
         {clearable && selected && !disabled && (
-          <span
-            role="button"
-            tabIndex={-1}
+          <button
+            type="button"
             aria-label="Effacer la sélection"
             onClick={clear}
-            className="grid size-5 shrink-0 place-items-center rounded text-ink-400 hover:bg-ink-100 hover:text-ink-700"
+            className="grid size-5 shrink-0 place-items-center rounded border-0 bg-transparent p-0 text-ink-400 hover:bg-ink-100 hover:text-ink-700"
           >
             <X className="size-3.5" />
-          </span>
+          </button>
         )}
 
         <ChevronDown
@@ -199,7 +179,6 @@ const SearchSelect: React.FC<SearchSelectProps> = ({
         />
       </button>
 
-      {/* Label flottant, aligné sur FloatingInput/FloatingSelect */}
       <span
         className={cn(
           'pointer-events-none absolute left-3 origin-[0] transition-all duration-200 motion-reduce:transition-none',
@@ -212,7 +191,6 @@ const SearchSelect: React.FC<SearchSelectProps> = ({
         {label}
       </span>
 
-      {/* Menu */}
       {open && (
         <div className="absolute z-50 mt-1 w-full overflow-hidden rounded-md border border-ink-200 bg-white shadow-elevated">
           <div className="flex items-center gap-2 border-b border-ink-100 px-3 py-2">
@@ -229,7 +207,6 @@ const SearchSelect: React.FC<SearchSelectProps> = ({
           </div>
 
           <div id={listboxId} role="listbox" className="max-h-60 overflow-y-auto py-1">
-            {/* État : chargement */}
             {isLoading && (
               <div className="flex items-center gap-2 px-3 py-6 text-sm text-ink-500">
                 <Loader2 className="size-4 animate-spin" />
@@ -237,7 +214,6 @@ const SearchSelect: React.FC<SearchSelectProps> = ({
               </div>
             )}
 
-            {/* État : erreur de chargement */}
             {!isLoading && loadError && (
               <div className="px-3 py-4 text-sm">
                 <p className="flex items-start gap-2 text-red-600">
@@ -256,12 +232,10 @@ const SearchSelect: React.FC<SearchSelectProps> = ({
               </div>
             )}
 
-            {/* État : vide */}
             {!isLoading && !loadError && filtered.length === 0 && (
               <p className="px-3 py-6 text-center text-sm text-ink-500">{emptyMessage}</p>
             )}
 
-            {/* État : succès */}
             {!isLoading &&
               !loadError &&
               filtered.map((option, index) => {
@@ -282,6 +256,8 @@ const SearchSelect: React.FC<SearchSelectProps> = ({
                   >
                     {option.image ? (
                       <img
+                        loading="lazy"
+                        decoding="async"
                         src={option.image}
                         alt=""
                         className="size-8 shrink-0 rounded-full object-cover"

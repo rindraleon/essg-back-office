@@ -1,9 +1,11 @@
+import { Loader2, Reply } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import type { Message } from '../../services/messages.service';
-import { formatFullName } from '../../utils/name.utils';
+import { Button } from '../ui/button';
+import { Dialog, DialogBody, DialogContent, DialogFooter, DialogHeader } from '../ui/dialog';
+import { Input } from '../ui/input';
+import { Label } from '../ui/label';
+import type { Message } from '@/services';
+import { formatFullName } from '@/utils';
 
 interface ContactReplyDialogProps {
   message: Message;
@@ -29,19 +31,16 @@ const ContactReplyDialog = ({
     setBody(message.reponse || '');
   }, [open, message]);
 
-  if (!open) return null;
-
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-ink-950/70 p-4">
-      <div className="max-h-[92vh] w-full max-w-lg overflow-y-auto rounded-xl bg-white shadow-xl">
-        <div className="border-b border-ink-100 px-6 py-4">
-          <h2 className="text-xl font-bold text-ink-900">Répondre au message</h2>
-          <p className="mt-1 text-sm text-ink-600">
-            {formatFullName(message)}
-          </p>
-        </div>
+    <Dialog open={open} onOpenChange={(isOpen) => !isOpen && !submitting && onClose()}>
+      <DialogContent size="lg" showCloseButton={!submitting}>
+        <DialogHeader
+          icon={<Reply aria-hidden="true" />}
+          title="Répondre au message"
+          description={`${formatFullName(message)} — ${message.email}`}
+        />
 
-        <div className="space-y-4 p-6">
+        <DialogBody className="space-y-4">
           <div className="space-y-1.5">
             <Label htmlFor="reply-to">Destinataire</Label>
             <Input id="reply-to" value={message.email} disabled />
@@ -67,23 +66,24 @@ const ContactReplyDialog = ({
               disabled={submitting}
             />
           </div>
-        </div>
+        </DialogBody>
 
-        <div className="flex gap-3 border-t border-ink-100 px-6 py-4">
-          <Button type="button" variant="outline" className="flex-1" onClick={onClose} disabled={submitting}>
+        <DialogFooter>
+          <Button type="button" variant="outline" onClick={onClose} disabled={submitting}>
             Annuler
           </Button>
           <Button
             type="button"
-            className="flex-1"
             disabled={submitting || !body.trim()}
+            aria-busy={submitting}
             onClick={() => void onSubmit({ sujet, message: body.trim() })}
           >
-            {submitting ? 'Envoi...' : 'Envoyer la réponse'}
+            {submitting && <Loader2 className="size-4 animate-spin" aria-hidden="true" />}
+            {submitting ? 'Envoi en cours…' : 'Envoyer la réponse'}
           </Button>
-        </div>
-      </div>
-    </div>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 };
 

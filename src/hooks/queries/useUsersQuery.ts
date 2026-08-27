@@ -1,12 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import {
-  createUser,
-  deleteUser,
-  getAllUsers,
-  updateUser,
-  uploadAvatar,
-} from '../../services';
-import type { User } from '../../types';
+import { createUser, deleteUser, getAllUsers, updateUser, uploadAvatar } from '@/services';
+import type { User } from '@/types';
 import { queryKeys } from './keys';
 
 export function useUsersQuery(page = 1, limit = 100) {
