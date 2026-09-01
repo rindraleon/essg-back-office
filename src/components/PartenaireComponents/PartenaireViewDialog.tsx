@@ -1,7 +1,6 @@
 import React from 'react';
 import {
   Building2,
-  Calendar,
   ExternalLink,
   Globe,
   Mail,

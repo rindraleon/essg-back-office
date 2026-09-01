@@ -247,7 +247,6 @@ const Utilisateurs: React.FC = () => {
         onDelete={handleDeleteRequest}
         onOpenSessions={handleOpenSessions}
         isAdmin={isAdmin}
-        presenceByUser={presenceByUser}
       />
 
       <UserSessionsDialog
