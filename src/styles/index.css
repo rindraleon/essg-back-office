@@ -1,0 +1,268 @@
+@import 'tailwindcss';
+
+/* Polices identiques au site public (frontend) : Manrope pour le texte,
+   Outfit pour les titres, Space Mono pour les accents techniques.
+   Fichiers auto-hébergés dans src/assets/fonts. */
+@import '../assets/fonts/fonts.css';
+
+@theme {
+  --font-sans:
+    'Manrope Variable', 'Manrope', ui-sans-serif, system-ui, -apple-system, 'Segoe UI',
+    Roboto, 'Helvetica Neue', Arial, sans-serif;
+
+  /* Police d'affichage : titres de pages, chiffres clés, identité visuelle. */
+  --font-display:
+    'Outfit Variable', 'Outfit', 'Manrope Variable', ui-sans-serif, system-ui, sans-serif;
+
+  /* Accent technologique : identifiants, codes, télémétrie. */
+  --font-tech: 'Space Mono', ui-monospace, 'SFMono-Regular', monospace;
+
+  /* Échelle typographique unique du back-office (titres → légendes). */
+  --text-display: 1.875rem;
+  --text-display--line-height: 2.25rem;
+  --text-display--letter-spacing: -0.02em;
+  --text-display--font-weight: 700;
+
+  --text-title: 1.25rem;
+  --text-title--line-height: 1.75rem;
+  --text-title--letter-spacing: -0.01em;
+  --text-title--font-weight: 600;
+
+  --text-section: 0.75rem;
+  --text-section--line-height: 1rem;
+  --text-section--letter-spacing: 0.06em;
+  --text-section--font-weight: 600;
+
+  /* ============================================================
+     PALETTE — strictement identique au site public.
+     Dérivée du logo ESSG : vert feuille #98c070, anthracite #586068,
+     rouge #e53935 en accent d'alerte uniquement.
+     ============================================================ */
+  --color-brand-50: #f5faef;
+  --color-brand-100: #e8f3db;
+  --color-brand-200: #d3e8bd;
+  --color-brand-300: #b7d897;
+  --color-brand-400: #98c070;
+  --color-brand-500: #78a44e;
+  --color-brand-600: #547c36;
+  --color-brand-700: #42612c;
+  --color-brand-800: #374e27;
+  --color-brand-900: #2f4123;
+  --color-brand-950: #17220f;
+
+  --color-sage-50: #f5faef;
+  --color-sage-100: #e8f3db;
+  --color-sage-200: #d3e8bd;
+  --color-sage-300: #b7d897;
+  --color-sage-400: #98c070;
+  --color-sage-500: #78a44e;
+  --color-sage-600: #547c36;
+  --color-sage-700: #42612c;
+  --color-sage-800: #374e27;
+  --color-sage-900: #2f4123;
+  --color-sage-950: #17220f;
+
+  --color-ink-50: #f6f7f8;
+  --color-ink-100: #e9ebed;
+  --color-ink-200: #d4d8dc;
+  --color-ink-300: #b0b7bd;
+  --color-ink-400: #848d96;
+  --color-ink-500: #68727c;
+  --color-ink-600: #586068;
+  --color-ink-700: #4a5158;
+  --color-ink-800: #3c4247;
+  --color-ink-900: #2b3034;
+  --color-ink-950: #1b1f22;
+
+  --color-danger-50: #fdecea;
+  --color-danger-100: #fbd5d1;
+  --color-danger-500: #e53935;
+  --color-danger-600: #d32f2f;
+  --color-danger-700: #c62828;
+
+  --color-background: #ffffff;
+  --color-foreground: var(--color-ink-900);
+  --color-primary: var(--color-brand-600);
+  --color-primary-foreground: #ffffff;
+  --color-secondary: var(--color-brand-100);
+  --color-secondary-foreground: var(--color-brand-700);
+  --color-muted: var(--color-ink-100);
+  --color-muted-foreground: var(--color-ink-500);
+  --color-accent: var(--color-brand-50);
+  --color-accent-foreground: var(--color-brand-900);
+  --color-card: #ffffff;
+  --color-card-foreground: var(--color-ink-900);
+  --color-popover: #ffffff;
+  --color-popover-foreground: var(--color-ink-900);
+  --color-input: var(--color-ink-200);
+  --color-border: var(--color-ink-100);
+  --color-ring: var(--color-brand-500);
+  --color-destructive: var(--color-danger-600);
+  --color-destructive-foreground: #ffffff;
+
+  --radius-xs: 0.25rem;
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.25rem;
+  --radius-3xl: 1.5rem;
+  --radius-4xl: 2rem;
+
+  --shadow-card: 0 1px 2px rgb(27 31 34 / 0.04), 0 4px 16px -4px rgb(27 31 34 / 0.08);
+  --shadow-card-hover: 0 2px 4px rgb(27 31 34 / 0.05), 0 16px 40px -12px rgb(27 31 34 / 0.16);
+  --shadow-soft: 0 1px 3px rgb(27 31 34 / 0.05), 0 8px 24px -8px rgb(27 31 34 / 0.1);
+  --shadow-elevated: 0 8px 20px -6px rgb(27 31 34 / 0.12), 0 24px 56px -16px rgb(27 31 34 / 0.2);
+  --shadow-focus: 0 0 0 4px rgb(84 124 54 / 0.22);
+
+  --animate-fade-in: fade-in 0.35s ease-out both;
+  --animate-fade-in-up: fade-in-up 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+  --animate-scale-in: scale-in 0.25s cubic-bezier(0.22, 1, 0.36, 1) both;
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes fade-in-up {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes scale-in {
+    from {
+      opacity: 0;
+      transform: scale(0.96);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    /* Interlignage et césure optimisés pour les libellés longs en français. */
+    font-feature-settings: 'ss01';
+    background-color: var(--color-ink-50);
+    color: var(--color-ink-900);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    line-height: 1.6;
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-brand-600);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  /* Les chiffres des tableaux et statistiques restent alignés verticalement. */
+  table,
+  [data-numeric] {
+    font-variant-numeric: tabular-nums;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+  }
+
+  h5,
+  h6 {
+    font-family: var(--font-sans);
+  }
+
+  /* Même règle que sur le site public : l'échelle typographique porte la
+     police, y compris quand le titre est un <div>, un <span> ou un <p>. */
+  .text-display,
+  .text-title {
+    font-family: var(--font-display);
+  }
+
+  .text-section {
+    font-family: var(--font-sans);
+  }
+
+  .font-tech,
+  .text-tech {
+    font-family: var(--font-tech);
+  }
+
+  /* Les champs de formulaire et les boutons héritent de la police du
+     document, sinon le navigateur impose la sienne. */
+  button,
+  input,
+  select,
+  textarea {
+    font: inherit;
+    letter-spacing: inherit;
+  }
+
+  ::selection {
+    background-color: var(--color-brand-600);
+    color: #ffffff;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: var(--color-ink-100);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-ink-300);
+    border-radius: 9999px;
+    border: 2px solid var(--color-ink-100);
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-brand-500);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
