@@ -48,9 +48,7 @@ const SectionHeader = ({
   <div className="mb-2 flex items-center justify-between gap-2">
     <div className="flex min-w-0 items-center gap-1.5">
       <span className="text-ink-400">{icon}</span>
-      <Label className="text-xs font-semibold uppercase tracking-wide text-ink-600">
-        {label}
-      </Label>
+      <Label className="text-xs font-semibold uppercase tracking-wide text-ink-600">{label}</Label>
       {count > 0 && (
         <span data-numeric className="text-xs text-ink-400">
           ({count})

@@ -1,4 +1,4 @@
-import { apiClient, clearAuthToken } from '@/api';
+import { apiClient } from '@/api';
 import type { LoginResponse, User } from '@/types';
 
 export const login = async (email: string, password: string): Promise<LoginResponse> => {
@@ -39,8 +39,4 @@ export const verifyToken = async (): Promise<User | null> => {
   } catch {
     return null;
   }
-};
-
-export const logout = async (): Promise<void> => {
-  clearAuthToken();
 };

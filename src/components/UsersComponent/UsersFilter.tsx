@@ -9,6 +9,7 @@ export interface UserFilters {
   search: string;
   role: string;
   statut: string;
+  presence: string;
 }
 
 interface UsersFilterProps {
@@ -82,6 +83,23 @@ const UsersFilter: React.FC<UsersFilterProps> = ({
               <SelectContent>
                 <SelectItem value="actif">Actif</SelectItem>
                 <SelectItem value="inactif">Inactif</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="presence">Présence</Label>
+            <Select
+              value={filters.presence}
+              onValueChange={(value) => onUpdateFilter('presence', value || '')}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Tous" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="online">🟢 En ligne</SelectItem>
+                <SelectItem value="inactive">🟡 Inactif</SelectItem>
+                <SelectItem value="offline">⚪ Hors ligne</SelectItem>
               </SelectContent>
             </Select>
           </div>

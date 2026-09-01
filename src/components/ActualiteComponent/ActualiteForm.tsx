@@ -180,6 +180,8 @@ const ActualiteForm: React.FC<ActualiteFormProps> = ({
   };
 
   const dialogTitle = mode === 'create' ? 'Nouvelle actualité' : "Modifier l'actualité";
+  let submitLabel = mode === 'create' ? 'Créer' : 'Enregistrer';
+  if (submitting) submitLabel = 'Enregistrement...';
 
   const renderStep0 = () => (
     <div className="space-y-1">
@@ -342,6 +344,9 @@ const ActualiteForm: React.FC<ActualiteFormProps> = ({
             {STEPS.map((step, index) => {
               const isCompleted = index < activeStep;
               const isActive = index === activeStep;
+              let stepClass = 'bg-ink-100 text-ink-400';
+              if (isActive) stepClass = 'bg-brand-600 text-white shadow-sm';
+              else if (isCompleted) stepClass = 'bg-brand-50 text-brand-700 hover:bg-brand-100';
 
               return (
                 <React.Fragment key={step.id}>
@@ -358,13 +363,7 @@ const ActualiteForm: React.FC<ActualiteFormProps> = ({
                     className={`
                       flex items-center gap-1.5 px-3 py-1.5 rounded-full
                       text-xs font-medium transition-all
-                      ${
-                        isActive
-                          ? 'bg-brand-600 text-white shadow-sm'
-                          : isCompleted
-                            ? 'bg-brand-50 text-brand-700 hover:bg-brand-100'
-                            : 'bg-ink-100 text-ink-400'
-                      }
+                      ${stepClass}
                     `}
                   >
                     {isCompleted ? <CircleCheck className="h-4 w-4" /> : step.icon}
@@ -431,7 +430,7 @@ const ActualiteForm: React.FC<ActualiteFormProps> = ({
                   className="gap-1 h-8 bg-brand-600 hover:bg-brand-700"
                 >
                   <CircleCheck className="h-3.5 w-3.5" />
-                  {submitting ? 'Enregistrement...' : mode === 'create' ? 'Créer' : 'Enregistrer'}
+                  {submitLabel}
                 </Button>
               )}
             </div>

@@ -1,7 +1,12 @@
 import { CircleCheck, ImageUp, Loader2, Trash2, TriangleAlert, UserPlus } from 'lucide-react';
 import React, { useRef, useState, useEffect } from 'react';
 import { toast } from 'sonner';
-import { ACCEPTED_IMAGE_MIME_TYPES, MAX_IMAGE_UPLOAD_SIZE, isAcceptedImage , toUpperName } from '@/utils';
+import {
+  ACCEPTED_IMAGE_MIME_TYPES,
+  MAX_IMAGE_UPLOAD_SIZE,
+  isAcceptedImage,
+  toUpperName,
+} from '@/utils';
 import { uploadAvatar } from '@/services';
 import type { User, UserFormData } from '@/types';
 import { useFormValidation } from '@/hooks';

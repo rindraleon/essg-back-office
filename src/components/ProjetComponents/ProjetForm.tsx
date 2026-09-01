@@ -6,7 +6,7 @@ import { getImageUrl, isValidSourceUrl } from '@/utils';
 import type { Projet, ProjetFormData, ProjectSource } from '@/types';
 import SourcesField from './SourcesField';
 import { PROJET_TYPES, PROJET_STATUTS, DEFAULT_FORM_DATA } from '@/constants';
-import { useFormValidation , usePartenairesQuery } from '@/hooks';
+import { useFormValidation, usePartenairesQuery, type FieldValidators } from '@/hooks';
 import { Button } from '../ui/button';
 import { Label } from '../ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../ui/dialog';
@@ -118,7 +118,7 @@ const ProjetForm: React.FC<ProjetFormProps> = ({ open, onClose, onSubmit, initia
     resetForm,
   } = useFormValidation<ProjetFormData>({
     defaultValues: DEFAULT_FORM_DATA,
-    validators: projectValidators as any,
+    validators: projectValidators as FieldValidators<ProjetFormData>,
     stepFields: STEP_FIELDS_MAP,
   });
 
@@ -150,7 +150,6 @@ const ProjetForm: React.FC<ProjetFormProps> = ({ open, onClose, onSubmit, initia
       resetForm();
       setImagePreview('');
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, mode, initialId]);
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -205,6 +204,8 @@ const ProjetForm: React.FC<ProjetFormProps> = ({ open, onClose, onSubmit, initia
   };
 
   const dialogTitle = mode === 'create' ? 'Nouveau projet' : 'Modifier le projet';
+  let submitLabel = mode === 'create' ? 'Créer' : 'Enregistrer';
+  if (submitting) submitLabel = 'Enregistrement...';
 
   const renderStep0 = () => (
     <div className="space-y-1">
@@ -510,7 +511,7 @@ const ProjetForm: React.FC<ProjetFormProps> = ({ open, onClose, onSubmit, initia
                   className="gap-1 h-8 bg-brand-600 hover:bg-brand-700"
                 >
                   <CircleCheck className="h-3.5 w-3.5" />
-                  {submitting ? 'Enregistrement...' : mode === 'create' ? 'Créer' : 'Enregistrer'}
+                  {submitLabel}
                 </Button>
               )}
             </div>

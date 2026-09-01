@@ -1,7 +1,8 @@
-import { Eye, Pencil, Trash2 } from 'lucide-react';
+import { Eye, MonitorSmartphone, Pencil, Trash2 } from 'lucide-react';
 import React from 'react';
-import { getImageUrl , formatFullName, getPersonInitials } from '@/utils';
+import { getImageUrl, formatFullName, getPersonInitials } from '@/utils';
 import type { User } from '@/types';
+
 import DataTable from '../common/DataTable';
 import type { Column } from '../common/DataTable';
 import { Badge } from '../ui/badge';
@@ -17,7 +18,9 @@ interface UsersTableProps {
   onView: (user: User) => void;
   onEdit: (user: User) => void;
   onDelete: (user: User) => void;
+  onOpenSessions: (user: User) => void;
   isAdmin: boolean;
+  
 }
 
 const UsersTable: React.FC<UsersTableProps> = ({
@@ -30,7 +33,9 @@ const UsersTable: React.FC<UsersTableProps> = ({
   onView,
   onEdit,
   onDelete,
+  onOpenSessions,
   isAdmin,
+  
 }) => {
   const getRoleLabel = (role: string) => {
     switch (role) {
@@ -120,7 +125,7 @@ const UsersTable: React.FC<UsersTableProps> = ({
     {
       id: 'actions',
       label: 'Actions',
-      minWidth: 140,
+      minWidth: 190,
       align: 'right',
       render: (user) => (
         <div className="flex justify-end gap-1">
@@ -130,6 +135,17 @@ const UsersTable: React.FC<UsersTableProps> = ({
           <Button size="icon" variant="ghost" onClick={() => onEdit(user)} className="h-8 w-8">
             <Pencil className="size-4 h-4 w-4" />
           </Button>
+          {isAdmin && (
+            <Button
+              size="icon"
+              variant="ghost"
+              onClick={() => onOpenSessions(user)}
+              className="h-8 w-8 text-brand-600 hover:text-brand-700"
+              title="Voir les sessions de cet utilisateur"
+            >
+              <MonitorSmartphone className="size-4 h-4 w-4" />
+            </Button>
+          )}
           {isAdmin && (
             <Button
               size="icon"

@@ -111,4 +111,4 @@ function AvatarFallback({ className, children, ...props }: Readonly<AvatarFallba
   );
 }
 
-export { Avatar, AvatarImage, AvatarFallback, avatarVariants };
+export { Avatar, AvatarImage, AvatarFallback };

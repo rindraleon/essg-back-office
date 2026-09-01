@@ -77,9 +77,9 @@ export {
 export { default as RessourceHumaineForm } from './RessourceHumaineComponent/RessourceHumaineForm';
 export { default as RessourceHumaineTable } from './RessourceHumaineComponent/RessourceHumaineTable';
 export { default as RessourceHumaineViewDialog } from './RessourceHumaineComponent/RessourceHumaineViewDialog';
-export { Avatar, AvatarImage, AvatarFallback, avatarVariants } from './ui/avatar';
-export { Badge, badgeVariants } from './ui/badge';
-export { Button, buttonVariants } from './ui/button';
+export { Avatar, AvatarImage, AvatarFallback } from './ui/avatar';
+export { Badge } from './ui/badge';
+export { Button } from './ui/button';
 export {
   Card,
   CardHeader,
@@ -102,7 +102,6 @@ export {
   DialogPortal,
   DialogTitle,
   DialogTrigger,
-  dialogContentVariants,
 } from './ui/dialog';
 export {
   DropdownMenu,
@@ -148,3 +147,11 @@ export type { UserFilters } from './UsersComponent/UsersFilter';
 export { default as UsersForm } from './UsersComponent/UsersForm';
 export { default as UsersTable } from './UsersComponent/UsersTable';
 export { default as UsersViewDialog } from './UsersComponent/UsersViewDialog';
+export { default as PresenceBadge } from './common/PresenceBadge';
+export {
+  PRESENCE_LABELS,
+  PRESENCE_DOT_COLORS,
+  PRESENCE_TEXT_COLORS,
+} from '../constants/presence.constants';
+export { default as SessionRealtimeProvider } from './common/SessionRealtimeProvider';
+export { default as UserSessionsDialog } from './UsersComponent/UserSessionsDialog';

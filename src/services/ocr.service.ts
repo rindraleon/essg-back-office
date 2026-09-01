@@ -100,7 +100,13 @@ interface TextFragment {
   width?: number;
 }
 
-function detectColumnCut({ items, pageWidth }: { items: TextFragment[]; pageWidth: number; }): number | null {
+function detectColumnCut({
+  items,
+  pageWidth,
+}: {
+  items: TextFragment[];
+  pageWidth: number;
+}): number | null {
   const visible = items.filter((item) => item.str?.trim());
   if (visible.length < 20) return null;
 
@@ -160,8 +166,7 @@ function itemsToLines(items: TextFragment[]): string {
 
     const transform = item.transform;
     if (!transform || transform.length < 6) {
-      if (rows.length > 0)
-        rows.at(-1)!.parts.push({ x: Number.MAX_SAFE_INTEGER, str: text });
+      if (rows.length > 0) rows.at(-1)!.parts.push({ x: Number.MAX_SAFE_INTEGER, str: text });
       continue;
     }
 

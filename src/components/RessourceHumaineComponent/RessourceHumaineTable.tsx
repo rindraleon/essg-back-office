@@ -1,6 +1,6 @@
 import { Eye, Pencil, Trash2 } from 'lucide-react';
 import React from 'react';
-import { getImageUrl , formatFullName, getPersonInitials } from '@/utils';
+import { getImageUrl, formatFullName, getPersonInitials } from '@/utils';
 import type { RessourceHumaineItem } from '@/types';
 import DataTable from '../common/DataTable';
 import type { Column } from '../common/DataTable';

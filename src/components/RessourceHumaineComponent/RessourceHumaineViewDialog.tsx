@@ -13,7 +13,7 @@ import {
   X,
 } from 'lucide-react';
 import React from 'react';
-import { getImageUrl , formatFullName, getPersonInitials } from '@/utils';
+import { getImageUrl, formatFullName, getPersonInitials } from '@/utils';
 import type { RessourceHumaineItem } from '@/types';
 import { Button } from '../ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../ui/dialog';
@@ -273,7 +273,7 @@ const RessourceHumaineViewDialog: React.FC<RessourceHumaineViewDialogProps> = ({
               )}
 
               {(competences.length > 0 || langues.length > 0) && (
-                <div className="grid gap-5 sm:grid-cols-2">
+                <div className="grid gap-5 sm:grid-cols">
                   {competences.length > 0 && (
                     <DetailSection
                       title="Compétences"

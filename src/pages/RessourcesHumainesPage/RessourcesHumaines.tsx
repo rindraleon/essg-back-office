@@ -1,4 +1,6 @@
-import { CompatCard as Card, CompatCardContent as CardContent ,
+import {
+  CompatCard as Card,
+  CompatCardContent as CardContent,
   RessourceHumaineFilters,
   RessourceHumaineForm,
   RessourceHumaineTable,

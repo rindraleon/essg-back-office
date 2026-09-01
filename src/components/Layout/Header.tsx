@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { routesStatic } from '@/routes';
 import { useAuth } from '@/contexts';
-import { getImageUrl , formatFullName } from '@/utils';
+import { getImageUrl, formatFullName } from '@/utils';
 import { Button } from '../ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../ui/dialog';
@@ -22,7 +22,7 @@ const Header: React.FC = () => {
   const [open, setOpen] = useState(false);
   const [logoutDialogOpen, setLogoutDialogOpen] = useState(false);
   const navigate = useNavigate();
-  const { isAuthenticated, user, username, logout } = useAuth();
+  const { isAuthenticated, user, username, isAdmin, logout } = useAuth();
   const { data: recentAdmissions = [] } = useRecentAdmissionsQuery(4, isAuthenticated);
   const { data: recentMessagesResponse } = useRecentMessagesQuery(4, isAuthenticated);
   const recentMessages = recentMessagesResponse?.data ?? [];
@@ -49,6 +49,19 @@ const Header: React.FC = () => {
       .join('')
       .toUpperCase()
       .slice(0, 2);
+  };
+
+  const getRoleLabel = (role?: string) => {
+    switch (role) {
+      case 'admin':
+        return 'Administrateur';
+      case 'editeur':
+        return 'Éditeur';
+      case 'lecteur':
+        return 'Lecteur';
+      default:
+        return 'Utilisateur';
+    }
   };
 
   const displayName = formatFullName(user) || username || 'Utilisateur';
@@ -289,10 +302,12 @@ const Header: React.FC = () => {
                     <User className="h-4 w-4 mr-2" />
                     Mon profil
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => navigate(routesStatic.parametres)}>
-                    <Settings className="h-4 w-4 mr-2" />
-                    Paramètres
-                  </DropdownMenuItem>
+                  {isAdmin && (
+                    <DropdownMenuItem onClick={() => navigate(routesStatic.parametres)}>
+                      <Settings className="h-4 w-4 mr-2" />
+                      Paramètres
+                    </DropdownMenuItem>
+                  )}
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
                     onClick={handleLogoutClick}
@@ -340,7 +355,7 @@ const Header: React.FC = () => {
                   </Avatar>
                   <div>
                     <p className="text-sm font-medium text-ink-900">{displayName}</p>
-                    <p className="text-xs text-ink-500">Administrateur</p>
+                    <p className="text-xs text-ink-500">{getRoleLabel(user?.role)}</p>
                   </div>
                 </div>
               </div>
@@ -488,17 +503,19 @@ const Header: React.FC = () => {
                     <span>Mon profil</span>
                   </button>
 
-                  <button
-                    type="button"
-                    onClick={() => {
-                      navigate(routesStatic.parametres);
-                      setOpen(false);
-                    }}
-                    className="flex items-center gap-3 py-2.5 px-3 rounded-md text-sm font-medium text-ink-700 hover:bg-ink-50"
-                  >
-                    <Settings className="size-4" />
-                    <span>Paramètres</span>
-                  </button>
+                  {isAdmin && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        navigate(routesStatic.parametres);
+                        setOpen(false);
+                      }}
+                      className="flex items-center gap-3 py-2.5 px-3 rounded-md text-sm font-medium text-ink-700 hover:bg-ink-50"
+                    >
+                      <Settings className="size-4" />
+                      <span>Paramètres</span>
+                    </button>
+                  )}
 
                   <button
                     type="button"

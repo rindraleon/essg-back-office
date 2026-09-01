@@ -118,7 +118,6 @@
   --animate-fade-in: fade-in 0.35s ease-out both;
   --animate-fade-in-up: fade-in-up 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
   --animate-scale-in: scale-in 0.25s cubic-bezier(0.22, 1, 0.36, 1) both;
-  --animate-slide-up: slide-up 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
 
   @keyframes fade-in {
     from {
@@ -151,16 +150,6 @@
     }
   }
 
-  @keyframes slide-up {
-    from {
-      opacity: 0;
-      transform: translateY(24px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
 }
 
 @layer base {
@@ -277,11 +266,3 @@
   display: none;
 }
 
-.safe-area-pb {
-  padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
-}
-
-.safe-area-px {
-  padding-left: max(0.75rem, env(safe-area-inset-left));
-  padding-right: max(0.75rem, env(safe-area-inset-right));
-}

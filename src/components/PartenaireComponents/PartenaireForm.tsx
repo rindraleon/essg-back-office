@@ -1,7 +1,7 @@
 import { ArrowLeft, ArrowRight, Briefcase, CircleCheck, Globe, Info, Upload } from 'lucide-react';
 import React, { useRef, useState, useEffect } from 'react';
 import { toast } from 'sonner';
-import { getImageUrl , toUpperName } from '@/utils';
+import { getImageUrl, toUpperName } from '@/utils';
 import { uploadImage } from '@/services';
 import type { Partenaire, PartenaireFormData } from '@/types';
 import { PARTENAIRE_TYPES, DEFAULT_PARTENAIRE_FORM_DATA } from '@/constants';
@@ -57,6 +57,9 @@ const PartenaireForm: React.FC<PartenaireFormProps> = ({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [logoPreview, setLogoPreview] = useState<string>('');
   const [uploadingImage, setUploadingImage] = useState(false);
+  let logoButtonLabel = 'Ajouter un logo';
+  if (logoPreview) logoButtonLabel = 'Changer le logo';
+  if (uploadingImage) logoButtonLabel = 'Upload...';
 
   const {
     formData,
@@ -167,6 +170,8 @@ const PartenaireForm: React.FC<PartenaireFormProps> = ({
   };
 
   const dialogTitle = mode === 'create' ? 'Nouveau partenaire' : 'Modifier le partenaire';
+  let submitLabel = mode === 'create' ? 'Créer' : 'Enregistrer';
+  if (submitting) submitLabel = 'Enregistrement...';
 
   const renderStep0 = () => (
     <div className="space-y-4">
@@ -252,7 +257,7 @@ const PartenaireForm: React.FC<PartenaireFormProps> = ({
               size="sm"
             >
               <Upload className="h-3.5 w-3.5" />
-              {uploadingImage ? 'Upload...' : logoPreview ? 'Changer le logo' : 'Ajouter un logo'}
+              {logoButtonLabel}
             </Button>
             <span className="text-[10px] text-ink-400">JPG, PNG, GIF, WebP — max 5 Mo</span>
           </div>
@@ -305,6 +310,9 @@ const PartenaireForm: React.FC<PartenaireFormProps> = ({
             {STEPS.map((step, index) => {
               const isCompleted = index < activeStep;
               const isActive = index === activeStep;
+              let stepClass = 'bg-ink-100 text-ink-400';
+              if (isActive) stepClass = 'bg-brand-600 text-white shadow-sm';
+              else if (isCompleted) stepClass = 'bg-brand-50 text-brand-700 hover:bg-brand-100';
 
               return (
                 <React.Fragment key={step.id}>
@@ -321,13 +329,7 @@ const PartenaireForm: React.FC<PartenaireFormProps> = ({
                     className={`
                       flex items-center gap-1.5 px-3 py-1.5 rounded-md
                       text-xs font-medium transition-all
-                      ${
-                        isActive
-                          ? 'bg-brand-600 text-white shadow-sm'
-                          : isCompleted
-                            ? 'bg-brand-50 text-brand-700 hover:bg-brand-100'
-                            : 'bg-ink-100 text-ink-400'
-                      }
+                      ${stepClass}
                     `}
                   >
                     {isCompleted ? <CircleCheck className="h-4 w-4" /> : step.icon}
@@ -380,7 +382,7 @@ const PartenaireForm: React.FC<PartenaireFormProps> = ({
               ) : (
                 <Button type="button" size="sm" onClick={handleSubmit} disabled={submitting}>
                   <CircleCheck className="h-3.5 w-3.5" />
-                  {submitting ? 'Enregistrement…' : mode === 'create' ? 'Créer' : 'Enregistrer'}
+                  {submitLabel}
                 </Button>
               )}
             </div>

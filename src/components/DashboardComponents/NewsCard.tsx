@@ -21,7 +21,7 @@ const NewsCard: React.FC<NewsCardProps> = ({ actualite, onView }) => {
   };
 
   return (
-    <Card className="h-full flex flex-col transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
+    <Card className="h-full flex flex-col transition-all duration-300 hover:shadow-lg hover:border-brand-200">
       <CardContent className="flex-1">
         <div className="flex items-start gap-4 mb-3">
           <div className="text-2xl w-[60px] h-[60px] flex items-center justify-center bg-brand-50 rounded-lg flex-shrink-0">

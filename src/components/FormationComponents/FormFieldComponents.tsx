@@ -1,12 +1,21 @@
-import { TextField, FormControl, InputLabel, Select, MenuItem, IconButton, Box, FormHelperText, Button } from '@/components/compat/mui';
+import {
+  TextField,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  IconButton,
+  Box,
+  FormHelperText,
+  Button,
+} from '@/components/compat/mui';
 import { Plus, Trash2 } from 'lucide-react';
 import React from 'react';
 
-// Composant pour un champ texte réutilisable
 interface FormTextFieldProps {
   label: string;
   value: string | number;
-  onChange: (value: any) => void;
+  onChange: (value: string | number) => void;
   onBlur?: () => void;
   error: string | undefined;
   touched?: boolean;
@@ -50,11 +59,10 @@ export const FormTextField: React.FC<FormTextFieldProps> = ({
   );
 };
 
-// Composant pour un Select réutilisable
 interface FormSelectProps {
   label: string;
   value: string | string[];
-  onChange: (value: any) => void;
+  onChange: (value: string | string[]) => void;
   onBlur?: () => void;
   error?: string;
   touched?: boolean;
@@ -62,7 +70,7 @@ interface FormSelectProps {
   multiple?: boolean;
   fullWidth?: boolean;
   size?: 'small' | 'medium';
-  renderValue?: (selected: any) => React.ReactNode;
+  renderValue?: (selected: unknown) => React.ReactNode;
 }
 
 export const FormSelect: React.FC<FormSelectProps> = ({
@@ -100,7 +108,6 @@ export const FormSelect: React.FC<FormSelectProps> = ({
   );
 };
 
-// Composant pour un champ de type tableau (objectifs, débouchés, etc.)
 interface ArrayFieldProps {
   label: string;
   icon?: React.ReactNode;

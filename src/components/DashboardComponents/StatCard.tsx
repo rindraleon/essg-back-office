@@ -57,7 +57,7 @@ const StatCard: React.FC<StatCardProps> = ({ title, value, change, icon, loading
   );
 
   const className =
-    'group relative block overflow-hidden rounded-sm border border-ink-100 bg-white p-5 text-left transition-all duration-200 hover:-translate-y-0.5 hover:border-brand-200 hover:shadow-card-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/40';
+    'group relative block overflow-hidden rounded-sm border border-ink-100 bg-white p-5 text-left transition-all duration-200 hover:border-brand-200 hover:shadow-card-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/40';
 
   if (to) {
     return (

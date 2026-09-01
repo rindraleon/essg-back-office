@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import * as React from 'react';
 import { Button as UiButton } from '../ui/button';
 import { Input } from '../ui/input';

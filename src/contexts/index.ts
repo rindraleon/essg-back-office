@@ -1,2 +1,3 @@
 // Point d'entrée unique des exports du répertoire "contexts".
-export { AuthProvider, useAuth } from './AuthContext';
+export { AuthContext, AuthProvider, useAuth } from './AuthContext';
+export type { AuthContextType } from './AuthContext';

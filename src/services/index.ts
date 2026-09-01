@@ -18,7 +18,7 @@ export type {
   AdmissionsListResponse,
   AdmissionDecisionPayload,
 } from './admissions.service';
-export { login, verifyToken, logout } from './auth.service';
+export { login, verifyToken } from './auth.service';
 export { getDashboardStats, getRecentActivities } from './dashboard.service';
 export {
   getAllFormations,
@@ -59,3 +59,13 @@ export { getSettings, updateSettings } from './settings.service';
 export type { Settings } from './settings.service';
 export { getAllUsers, createUser, updateUser, uploadAvatar, deleteUser } from './users.service';
 export type { UsersListResponse } from './users.service';
+export {
+  getCurrentSession,
+  getMySessions,
+  logoutCurrentSession,
+  getUsersPresence,
+  getUserPresenceById,
+  getUserSessions,
+  revokeSession,
+  revokeAllSessions,
+} from './session.service';

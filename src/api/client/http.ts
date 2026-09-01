@@ -38,6 +38,10 @@ function getToken(): string | undefined {
   return Cookies.get(TOKEN_COOKIE_NAME);
 }
 
+export function getAuthToken(): string | undefined {
+  return getToken();
+}
+
 export function setAuthToken(token: string, options?: Cookies.CookieAttributes) {
   if (typeof window === 'undefined') return;
   Cookies.set(TOKEN_COOKIE_NAME, token, { sameSite: 'lax', ...options });
@@ -58,7 +62,10 @@ export function registerAuthFailureHandler(fn: () => void) {
 }
 
 function handleUnauthorized(requestUrl: string): void {
-  const isAuthProbe = requestUrl.includes('/auth/verify') || requestUrl.includes('/auth/me');
+  const isAuthProbe =
+    requestUrl.includes('/auth/verify') ||
+    requestUrl.includes('/auth/me') ||
+    requestUrl.includes('/auth/session');
   if (isAuthProbe) return;
   try {
     clearAuthToken();

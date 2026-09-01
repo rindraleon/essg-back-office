@@ -48,4 +48,12 @@ export const queryKeys = {
     list: (params: object) => [...queryKeys.activityLogs.all, 'list', params] as const,
     detail: (id: number) => [...queryKeys.activityLogs.all, 'detail', id] as const,
   },
+  sessions: {
+    all: ['sessions'] as const,
+    current: () => [...queryKeys.sessions.all, 'current'] as const,
+    mine: () => [...queryKeys.sessions.all, 'mine'] as const,
+    presence: (page?: number, limit?: number) =>
+      [...queryKeys.sessions.all, 'presence', page, limit] as const,
+    user: (userId: number) => [...queryKeys.sessions.all, 'user', userId] as const,
+  },
 };

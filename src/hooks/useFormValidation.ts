@@ -52,10 +52,7 @@ function validateRequiredField(value: unknown, fieldName: string): string | unde
   return undefined;
 }
 
-function validateLength(
-  value: unknown,
-  config: FieldConfig<unknown>
-): string | undefined {
+function validateLength(value: unknown, config: FieldConfig<unknown>): string | undefined {
   if (typeof value !== 'string') return undefined;
   if (config.minLength && value.length < config.minLength.value) {
     return config.minLength.message;

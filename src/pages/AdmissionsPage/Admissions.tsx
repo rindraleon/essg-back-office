@@ -1,7 +1,8 @@
 import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from 'react';
 import { Download, LoaderCircle } from 'lucide-react';
 import { toast } from 'sonner';
-import { Button ,
+import {
+  Button,
   ListPageHeader,
   AdmissionFilters,
   ConfirmDialog,

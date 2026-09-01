@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import { toast } from 'sonner';
 import {
   UsersTable,
@@ -6,6 +6,7 @@ import {
   UsersViewDialog,
   ConfirmDialog,
   UsersFilter,
+  UserSessionsDialog,
   ListPageHeader,
   type UserFilters,
 } from '@/components';
@@ -18,14 +19,22 @@ import {
   useUsersQuery,
   useTitle,
 } from '@/hooks';
+import { useUsersPresence } from '@/hooks/queries/useSessionQueries';
 import { useAuth } from '@/contexts';
 import type { User, UserFormData } from '@/types';
+import type { UserPresence } from '@/types/session.types';
 import { ApiError } from '@/api';
 
 const Utilisateurs: React.FC = () => {
   useScrollToTop();
   useTitle('Utilisateurs');
-  const { data = [] } = useUsersQuery();
+  // Même plafond (1000) que la présence : les deux requêtes doivent couvrir
+  // le même ensemble d'utilisateurs, sinon la colonne « Présence » affiche
+  // « Hors ligne » à tort pour les comptes hors page.
+  const { data = [] } = useUsersQuery(1, 1000);
+  // Présence calculée par le backend (Spec §12/§17) : le frontend n'est
+  // jamais la source de vérité du statut en ligne.
+  const { data: presenceData } = useUsersPresence(1, 1000);
   const createMutation = useCreateUser();
   const updateMutation = useUpdateUser();
   const deleteMutation = useDeleteUser();
@@ -33,6 +42,7 @@ const Utilisateurs: React.FC = () => {
     search: '',
     role: '',
     statut: '',
+    presence: '',
   });
   const [filterOpen, setFilterOpen] = useState(false);
   const [formOpen, setFormOpen] = useState(false);
@@ -41,8 +51,17 @@ const Utilisateurs: React.FC = () => {
   const [viewDialogOpen, setViewDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [userToDelete, setUserToDelete] = useState<User | null>(null);
+  const [sessionsUser, setSessionsUser] = useState<User | null>(null);
   const { user } = useAuth();
   const isAdmin = user?.role === 'admin';
+
+  const presenceByUser = useMemo(() => {
+    const map: Record<number, UserPresence> = {};
+    for (const item of presenceData?.items ?? []) {
+      map[item.id] = item.presence;
+    }
+    return map;
+  }, [presenceData]);
 
   const filteredData = data.filter((user) => {
     const matchesSearch =
@@ -58,7 +77,11 @@ const Utilisateurs: React.FC = () => {
       (filters.statut === 'actif' && user.estActif) ||
       (filters.statut === 'inactif' && !user.estActif);
 
-    return matchesSearch && matchesRole && matchesStatut;
+    const matchesPresence =
+      filters.presence === '' ||
+      (presenceByUser[user.id]?.status ?? 'offline') === filters.presence;
+
+    return matchesSearch && matchesRole && matchesStatut && matchesPresence;
   });
 
   const {
@@ -91,6 +114,7 @@ const Utilisateurs: React.FC = () => {
       search: '',
       role: '',
       statut: '',
+      presence: '',
     });
     resetPage();
   }, [resetPage]);
@@ -104,6 +128,7 @@ const Utilisateurs: React.FC = () => {
     if (filters.search) count++;
     if (filters.role) count++;
     if (filters.statut) count++;
+    if (filters.presence) count++;
     return count;
   }, [filters]);
 
@@ -122,6 +147,10 @@ const Utilisateurs: React.FC = () => {
   const handleView = useCallback((user: User) => {
     setSelectedUser(user);
     setViewDialogOpen(true);
+  }, []);
+
+  const handleOpenSessions = useCallback((user: User) => {
+    setSessionsUser(user);
   }, []);
 
   const handleDeleteRequest = useCallback((user: User) => {
@@ -152,7 +181,7 @@ const Utilisateurs: React.FC = () => {
             return;
           }
 
-          const { avatarFile, avatar: _avatar, ...userDataWithoutAvatar } = formData;
+          const { avatarFile, ...userDataWithoutAvatar } = formData;
           await createMutation.mutateAsync({
             userData: {
               email: userDataWithoutAvatar.email,
@@ -216,7 +245,15 @@ const Utilisateurs: React.FC = () => {
         onView={handleView}
         onEdit={handleOpenEdit}
         onDelete={handleDeleteRequest}
+        onOpenSessions={handleOpenSessions}
         isAdmin={isAdmin}
+        presenceByUser={presenceByUser}
+      />
+
+      <UserSessionsDialog
+        open={sessionsUser !== null}
+        onClose={() => setSessionsUser(null)}
+        user={sessionsUser}
       />
 
       <UsersForm

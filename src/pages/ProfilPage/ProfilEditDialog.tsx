@@ -172,7 +172,11 @@ const ProfilEditDialog: React.FC<ProfilEditDialogProps> = ({ open, onClose, user
 
         <DialogBody className="space-y-6">
           <section aria-labelledby="profil-photo-label" className="space-y-3">
-            <Label id="profil-photo-label" className="text-section text-ink-500 uppercase" htmlFor={''}>
+            <Label
+              id="profil-photo-label"
+              className="text-section text-ink-500 uppercase"
+              htmlFor={''}
+            >
               Photo de profil
             </Label>
 
@@ -230,7 +234,11 @@ const ProfilEditDialog: React.FC<ProfilEditDialogProps> = ({ open, onClose, user
           </section>
 
           <section aria-labelledby="profil-identite-label" className="space-y-2">
-            <Label id="profil-identite-label" className="text-section text-ink-500 uppercase" htmlFor={''}>
+            <Label
+              id="profil-identite-label"
+              className="text-section text-ink-500 uppercase"
+              htmlFor={''}
+            >
               Informations personnelles
             </Label>
             <div className="grid grid-cols-1 items-start gap-x-3 sm:grid-cols-2">
@@ -267,7 +275,11 @@ const ProfilEditDialog: React.FC<ProfilEditDialogProps> = ({ open, onClose, user
             aria-labelledby="profil-securite-label"
             className="space-y-1 rounded-xl border border-ink-100 bg-ink-50/60 p-3"
           >
-            <Label id="profil-securite-label" className="text-section text-ink-600 uppercase" htmlFor={''}>
+            <Label
+              id="profil-securite-label"
+              className="text-section text-ink-600 uppercase"
+              htmlFor={''}
+            >
               Changer le mot de passe (facultatif)
             </Label>
             <div className="grid grid-cols-1 items-start gap-x-3 sm:grid-cols-2">

@@ -10,10 +10,14 @@ import {
 } from 'lucide-react';
 import React, { useRef, useState, useEffect } from 'react';
 import { toast } from 'sonner';
-import { toUpperName , getImageUrl } from '@/utils';
+import { toUpperName, getImageUrl } from '@/utils';
 import { uploadImage } from '@/services';
 import type { RessourceHumaineItem, RessourceHumaineFormData } from '@/types';
-import { RESSOURCE_HUMAINE_POSTES as postes , EMAIL_ERROR_MESSAGE, EMAIL_PATTERN } from '@/constants';
+import {
+  RESSOURCE_HUMAINE_POSTES as postes,
+  EMAIL_ERROR_MESSAGE,
+  EMAIL_PATTERN,
+} from '@/constants';
 import { useFormValidation } from '@/hooks';
 import { Button } from '../ui/button';
 import { Label } from '../ui/label';

@@ -47,4 +47,4 @@ export {
 } from './useAdmissionsQuery';
 export { useSettingsQuery, useUpdateSettings } from './useSettingsQuery';
 export { useDashboardStatsQuery, useRecentActivitiesQuery } from './useDashboardQuery';
-export { useActivityLogsQuery, useActivityLogQuery } from './useActivityLogsQuery';
+export { useActivityLogsQuery } from './useActivityLogsQuery';

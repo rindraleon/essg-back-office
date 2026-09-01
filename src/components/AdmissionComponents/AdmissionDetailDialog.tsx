@@ -14,7 +14,7 @@ import { ADMISSION_FILE_TYPE_LABELS } from '@/types';
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
 import { Dialog, DialogBody, DialogContent, DialogFooter, DialogHeader } from '../ui/dialog';
-import { formatFullName , formatFileSize, getFileExtension } from '@/utils';
+import { formatFullName, formatFileSize, getFileExtension } from '@/utils';
 
 interface AdmissionDetailDialogProps {
   admission: Admission;

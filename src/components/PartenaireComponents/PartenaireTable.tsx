@@ -1,6 +1,6 @@
 import { Eye, Pencil, Trash2 } from 'lucide-react';
 import React, { useMemo } from 'react';
-import { getImageUrl, isRemoteImage , formatDate } from '@/utils';
+import { getImageUrl, isRemoteImage, formatDate } from '@/utils';
 import type { Partenaire } from '@/types';
 
 import { PARTENAIRE_TYPE_COLORS } from '@/constants';

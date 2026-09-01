@@ -9,7 +9,10 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
- ActivityLogTable, ActivityLogViewDialog, ListPageHeader } from '@/components';
+  ActivityLogTable,
+  ActivityLogViewDialog,
+  ListPageHeader,
+} from '@/components';
 import { useDebounce, useScrollToTop, useTitle, useActivityLogsQuery } from '@/hooks';
 import type { ActivityLog } from '@/types';
 

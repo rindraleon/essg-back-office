@@ -71,3 +71,14 @@ export { useProjetFilter } from './useProjetFilter';
 export { useRessourceHumaineFilter } from './useRessourceHumaineFilter';
 export { default as useScrollToTop } from './useScrollToTop';
 export { useTitle } from './useTitle';
+export {
+  useCurrentSession,
+  useMySessions,
+  useUserSessions,
+  useUsersPresence,
+} from './queries/useSessionQueries';
+export {
+  useRevokeSession,
+  useRevokeAllSessions,
+  useRevokeMySession,
+} from './mutations/useSessionMutations';

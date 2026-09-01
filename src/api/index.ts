@@ -1,9 +1,9 @@
-// Point d'entrée unique des exports du répertoire "api".
 export {
   API_BASE_URL,
   setAuthToken,
   clearAuthToken,
   hasAuthToken,
+  getAuthToken,
   registerAuthFailureHandler,
   apiClient,
 } from './client/http';

@@ -1,4 +1,3 @@
-/* eslint-disable sonarjs/no-nested-conditional, @typescript-eslint/no-unused-vars, sonarjs/no-unused-vars */
 import {
   ArrowLeft,
   ArrowRight,
@@ -10,11 +9,13 @@ import {
 } from 'lucide-react';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'sonner';
-import { getImageUrl , formatFullName } from '@/utils';
+import { getImageUrl, formatFullName } from '@/utils';
 import { uploadImage } from '@/services';
 import type { FormationFormData, FormationFormProps } from '@/types';
-import { useFormValidation , useFormationMentionsQuery , useRessourcesHumainesQuery } from '@/hooks';
-import { EMAIL_ERROR_MESSAGE, EMAIL_PATTERN ,
+import { useFormValidation, useFormationMentionsQuery, useRessourcesHumainesQuery } from '@/hooks';
+import {
+  EMAIL_ERROR_MESSAGE,
+  EMAIL_PATTERN,
   CONDITION_ACCES_OPTIONS,
   DUREE_OPTIONS,
   NIVEAU_OPTIONS,

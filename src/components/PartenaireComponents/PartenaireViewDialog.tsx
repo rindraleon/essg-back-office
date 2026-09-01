@@ -1,11 +1,26 @@
-import { Calendar, Globe, Mail, Tag, X } from 'lucide-react';
 import React from 'react';
-import { getImageUrl, isRemoteImage , formatDate } from '@/utils';
+import {
+  Building2,
+  Calendar,
+  ExternalLink,
+  Globe,
+  Mail,
+  Tag,
+  X,
+} from 'lucide-react';
+
+import { getImageUrl, isRemoteImage, formatDate } from '@/utils';
 import type { Partenaire } from '@/types';
 import { PARTENAIRE_TYPE_COLORS } from '@/constants';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../ui/dialog';
+
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '../ui/dialog';
 import { Button } from '../ui/button';
-import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
+import { Avatar, AvatarFallback } from '../ui/avatar';
 import { Badge } from '../ui/badge';
 
 interface PartenaireViewDialogProps {
@@ -14,14 +29,14 @@ interface PartenaireViewDialogProps {
   partenaire: Partenaire | null;
 }
 
-const getBadgeVariant = (colorType: string): React.ComponentProps<typeof Badge>['variant'] => {
+const getBadgeVariant = (
+  colorType: string,
+): React.ComponentProps<typeof Badge>['variant'] => {
   switch (colorType) {
     case 'primary':
-      return 'default';
-    case 'secondary':
-      return 'secondary';
     case 'success':
       return 'default';
+    case 'secondary':
     case 'warning':
       return 'secondary';
     default:
@@ -36,159 +51,241 @@ const PartenaireViewDialog: React.FC<PartenaireViewDialogProps> = ({
 }) => {
   if (!partenaire) return null;
 
-  const badgeVariant: React.ComponentProps<typeof Badge>['variant'] = getBadgeVariant(
-    PARTENAIRE_TYPE_COLORS[partenaire.type]
+  const badgeVariant = getBadgeVariant(
+    PARTENAIRE_TYPE_COLORS[partenaire.type],
   );
+  const logoIsImage = isRemoteImage(partenaire.logo);
+  const hasContactInfo = partenaire.siteWeb || partenaire.contact;
 
   return (
-    <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
+    <Dialog
+      open={open}
+      onOpenChange={(isOpen) => !isOpen && onClose()}
+    >
       <DialogContent
         showCloseButton={false}
         className="
-          !w-[96vw]
-          !max-w-[calc(100%-1rem)]
-          sm:!max-w-6xl
-          !h-[90vh]
-          !max-h-[90vh]
-          gap-0
+          w-[calc(100vw-2rem)]
+          max-w-[850px]
           overflow-hidden
-          rounded-[30px]
-          border-2 border-ink-100
+          rounded-2xl
+          border border-ink-100
           bg-white
           p-0
-          shadow-[0_24px_80px_rgba(15,23,42,0.35)]
+          shadow-[0_24px_70px_rgba(15,23,42,0.18)]
         "
       >
-        <div className="flex min-h-0 flex-col">
-          <DialogHeader className="shrink-0 border-b border-ink-100 bg-white px-5 py-4 lg:px-6">
-            <div className="flex items-start justify-between gap-4">
-              <div className="min-w-0">
-                <DialogTitle className="text-xl font-bold text-ink-900">
-                  Détail du partenaire
-                </DialogTitle>
-              </div>
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                onClick={onClose}
-                className="h-10 w-10 shrink-0 rounded-full border border-ink-100 bg-white hover:bg-ink-100"
-                aria-label="Fermer"
-              >
-                <X className="h-4 w-4" />
-              </Button>
+        {/* ============ HEADER ÉPURÉ ============ */}
+        <DialogHeader className="border-b border-ink-100 px-6 py-4 sm:px-8">
+          <div className="flex items-center justify-between gap-4">
+            <div className="min-w-0">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-brand-600">
+                Fiche Partenaire
+              </span>
+              <DialogTitle className="mt-0.5 truncate text-lg font-bold text-ink-950 sm:text-xl">
+                {partenaire.nom}
+              </DialogTitle>
             </div>
-          </DialogHeader>
 
-          <div className="min-h-0 flex-1 overflow-y-auto px-5 py-5 lg:px-6">
-            <div className="flex items-center gap-4 mb-4">
-              <Avatar className="h-20 w-20">
-                {partenaire.logo &&
-                (partenaire.logo.startsWith('/uploads/') || partenaire.logo.startsWith('http')) ? (
-                  <AvatarImage
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              onClick={onClose}
+              aria-label="Fermer"
+              className="
+                size-8
+                shrink-0
+                rounded-full
+                border border-ink-100
+                text-ink-400
+                hover:bg-ink-50 hover:text-ink-900
+              "
+            >
+              <X className="size-4" />
+            </Button>
+          </div>
+        </DialogHeader>
+
+        {/* ============ GRILLE PRINCIPALE (SANS SCROLL) ============ */}
+        <div className="grid grid-cols-1 divide-y divide-ink-100 lg:grid-cols-12 lg:divide-x lg:divide-y-0">
+          
+          {/* COLONNE GAUCHE : Identité & Métadonnées (4/12) */}
+          <aside className="bg-ink-50/30 p-6 lg:col-span-4 lg:p-8">
+            <div className="flex flex-row items-center gap-4 lg:flex-col lg:items-start lg:gap-6">
+              {/* Logo */}
+              <div
+                className="
+                  flex size-20
+                  shrink-0 items-center justify-center
+                  overflow-hidden rounded-xl
+                  border border-ink-100 bg-white
+                  shadow-sm
+                  sm:size-24
+                  lg:size-28
+                "
+              >
+                {logoIsImage ? (
+                  <img
                     src={getImageUrl(partenaire.logo)}
-                    alt={partenaire.nom}
+                    alt={`Logo de ${partenaire.nom}`}
+                    loading="lazy"
+                    decoding="async"
+                    className="size-full object-contain p-2.5"
                     onError={(e) => {
                       e.currentTarget.style.display = 'none';
                     }}
                   />
                 ) : (
-                  <AvatarFallback className="bg-ink-100 text-ink-700 text-3xl">
-                    {partenaire.logo}
-                  </AvatarFallback>
+                  <Avatar className="size-full rounded-xl">
+                    <AvatarFallback className="rounded-xl bg-ink-100 text-2xl font-bold text-ink-600">
+                      {partenaire.nom.charAt(0).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
                 )}
-              </Avatar>
-              <div>
-                <h3 className="text-xl font-bold mb-1">{partenaire.nom}</h3>
-                <Badge variant={badgeVariant}>{partenaire.type}</Badge>
+              </div>
+
+              {/* Badges & Type */}
+              <div className="space-y-2">
+                <div className="flex flex-wrap gap-1.5">
+                  <Badge variant={badgeVariant} className="px-2 py-0 text-[10px] font-semibold uppercase tracking-wide">
+                    {partenaire.type}
+                  </Badge>
+                  {partenaire.secteur && (
+                    <Badge variant="outline" className="gap-1 px-2 py-0 text-[10px] font-normal text-ink-600">
+                      <Tag className="size-3" />
+                      {partenaire.secteur}
+                    </Badge>
+                  )}
+                </div>
+                <p className="hidden text-xs text-ink-500 lg:block">
+                  Informations d'identification et statut du partenariat.
+                </p>
               </div>
             </div>
 
-            <hr className="my-4" />
-
-            <div className="flex flex-wrap gap-4 mb-4">
-              <div className="flex items-center gap-1 text-ink-600 text-sm">
-                <Tag className="size-4" />
-                <span className="font-medium">Secteur:</span>
-                <span>{partenaire.secteur}</span>
-              </div>
-              <div className="flex items-center gap-1 text-ink-600 text-sm">
-                <Calendar className="size-4" />
-                <span className="font-medium">Depuis:</span>
-                <span>{formatDate(partenaire.dateDebut)}</span>
+            {/* Date de début du partenariat */}
+            <div className="mt-6 border-t border-ink-100/80 pt-5">
+              <div className="flex items-center gap-3">
+                
+                <div className="min-w-0">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-ink-400">
+                    Partenaire depuis
+                  </p>
+                  <p className="mt-0.5 truncate text-xs font-semibold text-ink-800">
+                    {formatDate(partenaire.dateDebut)}
+                  </p>
+                </div>
               </div>
             </div>
+          </aside>
 
-            <hr className="my-4" />
+          {/* COLONNE DROITE : Contenu & Coordonnées (8/12) */}
+          <main className="p-6 lg:col-span-8 lg:p-8 flex flex-col justify-between gap-6">
+            
+            {/* Section Description */}
+            <section aria-labelledby="desc-title">
+              <div className="mb-2 flex items-center gap-2">
+                <Building2 className="size-4 text-brand-600" />
+                <h3 id="desc-title" className="text-xs font-bold uppercase tracking-wider text-ink-900">
+                  À propos du partenaire
+                </h3>
+              </div>
+              <div className="rounded-xl border border-ink-50 bg-ink-50/20 p-4">
+                {partenaire.description ? (
+                  <p className="text-sm leading-relaxed text-ink-600">
+                    {partenaire.description}
+                  </p>
+                ) : (
+                  <p className="text-sm italic text-ink-400">
+                    Aucune description disponible pour ce partenaire.
+                  </p>
+                )}
+              </div>
+            </section>
 
-            <div className="mb-4">
-              <h4 className="font-semibold text-ink-700 mb-2">Description</h4>
-              <p className="text-ink-700 leading-relaxed whitespace-pre-wrap">
-                {partenaire.description}
-              </p>
-            </div>
+            {/* Section Coordonnées */}
+            <section aria-labelledby="contact-title">
+              <div className="mb-2.5 flex items-center gap-2">
+                <Mail className="size-4 text-brand-600" />
+                <h3 id="contact-title" className="text-xs font-bold uppercase tracking-wider text-ink-900">
+                  Coordonnées directes
+                </h3>
+              </div>
 
-            <hr className="my-4" />
-
-            <div className="space-y-3">
-              {partenaire.siteWeb && (
-                <div className="flex items-center gap-2">
-                  <Globe className="size-4 text-ink-600" />
-                  <span className="text-sm text-ink-700">
-                    <span className="font-semibold">Site web:</span>{' '}
+              {hasContactInfo ? (
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  {partenaire.siteWeb && (
                     <a
                       href={partenaire.siteWeb}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-brand-600 hover:underline"
+                      className="
+                        group flex items-center gap-3
+                        rounded-xl border border-ink-100 bg-white
+                        p-3 transition-all
+                        hover:border-brand-200 hover:bg-brand-50/20
+                      "
                     >
-                      {partenaire.siteWeb}
+                      <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-ink-50 text-ink-500 group-hover:bg-brand-100 group-hover:text-brand-600 transition-colors">
+                        <Globe className="size-4" />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <span className="block text-[9px] font-bold uppercase tracking-wider text-ink-400">
+                          Site Internet
+                        </span>
+                        <span className="mt-0.5 block truncate text-xs font-medium text-ink-800 group-hover:text-brand-700 transition-colors">
+                          {partenaire.siteWeb.replace(/^https?:\/\/(www\.)?/, '')}
+                        </span>
+                      </div>
+                      <ExternalLink className="size-3.5 shrink-0 text-ink-300 group-hover:text-brand-500 transition-colors" />
                     </a>
-                  </span>
+                  )}
+
+                  {partenaire.contact && (
+                    <a
+                      href={partenaire.contact.includes('@') ? `mailto:${partenaire.contact}` : undefined}
+                      className="
+                        group flex items-center gap-3
+                        rounded-xl border border-ink-100 bg-white
+                        p-3 transition-all
+                        hover:border-brand-200 hover:bg-brand-50/20
+                      "
+                    >
+                      <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-ink-50 text-ink-500 group-hover:bg-brand-100 group-hover:text-brand-600 transition-colors">
+                        <Mail className="size-4" />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <span className="block text-[9px] font-bold uppercase tracking-wider text-ink-400">
+                          Contact
+                        </span>
+                        <span className="mt-0.5 block truncate text-xs font-medium text-ink-800 group-hover:text-brand-700 transition-colors">
+                          {partenaire.contact}
+                        </span>
+                      </div>
+                    </a>
+                  )}
+                </div>
+              ) : (
+                <div className="rounded-xl border border-dashed border-ink-200 bg-ink-50/30 py-4 text-center">
+                  <p className="text-xs text-ink-400">Aucune coordonnée enregistrée.</p>
                 </div>
               )}
-
-              {partenaire.contact && (
-                <div className="flex items-center gap-2">
-                  <Mail className="size-4 text-ink-600" />
-                  <span className="text-sm text-ink-700">
-                    <span className="font-semibold">Contact:</span> {partenaire.contact}
-                  </span>
-                </div>
-              )}
-            </div>
-
-            <div className="mt-4 pt-4 border-t border-ink-100">
-              <h4 className="font-semibold text-ink-700 mb-2">Logo</h4>
-              <div className="bg-ink-50 p-3 rounded-lg border border-ink-100">
-                {isRemoteImage(partenaire.logo) ? (
-                  <div>
-                    <img
-                      loading="lazy"
-                      decoding="async"
-                      src={getImageUrl(partenaire.logo)}
-                      alt={`Logo de ${partenaire.nom}`}
-                      className="max-w-[200px] max-h-[200px] rounded-lg"
-                      onError={(e) => {
-                        e.currentTarget.style.display = 'none';
-                      }}
-                    />
-                  </div>
-                ) : (
-                  <p className="text-sm text-ink-600">
-                    <span className="font-semibold">Emoji:</span> {partenaire.logo || 'Aucun'}
-                  </p>
-                )}
-              </div>
-            </div>
-          </div>
-
-          <div className="flex shrink-0 items-center justify-end border-t border-ink-100 bg-white px-5 py-4 lg:px-6">
-            <Button type="button" onClick={onClose} variant="outline" className="rounded-xl">
-              Fermer
-            </Button>
-          </div>
+            </section>
+          </main>
         </div>
+
+        {/* ============ FOOTER CLASSIQUE ============ */}
+        <footer className="flex items-center justify-end gap-2 border-t border-ink-100 bg-ink-50/30 px-6 py-3 sm:px-8">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onClose}
+            className="h-8 rounded-lg text-xs"
+          >
+            Fermer
+          </Button>
+        </footer>
       </DialogContent>
     </Dialog>
   );

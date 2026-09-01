@@ -1,18 +1,38 @@
-import { IdCard, Mail, Pencil, Shield, User as UserIcon } from 'lucide-react';
+import {
+  IdCard,
+  LoaderCircle,
+  LogOut,
+  Mail,
+  MonitorSmartphone,
+  Pencil,
+  Shield,
+  User as UserIcon,
+} from 'lucide-react';
 import React, { useState } from 'react';
+import { toast } from 'sonner';
 import { useAuth } from '@/contexts';
-import { getImageUrl, formatFullName, getPersonInitials } from '@/utils';
-import { useTitle, useScrollToTop } from '@/hooks';
+import { getImageUrl, formatFullName, getPersonInitials, formatRelativeTime } from '@/utils';
+import { useTitle, useScrollToTop, useMySessions, useRevokeMySession } from '@/hooks';
 import { Button } from '@/components';
+import { Badge } from '@/components/ui/badge';
+import type { SessionStatus } from '@/types/session.types';
 import ProfilEditDialog from './ProfilEditDialog';
+
+const SESSION_STATUS_META: Record<
+  SessionStatus,
+  { label: string; variant: 'default' | 'secondary' | 'outline' | 'destructive' }
+> = {
+  active: { label: 'Active', variant: 'default' },
+  inactive: { label: 'Inactive', variant: 'secondary' },
+  expired: { label: 'Expirée', variant: 'outline' },
+  revoked: { label: 'Révoquée', variant: 'destructive' },
+};
 
 const ROLE_LABELS: Record<string, string> = {
   admin: 'Administrateur',
   editeur: 'Éditeur',
   lecteur: 'Lecteur',
 };
-
-
 
 const InfoCard: React.FC<{ icon: React.ReactNode; label: string; value: string }> = ({
   icon,
@@ -108,8 +128,92 @@ const Profil: React.FC = () => {
         </div>
       </section>
 
+      <MySessionsSection />
+
       <ProfilEditDialog open={editOpen} onClose={() => setEditOpen(false)} user={user} />
     </div>
+  );
+};
+
+const MySessionsSection: React.FC = () => {
+  const { data: sessions = [], isLoading } = useMySessions();
+  const revokeMySessionMutation = useRevokeMySession();
+
+  const handleRevoke = async (sessionId: string) => {
+    try {
+      await revokeMySessionMutation.mutateAsync(sessionId);
+      toast.success('Appareil déconnecté');
+    } catch {
+      toast.error('Impossible de déconnecter cet appareil');
+    }
+  };
+
+  let body: React.ReactNode;
+  if (isLoading) {
+    body = (
+      <div className="flex items-center justify-center gap-2 py-6 text-sm text-ink-400">
+        <LoaderCircle className="size-4 animate-spin" />
+        Chargement des sessions…
+      </div>
+    );
+  } else if (sessions.length === 0) {
+    body = <p className="py-4 text-center text-sm text-ink-400">Aucune session enregistrée.</p>;
+  } else {
+    body = (
+      <ul className="space-y-3">
+        {sessions.map((session) => {
+          const meta = SESSION_STATUS_META[session.status];
+          const canRevoke =
+            !session.isCurrent && session.status !== 'revoked' && session.status !== 'expired';
+          return (
+            <li
+              key={session.id}
+              className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-ink-100 bg-ink-50/60 p-3"
+            >
+              <div className="min-w-0">
+                <p className="flex flex-wrap items-center gap-2 text-sm font-medium text-ink-900">
+                  {session.deviceName ?? 'Appareil inconnu'}
+                  {session.isCurrent && <Badge variant="outline">Session courante</Badge>}
+                  <Badge variant={meta.variant}>{meta.label}</Badge>
+                </p>
+                <p className="mt-0.5 text-xs text-ink-500">
+                  {[session.browserName, session.osName].filter(Boolean).join(' · ') || '—'}
+                  {' · Dernière activité '}
+                  {formatRelativeTime(session.lastActivityAt)}
+                </p>
+              </div>
+              {canRevoke && (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  disabled={revokeMySessionMutation.isPending}
+                  onClick={() => handleRevoke(session.id)}
+                  className="text-red-600 hover:text-red-700"
+                >
+                  <LogOut className="size-4" />
+                  Déconnecter
+                </Button>
+              )}
+            </li>
+          );
+        })}
+      </ul>
+    );
+  }
+
+  return (
+    <section className="rounded-xl border border-ink-100 bg-white p-5 shadow-card">
+      <h2 className="mb-1 flex items-center gap-2 text-base font-semibold text-ink-900">
+        <MonitorSmartphone className="size-4 text-brand-600" />
+        Mes sessions
+      </h2>
+      <p className="mb-3 text-xs text-ink-400">
+        Chaque connexion (navigateur, appareil) est une session indépendante. La déconnexion d'un
+        appareil n'affecte pas les autres.
+      </p>
+      <div className="mb-4 h-px w-full bg-ink-100" />
+      {body}
+    </section>
   );
 };
 

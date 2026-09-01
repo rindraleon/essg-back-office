@@ -21,14 +21,18 @@ const niveaux = [
 ];
 
 const domaines = [
-  'Informatique',
-  'Gestion',
-  'Droit',
-  'Médecine',
-  'Ingénierie',
-  'Sciences',
-  'Lettres',
-  'Économie',
+  'Géomatique et agriculture durable',
+      'Géomatique et santé',
+      'Géomatique, ressources naturelles et assainissement',
+      'Cartographie numérique et développement',
+      'Géomatique et économie',
+      'Géomatique et bonne gouvernance',
+      'Géomatique, communication et marketing',
+      'Géo-entreprenariat',
+      'Système d\'Information Géomatique et Décision',
+      'Ingénierie Géospatiale et Technologie d1\'Informations',
+      'Géomatique et Intelligence Artificielle',
+      'Télédétection et SIG',
 ];
 
 const FormationFilters: React.FC<FormationFiltersProps> = ({
@@ -49,7 +53,7 @@ const FormationFilters: React.FC<FormationFiltersProps> = ({
           </Button>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 w-full sm:grid-cols-3 gap-4">
           <div className="space-y-2">
             <Label>Niveau</Label>
             <Select
@@ -69,11 +73,12 @@ const FormationFilters: React.FC<FormationFiltersProps> = ({
             </Select>
           </div>
 
-          <div className="space-y-2">
+          <div className="space-y-2 w-full">
             <Label>Domaine</Label>
             <Select
               value={filters.domaine}
               onValueChange={(value) => onUpdateFilter('domaine', value || '')}
+              
             >
               <SelectTrigger>
                 <SelectValue placeholder="Tous" />
