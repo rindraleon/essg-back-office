@@ -140,12 +140,12 @@ export default function Login() {
 
   const fieldClass = (hasError: boolean) =>
     [
-      'h-12 w-full rounded-xl border bg-white/8 pl-11 text-sm text-white backdrop-blur-sm',
-      'placeholder:text-white/60',
-      'transition-colors duration-200 outline-none',
-      'hover:bg-white/12',
-      'focus:border-sage-400/70 focus:bg-white/14 focus:ring-2 focus:ring-sage-400/25',
-      hasError ? 'border-red-400/60' : 'border-white/15',
+      'h-12 w-full rounded-xl border bg-white/95 pl-11 text-sm text-ink-900 shadow-sm',
+      'placeholder:text-ink-400',
+      'transition-all duration-200 outline-none',
+      'hover:bg-white',
+      'focus:border-brand-500 focus:bg-white focus:ring-4 focus:ring-brand-500/20',
+      hasError ? 'border-red-400 focus:border-red-500 focus:ring-red-500/20' : 'border-ink-200/80',
     ].join(' ');
 
   return (
@@ -168,7 +168,7 @@ export default function Login() {
             </picture>
           </div>
 
-          <div className="absolute inset-0 bg-brand-350/45" />
+          <div className="absolute inset-0 bg-brand-900/45" />
           <div className="absolute inset-0 bg-[radial-gradient(125%_125%_at_50%_0%,rgba(39,86,78,0.32)_0%,rgba(23,56,50,0.55)_45%,rgba(42, 129, 116, 0.8)_100%)]" />
 
           <div className="login-aurora-a absolute -left-32 -top-32 size-[38rem] rounded-full bg-[radial-gradient(circle,rgba(133, 226, 209, 0.32),transparent_45%)] blur-3xl" />
@@ -183,7 +183,7 @@ export default function Login() {
         </div>
 
         <div className="relative w-full max-w-md">
-          <div className="login-rise relative overflow-hidden rounded-3xl border border-white/20 bg-brand-650/45 p-6 shadow-[0_24px_70px_-20px_rgba(0,0,0,0.55)] backdrop-blur-2xl sm:p-8">
+          <div className="login-rise relative overflow-hidden rounded-3xl border border-white/20 bg-ink-950/65 p-6 shadow-[0_24px_80px_-20px_rgba(0,0,0,0.7)] backdrop-blur-2xl sm:p-8">
             <span
               aria-hidden
               className="login-sheen pointer-events-none absolute inset-y-0 -left-1/3 w-1/3 bg-gradient-to-r from-transparent via-white/18 to-transparent"
@@ -191,14 +191,14 @@ export default function Login() {
 
             <span
               aria-hidden
-              className="pointer-events-none absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-sage-900/70 to-transparent"
+              className="pointer-events-none absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-white/15 to-transparent"
             />
 
             <header className="login-fade login-s1 mb-7 text-center">
               <h1 className="text-xl font-bold tracking-tight text-white sm:text-2xl">
                 Bienvenue à l'Admin ESSG
               </h1>
-              <p className="mt-1.5 text-sm text-sage-100">
+              <p className="mt-1.5 text-sm text-brand-100/90">
                 Connectez-vous pour accéder à votre tableau de bord
               </p>
             </header>
@@ -223,7 +223,7 @@ export default function Login() {
                 </label>
 
                 <div className="login-field relative transition-transform duration-200">
-                  <span className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-white/60">
+                  <span className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-brand-600">
                     <Mail className="size-4" />
                   </span>
 
@@ -263,7 +263,7 @@ export default function Login() {
                 </label>
 
                 <div className="login-field relative transition-transform duration-200">
-                  <span className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-white/60">
+                  <span className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-brand-600">
                     <Lock className="size-4" />
                   </span>
 
@@ -290,7 +290,7 @@ export default function Login() {
                     aria-label={
                       showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'
                     }
-                    className="absolute inset-y-0 right-0 flex items-center rounded-r-xl pr-4 pl-2 text-white/50 transition-colors hover:text-white focus-visible:text-white focus-visible:outline-none"
+                    className="absolute inset-y-0 right-0 flex items-center rounded-r-xl pr-4 pl-2 text-ink-400 transition-colors hover:text-brand-700 focus-visible:text-brand-700 focus-visible:outline-none"
                   >
                     {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
                   </button>
@@ -309,7 +309,7 @@ export default function Login() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="group relative flex h-12 w-full items-center justify-center gap-2 overflow-hidden rounded-xl bg-sage-400 text-sm font-semibold text-brand-950 shadow-[0_10px_28px_-8px_rgba(152,192,112,0.6)] transition-colors duration-200 hover:bg-sage-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage-200 focus-visible:ring-offset-2 focus-visible:ring-offset-brand-950 disabled:cursor-not-allowed disabled:opacity-70 motion-reduce:transition-none"
+                  className="group relative flex h-12 w-full items-center justify-center gap-2 overflow-hidden rounded-xl bg-white text-sm font-bold text-brand-800 shadow-[0_12px_30px_-10px_rgba(0,0,0,0.55)] ring-1 ring-white/20 transition-all duration-200 hover:bg-brand-50 hover:text-brand-900 hover:shadow-[0_16px_36px_-10px_rgba(0,0,0,0.6)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white/30 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-70 motion-reduce:transition-none"
                 >
                   {loading ? (
                     <>
