@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react';
+import { VALIDATION_MESSAGES } from '@/constants/validation.constants';
 
 export interface ValidationRule<T> {
   validate: (value: T, formData: Record<string, unknown>) => string | undefined;
@@ -45,9 +46,9 @@ function isEmptyValue(value: unknown): boolean {
   return value === undefined || value === null || value === '';
 }
 
-function validateRequiredField(value: unknown, fieldName: string): string | undefined {
+function validateRequiredField(value: unknown): string | undefined {
   if (isEmptyValue(value) || (typeof value === 'string' && !value.trim())) {
-    return `Le champ ${fieldName} est requis`;
+    return VALIDATION_MESSAGES.required;
   }
   return undefined;
 }
@@ -93,12 +94,18 @@ function computeFieldError<T extends Record<string, unknown> | object>(
   if (!config) return undefined;
 
   const value = data[field];
-  const fieldName = String(field);
 
-  if (config.required) return validateRequiredField(value, fieldName);
+  // 1. Obligatoire d'abord — mais sans court-circuiter les autres règles
+  //    quand le champ est renseigné (pattern/longueur doivent s'appliquer).
+  if (config.required) {
+    const requiredError = validateRequiredField(value);
+    if (requiredError) return requiredError;
+  }
 
+  // 2. Champ facultatif vide : pas d'autre contrôle.
   if (isEmptyValue(value)) return undefined;
 
+  // 3. Longueurs, motifs et règles personnalisées.
   return (
     validateLength(value, config as FieldConfig<unknown>) ??
     validatePattern(value, config as FieldConfig<unknown>) ??

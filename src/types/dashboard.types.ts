@@ -24,6 +24,8 @@ export interface Activity {
   action: string;
   time: string;
   type: 'user' | 'formation' | 'news' | 'project';
+  /** Photo de profil de l'utilisateur (facultative). */
+  avatar?: string | null;
 }
 
 export interface Overview {

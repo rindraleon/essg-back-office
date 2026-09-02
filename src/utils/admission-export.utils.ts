@@ -1,4 +1,5 @@
 import { getAllAdmissions, type AdmissionQuery } from '@/services';
+import { formatBacSerie } from '@/constants';
 import type { Admission } from '@/types';
 
 const STATUS_LABELS: Record<Admission['statut'], string> = {
@@ -94,7 +95,7 @@ export async function exportAdmissionsByParcours(
       mention: admission.mention ?? '',
       parcours: admission.formation || admission.parcours || parcours,
       bacType: admission.bacType ?? '',
-      bacSerie: admission.bacSerie?.toUpperCase() ?? '',
+      bacSerie: formatBacSerie(admission.bacSerie),
       bacCategorie: admission.bacCategorie ?? '',
       numeroBaccalaureat: admission.numeroBaccalaureat ?? '',
       bacAnneeObtention: admission.bacAnneeObtention ?? '',

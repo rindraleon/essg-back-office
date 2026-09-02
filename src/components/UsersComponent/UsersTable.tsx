@@ -20,7 +20,6 @@ interface UsersTableProps {
   onDelete: (user: User) => void;
   onOpenSessions: (user: User) => void;
   isAdmin: boolean;
-  
 }
 
 const UsersTable: React.FC<UsersTableProps> = ({
@@ -35,7 +34,6 @@ const UsersTable: React.FC<UsersTableProps> = ({
   onDelete,
   onOpenSessions,
   isAdmin,
-  
 }) => {
   const getRoleLabel = (role: string) => {
     switch (role) {

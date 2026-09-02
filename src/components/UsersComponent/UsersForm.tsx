@@ -10,7 +10,7 @@ import {
 import { uploadAvatar } from '@/services';
 import type { User, UserFormData } from '@/types';
 import { useFormValidation } from '@/hooks';
-import { EMAIL_ERROR_MESSAGE, EMAIL_PATTERN } from '@/constants';
+import { validateEmail, validateFirstName, validateName } from '@/constants';
 import { Button } from '../ui/button';
 import { Label } from '../ui/label';
 import { Checkbox } from '../ui/checkbox';
@@ -56,14 +56,20 @@ const UsersForm: React.FC<UsersFormProps> = ({ open, onClose, onSubmit, initialD
       validators: {
         email: {
           required: true,
-          pattern: { regex: EMAIL_PATTERN, message: EMAIL_ERROR_MESSAGE },
+          custom: (value) => validateEmail(String(value ?? '')),
         },
         motDePasse: {
           required: mode === 'create',
           minLength: { value: 6, message: 'Min. 6 caractères' },
         },
-        prenom: { required: true },
-        nom: { required: true },
+        prenom: {
+          required: true,
+          custom: (value) => validateFirstName(String(value ?? '')),
+        },
+        nom: {
+          required: true,
+          custom: (value) => validateName(String(value ?? '')),
+        },
       },
     });
 

@@ -1,23 +1,11 @@
 import React from 'react';
-import {
-  Building2,
-  ExternalLink,
-  Globe,
-  Mail,
-  Tag,
-  X,
-} from 'lucide-react';
+import { Building2, ExternalLink, Globe, Mail, Tag, X } from 'lucide-react';
 
 import { getImageUrl, isRemoteImage, formatDate } from '@/utils';
 import type { Partenaire } from '@/types';
 import { PARTENAIRE_TYPE_COLORS } from '@/constants';
 
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '../ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../ui/dialog';
 import { Button } from '../ui/button';
 import { Avatar, AvatarFallback } from '../ui/avatar';
 import { Badge } from '../ui/badge';
@@ -28,9 +16,7 @@ interface PartenaireViewDialogProps {
   partenaire: Partenaire | null;
 }
 
-const getBadgeVariant = (
-  colorType: string,
-): React.ComponentProps<typeof Badge>['variant'] => {
+const getBadgeVariant = (colorType: string): React.ComponentProps<typeof Badge>['variant'] => {
   switch (colorType) {
     case 'primary':
     case 'success':
@@ -50,17 +36,12 @@ const PartenaireViewDialog: React.FC<PartenaireViewDialogProps> = ({
 }) => {
   if (!partenaire) return null;
 
-  const badgeVariant = getBadgeVariant(
-    PARTENAIRE_TYPE_COLORS[partenaire.type],
-  );
+  const badgeVariant = getBadgeVariant(PARTENAIRE_TYPE_COLORS[partenaire.type]);
   const logoIsImage = isRemoteImage(partenaire.logo);
   const hasContactInfo = partenaire.siteWeb || partenaire.contact;
 
   return (
-    <Dialog
-      open={open}
-      onOpenChange={(isOpen) => !isOpen && onClose()}
-    >
+    <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
       <DialogContent
         showCloseButton={false}
         className="
@@ -108,7 +89,6 @@ const PartenaireViewDialog: React.FC<PartenaireViewDialogProps> = ({
 
         {/* ============ GRILLE PRINCIPALE (SANS SCROLL) ============ */}
         <div className="grid grid-cols-1 divide-y divide-ink-100 lg:grid-cols-12 lg:divide-x lg:divide-y-0">
-          
           {/* COLONNE GAUCHE : Identité & Métadonnées (4/12) */}
           <aside className="bg-ink-50/30 p-6 lg:col-span-4 lg:p-8">
             <div className="flex flex-row items-center gap-4 lg:flex-col lg:items-start lg:gap-6">
@@ -147,11 +127,17 @@ const PartenaireViewDialog: React.FC<PartenaireViewDialogProps> = ({
               {/* Badges & Type */}
               <div className="space-y-2">
                 <div className="flex flex-wrap gap-1.5">
-                  <Badge variant={badgeVariant} className="px-2 py-0 text-[10px] font-semibold uppercase tracking-wide">
+                  <Badge
+                    variant={badgeVariant}
+                    className="px-2 py-0 text-[10px] font-semibold uppercase tracking-wide"
+                  >
                     {partenaire.type}
                   </Badge>
                   {partenaire.secteur && (
-                    <Badge variant="outline" className="gap-1 px-2 py-0 text-[10px] font-normal text-ink-600">
+                    <Badge
+                      variant="outline"
+                      className="gap-1 px-2 py-0 text-[10px] font-normal text-ink-600"
+                    >
                       <Tag className="size-3" />
                       {partenaire.secteur}
                     </Badge>
@@ -166,7 +152,6 @@ const PartenaireViewDialog: React.FC<PartenaireViewDialogProps> = ({
             {/* Date de début du partenariat */}
             <div className="mt-6 border-t border-ink-100/80 pt-5">
               <div className="flex items-center gap-3">
-                
                 <div className="min-w-0">
                   <p className="text-[10px] font-bold uppercase tracking-wider text-ink-400">
                     Partenaire depuis
@@ -181,20 +166,20 @@ const PartenaireViewDialog: React.FC<PartenaireViewDialogProps> = ({
 
           {/* COLONNE DROITE : Contenu & Coordonnées (8/12) */}
           <main className="p-6 lg:col-span-8 lg:p-8 flex flex-col justify-between gap-6">
-            
             {/* Section Description */}
             <section aria-labelledby="desc-title">
               <div className="mb-2 flex items-center gap-2">
                 <Building2 className="size-4 text-brand-600" />
-                <h3 id="desc-title" className="text-xs font-bold uppercase tracking-wider text-ink-900">
+                <h3
+                  id="desc-title"
+                  className="text-xs font-bold uppercase tracking-wider text-ink-900"
+                >
                   À propos du partenaire
                 </h3>
               </div>
               <div className="rounded-xl border border-ink-50 bg-ink-50/20 p-4">
                 {partenaire.description ? (
-                  <p className="text-sm leading-relaxed text-ink-600">
-                    {partenaire.description}
-                  </p>
+                  <p className="text-sm leading-relaxed text-ink-600">{partenaire.description}</p>
                 ) : (
                   <p className="text-sm italic text-ink-400">
                     Aucune description disponible pour ce partenaire.
@@ -207,7 +192,10 @@ const PartenaireViewDialog: React.FC<PartenaireViewDialogProps> = ({
             <section aria-labelledby="contact-title">
               <div className="mb-2.5 flex items-center gap-2">
                 <Mail className="size-4 text-brand-600" />
-                <h3 id="contact-title" className="text-xs font-bold uppercase tracking-wider text-ink-900">
+                <h3
+                  id="contact-title"
+                  className="text-xs font-bold uppercase tracking-wider text-ink-900"
+                >
                   Coordonnées directes
                 </h3>
               </div>
@@ -243,7 +231,11 @@ const PartenaireViewDialog: React.FC<PartenaireViewDialogProps> = ({
 
                   {partenaire.contact && (
                     <a
-                      href={partenaire.contact.includes('@') ? `mailto:${partenaire.contact}` : undefined}
+                      href={
+                        partenaire.contact.includes('@')
+                          ? `mailto:${partenaire.contact}`
+                          : undefined
+                      }
                       className="
                         group flex items-center gap-3
                         rounded-xl border border-ink-100 bg-white
