@@ -17,7 +17,7 @@ import {
   DialogHeader,
   FloatingInput,
 } from '@/components';
-import { EMAIL_PATTERN } from '@/constants';
+import { VALIDATION_MESSAGES, validateEmail, validateFirstName, validateName } from '@/constants';
 import {
   ACCEPTED_IMAGE_MIME_TYPES,
   MAX_IMAGE_UPLOAD_SIZE,
@@ -81,9 +81,15 @@ const ProfilEditDialog: React.FC<ProfilEditDialogProps> = ({ open, onClose, user
   const validate = (): boolean => {
     const next: Partial<Record<keyof FormState, string>> = {};
 
-    if (form.prenom.trim().length < 2) next.prenom = 'Au moins 2 caractères';
-    if (form.nom.trim().length < 2) next.nom = 'Au moins 2 caractères';
-    if (!EMAIL_PATTERN.test(form.email.trim())) next.email = 'Email invalide';
+    const prenomError = validateFirstName(form.prenom);
+    if (prenomError || form.prenom.trim().length < 2) {
+      next.prenom = prenomError ?? 'Au moins 2 caractères';
+    }
+    const nomError = validateName(form.nom);
+    if (nomError || form.nom.trim().length < 2) {
+      next.nom = nomError ?? 'Au moins 2 caractères';
+    }
+    if (validateEmail(form.email.trim())) next.email = VALIDATION_MESSAGES.emailInvalid;
 
     if (form.motDePasse) {
       if (form.motDePasse.length < 6) next.motDePasse = 'Au moins 6 caractères';

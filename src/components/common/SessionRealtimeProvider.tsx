@@ -36,7 +36,6 @@ export const SessionRealtimeProvider: React.FC<{ children: React.ReactNode }> = 
       }
     });
 
-    
     const unsubscribeSettings = presenceSocket.onSettingsUpdated((event) => {
       queryClient.setQueryData(queryKeys.settings.get(), event.settings);
     });

@@ -5,7 +5,7 @@ import { useAuth } from '@/contexts';
 import { routesStatic } from '@/routes';
 import loginBg from '../../assets/files/images/background/login-bg.webp';
 import loginBgMobile from '../../assets/files/images/background/login-bg-mobile.webp';
-import { EMAIL_PATTERN } from '@/constants';
+import { VALIDATION_MESSAGES, validateEmail } from '@/constants';
 import { useTitle, useScrollToTop } from '@/hooks';
 
 const styles = `
@@ -103,14 +103,14 @@ export default function Login() {
   const validateForm = (): boolean => {
     const errors: { email?: string; password?: string } = {};
 
-    if (!email.trim()) {
-      errors.email = "L'email est requis";
-    } else if (!EMAIL_PATTERN.test(email)) {
-      errors.email = "Format d'email invalide";
+    // validateEmail renvoie `undefined` quand l'adresse est valide.
+    const emailError = email.trim() ? validateEmail(email.trim()) : VALIDATION_MESSAGES.required;
+    if (emailError) {
+      errors.email = emailError;
     }
 
     if (!password) {
-      errors.password = 'Le mot de passe est requis';
+      errors.password = VALIDATION_MESSAGES.required;
     } else if (password.length < 6) {
       errors.password = 'Le mot de passe doit contenir au moins 6 caractères';
     }

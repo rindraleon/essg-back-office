@@ -11,6 +11,7 @@ export interface FloatingInputProps extends React.InputHTMLAttributes<HTMLInputE
 
 const FloatingInput = React.forwardRef<HTMLInputElement, FloatingInputProps>(
   ({ className, label, error, hint, id, type = 'text', ...props }, ref) => {
+    const errorId = id ? `${id}-error` : undefined;
     return (
       <div className="relative w-full pt-2">
         <Input
@@ -18,6 +19,8 @@ const FloatingInput = React.forwardRef<HTMLInputElement, FloatingInputProps>(
           id={id}
           type={type}
           placeholder=" "
+          aria-invalid={error ? true : undefined}
+          aria-describedby={error && errorId ? errorId : undefined}
           className={cn(
             'peer h-12 w-full rounded-md border border-ink-300 bg-white px-3 pt-5 pb-2 text-sm',
             'focus-visible:border-brand-800',
@@ -54,7 +57,11 @@ const FloatingInput = React.forwardRef<HTMLInputElement, FloatingInputProps>(
         >
           {label}
         </Label>
-        <p className={cn('mt-1 min-h-4 text-[11px]', error ? 'text-red-500' : 'text-ink-400')}>
+        <p
+          id={errorId}
+          role={error ? 'alert' : undefined}
+          className={cn('mt-1 min-h-4 text-[11px]', error ? 'text-red-500' : 'text-ink-400')}
+        >
           {error || hint || '\u00a0'}
         </p>
       </div>

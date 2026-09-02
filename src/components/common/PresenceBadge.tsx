@@ -1,7 +1,11 @@
 import React from 'react';
 import type { UserPresence, UserPresenceStatus } from '@/types/session.types';
 import { formatRelativeTime } from '@/utils';
-import { PRESENCE_DOT_COLORS, PRESENCE_LABELS, PRESENCE_TEXT_COLORS } from '../../constants/presence.constants';
+import {
+  PRESENCE_DOT_COLORS,
+  PRESENCE_LABELS,
+  PRESENCE_TEXT_COLORS,
+} from '../../constants/presence.constants';
 
 function presenceHint(presence: UserPresence): string {
   switch (presence.status) {

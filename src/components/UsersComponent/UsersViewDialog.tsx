@@ -1,11 +1,6 @@
 import type { ReactNode } from 'react';
 
-import {
-  Mail,
-  Shield,
-  UserRound,
-  X,
-} from 'lucide-react';
+import { Mail, Shield, UserRound, X } from 'lucide-react';
 
 import { getImageUrl, formatFullName, getPersonInitials } from '@/utils';
 import type { User } from '@/types';
@@ -13,12 +8,7 @@ import type { User } from '@/types';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '../ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../ui/dialog';
 
 interface UsersViewDialogProps {
   open: boolean;
@@ -53,13 +43,9 @@ function InfoItem({ label, value, icon }: Readonly<InfoItemProps>) {
       ) : null}
 
       <div className="min-w-0 flex-1">
-        <p className="mb-1 text-[11px] font-medium uppercase tracking-wide text-ink-400">
-          {label}
-        </p>
+        <p className="mb-1 text-[11px] font-medium uppercase tracking-wide text-ink-400">{label}</p>
 
-        <p className="truncate text-sm font-semibold text-ink-900">
-          {value || 'Non renseigné'}
-        </p>
+        <p className="truncate text-sm font-semibold text-ink-900">{value || 'Non renseigné'}</p>
       </div>
     </div>
   );
@@ -86,11 +72,7 @@ function SectionHeader({
   );
 }
 
-function UsersViewDialog({
-  open,
-  onClose,
-  user,
-}: Readonly<UsersViewDialogProps>) {
+function UsersViewDialog({ open, onClose, user }: Readonly<UsersViewDialogProps>) {
   if (!user) {
     return null;
   }
@@ -100,11 +82,7 @@ function UsersViewDialog({
   const roleLabel = getRoleLabel(user.role);
 
   const roleVariant =
-    user.role === 'admin'
-      ? 'default'
-      : user.role === 'editeur'
-        ? 'secondary'
-        : 'outline';
+    user.role === 'admin' ? 'default' : user.role === 'editeur' ? 'secondary' : 'outline';
 
   return (
     <Dialog
@@ -156,11 +134,7 @@ function UsersViewDialog({
                     rounded-full
                     border-2
                     border-white
-                    ${
-                      user.estActif
-                        ? 'bg-emerald-500'
-                        : 'bg-ink-300'
-                    }
+                    ${user.estActif ? 'bg-emerald-500' : 'bg-ink-300'}
                   `}
                 />
               </div>
@@ -172,26 +146,15 @@ function UsersViewDialog({
 
                 {user.email ? (
                   <div className="mt-1.5 flex min-w-0 items-center gap-1.5">
-                    <Mail
-                      aria-hidden="true"
-                      className="h-3.5 w-3.5 shrink-0 text-ink-400"
-                    />
+                    <Mail aria-hidden="true" className="h-3.5 w-3.5 shrink-0 text-ink-400" />
 
-                    <span className="truncate text-sm text-ink-500">
-                      {user.email}
-                    </span>
+                    <span className="truncate text-sm text-ink-500">{user.email}</span>
                   </div>
                 ) : null}
 
                 <div className="mt-2.5 flex flex-wrap items-center gap-2">
-                  <Badge
-                    variant={roleVariant}
-                    className="rounded-lg px-2.5 py-1 text-xs"
-                  >
-                    <Shield
-                      aria-hidden="true"
-                      className="mr-1.5 h-3.5 w-3.5"
-                    />
+                  <Badge variant={roleVariant} className="rounded-lg px-2.5 py-1 text-xs">
+                    <Shield aria-hidden="true" className="mr-1.5 h-3.5 w-3.5" />
                     {roleLabel}
                   </Badge>
 
@@ -232,9 +195,7 @@ function UsersViewDialog({
           {/* Account overview */}
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
             <div className="rounded-xl border border-ink-100 bg-ink-50/60 p-4">
-              <p className="text-[11px] font-medium uppercase tracking-wide text-ink-400">
-                Statut
-              </p>
+              <p className="text-[11px] font-medium uppercase tracking-wide text-ink-400">Statut</p>
 
               <div className="mt-2 flex items-center gap-2">
                 <span
@@ -254,85 +215,50 @@ function UsersViewDialog({
             </div>
 
             <div className="rounded-xl border border-ink-100 bg-ink-50/60 p-4">
-              <p className="text-[11px] font-medium uppercase tracking-wide text-ink-400">
-                Rôle
-              </p>
+              <p className="text-[11px] font-medium uppercase tracking-wide text-ink-400">Rôle</p>
 
-              <p className="mt-2 text-sm font-semibold text-ink-900">
-                {roleLabel}
-              </p>
+              <p className="mt-2 text-sm font-semibold text-ink-900">{roleLabel}</p>
             </div>
 
             <div className="rounded-xl border border-ink-100 bg-ink-50/60 p-4">
-              <p className="text-[11px] font-medium uppercase tracking-wide text-ink-400">
-                Profil
-              </p>
+              <p className="text-[11px] font-medium uppercase tracking-wide text-ink-400">Profil</p>
 
-              <p className="mt-2 text-sm font-semibold text-ink-900">
-                Utilisateur
-              </p>
+              <p className="mt-2 text-sm font-semibold text-ink-900">Utilisateur</p>
             </div>
           </div>
 
           {/* Personal information */}
           <section aria-labelledby="personal-information-title">
             <SectionHeader
-              icon={
-                <UserRound
-                  aria-hidden="true"
-                  className="h-4 w-4"
-                />
-              }
+              icon={<UserRound aria-hidden="true" className="h-4 w-4" />}
               title="Informations personnelles"
             />
 
             <div className="grid gap-3 sm:grid-cols-2">
-              <InfoItem
-                label="Nom"
-                value={user.nom}
-              />
+              <InfoItem label="Nom" value={user.nom} />
 
-              <InfoItem
-                label="Prénom"
-                value={user.prenom}
-              />
+              <InfoItem label="Prénom" value={user.prenom} />
             </div>
           </section>
 
           {/* Account information */}
           <section aria-labelledby="account-information-title">
             <SectionHeader
-              icon={
-                <Shield
-                  aria-hidden="true"
-                  className="h-4 w-4"
-                />
-              }
+              icon={<Shield aria-hidden="true" className="h-4 w-4" />}
               title="Informations du compte"
             />
 
             <div className="grid gap-3 sm:grid-cols-2">
-              <InfoItem
-                label="Rôle"
-                value={roleLabel}
-              />
+              <InfoItem label="Rôle" value={roleLabel} />
 
-              <InfoItem
-                label="Statut"
-                value={user.estActif ? 'Actif' : 'Inactif'}
-              />
+              <InfoItem label="Statut" value={user.estActif ? 'Actif' : 'Inactif'} />
             </div>
           </section>
         </div>
 
         {/* Footer */}
         <div className="flex justify-end border-t border-ink-100 bg-ink-50/40 px-6 py-4 sm:px-7">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={onClose}
-            className="rounded-lg px-5"
-          >
+          <Button type="button" variant="outline" onClick={onClose} className="rounded-lg px-5">
             Fermer
           </Button>
         </div>
@@ -342,4 +268,3 @@ function UsersViewDialog({
 }
 
 export default UsersViewDialog;
-

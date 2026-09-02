@@ -9,6 +9,7 @@ import {
   User as UserIcon,
 } from 'lucide-react';
 import React from 'react';
+import { formatBacSerie, formatBacType } from '@/constants';
 import type { Admission, AdmissionFile } from '@/types';
 import { ADMISSION_FILE_TYPE_LABELS } from '@/types';
 import { Badge } from '../ui/badge';
@@ -133,8 +134,8 @@ const AdmissionDetailDialog: React.FC<AdmissionDetailDialogProps> = ({
                 label="Parcours / formation"
                 value={admission.formation || admission.parcours}
               />
-              <Field label="Type de Bac" value={admission.bacType} />
-              <Field label="Série du Bac" value={admission.bacSerie} />
+              <Field label="Type de Bac" value={formatBacType(admission.bacType)} />
+              <Field label="Série du Bac" value={formatBacSerie(admission.bacSerie)} />
               <Field label="Catégorie du Bac" value={admission.bacCategorie} />
               <Field label="Numéro d'inscription au Bac" value={admission.numeroBaccalaureat} />
               <Field label="Année d'obtention du Bac" value={admission.bacAnneeObtention} />

@@ -12,6 +12,7 @@ export interface FloatingSelectProps {
   hint?: string;
   placeholder?: string;
   className?: string;
+  id?: string;
 }
 
 const FloatingSelect: React.FC<FloatingSelectProps> = ({
@@ -23,13 +24,20 @@ const FloatingSelect: React.FC<FloatingSelectProps> = ({
   hint,
   placeholder = ' ',
   className,
+  id,
 }) => {
+  const autoId = React.useId();
+  const selectId = id ?? `floating-select-${autoId.replace(/[^a-zA-Z0-9-]/g, '')}`;
+  const errorId = `${selectId}-error`;
   const hasValue = Boolean(value);
 
   return (
     <div className="relative w-full pt-2">
       <Select value={value} onValueChange={onValueChange}>
         <SelectTrigger
+          id={selectId}
+          aria-invalid={error ? true : undefined}
+          aria-describedby={error ? errorId : undefined}
           className={cn(
             'h-12 min-h-12 w-full bg-white px-3 pt-5 pb-2 text-sm',
             'focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20',
@@ -58,7 +66,11 @@ const FloatingSelect: React.FC<FloatingSelectProps> = ({
       >
         {label}
       </span>
-      <p className={cn('mt-1 min-h-4 text-[11px]', error ? 'text-red-500' : 'text-ink-400')}>
+      <p
+        id={errorId}
+        role={error ? 'alert' : undefined}
+        className={cn('mt-1 min-h-4 text-[11px]', error ? 'text-red-500' : 'text-ink-400')}
+      >
         {error || hint || '\u00a0'}
       </p>
     </div>

@@ -10,6 +10,7 @@ export interface FloatingTextareaProps extends React.TextareaHTMLAttributes<HTML
 const FloatingTextarea = React.forwardRef<HTMLTextAreaElement, FloatingTextareaProps>(
   ({ className, label, error, hint, id, value, ...props }, ref) => {
     const hasValue = value !== undefined && value !== null && String(value).length > 0;
+    const errorId = id ? `${id}-error` : undefined;
 
     return (
       <div className="relative w-full pt-2">
@@ -18,6 +19,8 @@ const FloatingTextarea = React.forwardRef<HTMLTextAreaElement, FloatingTextareaP
           id={id}
           value={value}
           placeholder=" "
+          aria-invalid={error ? true : undefined}
+          aria-describedby={error && errorId ? errorId : undefined}
           className={cn(
             'peer w-full rounded-md border bg-white px-3 pt-5 pb-2 text-sm',
             'resize-none outline-none transition-all',

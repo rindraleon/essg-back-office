@@ -22,17 +22,17 @@ const niveaux = [
 
 const domaines = [
   'Géomatique et agriculture durable',
-      'Géomatique et santé',
-      'Géomatique, ressources naturelles et assainissement',
-      'Cartographie numérique et développement',
-      'Géomatique et économie',
-      'Géomatique et bonne gouvernance',
-      'Géomatique, communication et marketing',
-      'Géo-entreprenariat',
-      'Système d\'Information Géomatique et Décision',
-      'Ingénierie Géospatiale et Technologie d1\'Informations',
-      'Géomatique et Intelligence Artificielle',
-      'Télédétection et SIG',
+  'Géomatique et santé',
+  'Géomatique, ressources naturelles et assainissement',
+  'Cartographie numérique et développement',
+  'Géomatique et économie',
+  'Géomatique et bonne gouvernance',
+  'Géomatique, communication et marketing',
+  'Géo-entreprenariat',
+  "Système d'Information Géomatique et Décision",
+  "Ingénierie Géospatiale et Technologie d1'Informations",
+  'Géomatique et Intelligence Artificielle',
+  'Télédétection et SIG',
 ];
 
 const FormationFilters: React.FC<FormationFiltersProps> = ({
@@ -78,7 +78,6 @@ const FormationFilters: React.FC<FormationFiltersProps> = ({
             <Select
               value={filters.domaine}
               onValueChange={(value) => onUpdateFilter('domaine', value || '')}
-              
             >
               <SelectTrigger>
                 <SelectValue placeholder="Tous" />

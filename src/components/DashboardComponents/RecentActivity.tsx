@@ -1,11 +1,14 @@
 import React from 'react';
+import { Avatar, AvatarImage } from '../ui/avatar';
 
 interface Activity {
   id: number;
   user: string;
   action: string;
   time: string;
-  avatar?: string;
+  type?: 'user' | 'formation' | 'news' | 'project';
+  /** Photo de profil de l'utilisateur (facultative — sinon emplacement vide). */
+  avatar?: string | null;
 }
 
 interface RecentActivityProps {
@@ -14,39 +17,6 @@ interface RecentActivityProps {
 }
 
 const RecentActivity: React.FC<RecentActivityProps> = ({ activities = [], loading = false }) => {
-  const defaultActivities: Activity[] = [
-    {
-      id: 1,
-      user: 'Jean Dupont',
-      action: 'a créé une nouvelle commande',
-      time: 'Il y a 2 min',
-      avatar: '👤',
-    },
-    {
-      id: 2,
-      user: 'Marie Martin',
-      action: 'a mis à jour son profil',
-      time: 'Il y a 15 min',
-      avatar: '👤',
-    },
-    {
-      id: 3,
-      user: 'Pierre Durand',
-      action: 'a téléchargé un rapport',
-      time: 'Il y a 1 heure',
-      avatar: '👤',
-    },
-    {
-      id: 4,
-      user: 'Sophie Bernard',
-      action: 'a commenté un article',
-      time: 'Il y a 3 heures',
-      avatar: '👤',
-    },
-  ];
-
-  const displayActivities = activities.length > 0 ? activities : defaultActivities;
-
   if (loading) {
     return (
       <div className="bg-white rounded-lg shadow-sm border border-ink-100 p-6">
@@ -76,22 +46,29 @@ const RecentActivity: React.FC<RecentActivityProps> = ({ activities = [], loadin
   return (
     <div className="bg-white rounded-lg shadow-sm border border-ink-100 p-6">
       <h3 className="text-lg font-semibold text-ink-900 mb-4">Activité Récente</h3>
-      <div className="space-y-4">
-        {displayActivities.map((activity) => (
-          <div
-            key={activity.id}
-            className="flex items-start gap-4 pb-4 border-b border-ink-100 last:border-0 last:pb-0"
-          >
-            <div className="text-2xl">{activity.avatar || '👤'}</div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm text-ink-900">
-                <span className="font-medium">{activity.user}</span> {activity.action}
-              </p>
-              <p className="text-xs text-ink-500 mt-1">{activity.time}</p>
+      {activities.length === 0 ? (
+        <p className="py-6 text-center text-sm text-ink-400">Aucune activité récente.</p>
+      ) : (
+        <div className="space-y-4">
+          {activities.map((activity) => (
+            <div
+              key={activity.id}
+              className="flex items-start gap-4 pb-4 border-b border-ink-100 last:border-0 last:pb-0"
+            >
+              {/* Photo de profil de l'utilisateur si disponible, sinon emplacement vide. */}
+              <Avatar size="sm" className="border border-ink-100">
+                <AvatarImage src={activity.avatar ?? undefined} alt={activity.user} />
+              </Avatar>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm text-ink-900">
+                  <span className="font-medium">{activity.user}</span> {activity.action}
+                </p>
+                <p className="text-xs text-ink-500 mt-1">{activity.time}</p>
+              </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };

@@ -15,8 +15,11 @@ import { uploadImage } from '@/services';
 import type { RessourceHumaineItem, RessourceHumaineFormData } from '@/types';
 import {
   RESSOURCE_HUMAINE_POSTES as postes,
-  EMAIL_ERROR_MESSAGE,
-  EMAIL_PATTERN,
+  validateFirstName,
+  validateName,
+  validateOptionalAddress,
+  validateOptionalEmail,
+  validateOptionalPhone,
 } from '@/constants';
 import { useFormValidation } from '@/hooks';
 import { Button } from '../ui/button';
@@ -118,14 +121,22 @@ const RessourceHumaineForm: React.FC<RessourceHumaineFormProps> = ({
       nom: {
         required: true,
         minLength: { value: 2, message: 'Le nom doit contenir au moins 2 caractères' },
+        custom: (value) => validateName(String(value ?? '')),
       },
       prenom: {
         required: true,
         minLength: { value: 2, message: 'Le prénom doit contenir au moins 2 caractères' },
+        custom: (value) => validateFirstName(String(value ?? '')),
       },
       poste: { required: true },
       email: {
-        pattern: { regex: EMAIL_PATTERN, message: EMAIL_ERROR_MESSAGE },
+        custom: (value) => validateOptionalEmail(String(value ?? '')),
+      },
+      telephone: {
+        custom: (value) => validateOptionalPhone(String(value ?? '')),
+      },
+      adresse: {
+        custom: (value) => validateOptionalAddress(String(value ?? '')),
       },
     },
     stepFields: STEP_FIELDS_MAP,
@@ -321,8 +332,12 @@ const RessourceHumaineForm: React.FC<RessourceHumaineFormProps> = ({
         <FloatingInput
           id="telephone"
           label="Téléphone"
+          type="tel"
+          inputMode="tel"
           value={formData.telephone}
           onChange={(e) => handleChange('telephone', e.target.value)}
+          onBlur={() => handleBlur('telephone')}
+          error={errors.telephone}
           placeholder="+261 34 00 000 00"
         />
       </div>
@@ -332,6 +347,8 @@ const RessourceHumaineForm: React.FC<RessourceHumaineFormProps> = ({
         label="Adresse"
         value={formData.adresse ?? ''}
         onChange={(e) => handleChange('adresse', e.target.value)}
+        onBlur={() => handleBlur('adresse')}
+        error={errors.adresse}
         placeholder="Lot II M 15 Antananarivo"
       />
 

@@ -4,7 +4,12 @@ import { toast } from 'sonner';
 import { getImageUrl, toUpperName } from '@/utils';
 import { uploadImage } from '@/services';
 import type { Partenaire, PartenaireFormData } from '@/types';
-import { PARTENAIRE_TYPES, DEFAULT_PARTENAIRE_FORM_DATA } from '@/constants';
+import {
+  PARTENAIRE_TYPES,
+  DEFAULT_PARTENAIRE_FORM_DATA,
+  validateOptionalEmailOrPhone,
+  validateOptionalUrl,
+} from '@/constants';
 import { useFormValidation } from '@/hooks';
 import { Button } from '../ui/button';
 import { Label } from '../ui/label';
@@ -86,6 +91,12 @@ const PartenaireForm: React.FC<PartenaireFormProps> = ({
       type: { required: true },
       secteur: { required: true },
       dateDebut: { required: true },
+      siteWeb: {
+        custom: (value) => validateOptionalUrl(String(value ?? '')),
+      },
+      contact: {
+        custom: (value) => validateOptionalEmailOrPhone(String(value ?? '')),
+      },
     },
     stepFields: STEP_FIELDS_MAP,
   });
@@ -275,6 +286,8 @@ const PartenaireForm: React.FC<PartenaireFormProps> = ({
         autoComplete="url"
         value={formData.siteWeb}
         onChange={(e) => handleChange('siteWeb', e.target.value)}
+        onBlur={() => handleBlur('siteWeb')}
+        error={errors.siteWeb}
         hint="https://exemple.com"
       />
 
@@ -284,6 +297,8 @@ const PartenaireForm: React.FC<PartenaireFormProps> = ({
         autoComplete="email"
         value={formData.contact}
         onChange={(e) => handleChange('contact', e.target.value)}
+        onBlur={() => handleBlur('contact')}
+        error={errors.contact}
         hint="Email ou téléphone"
       />
     </div>
