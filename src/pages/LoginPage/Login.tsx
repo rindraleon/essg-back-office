@@ -103,7 +103,6 @@ export default function Login() {
   const validateForm = (): boolean => {
     const errors: { email?: string; password?: string } = {};
 
-    // validateEmail renvoie `undefined` quand l'adresse est valide.
     const emailError = email.trim() ? validateEmail(email.trim()) : VALIDATION_MESSAGES.required;
     if (emailError) {
       errors.email = emailError;

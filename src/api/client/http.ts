@@ -10,6 +10,7 @@ import {
 
 const DEFAULT_API_URL = 'http://localhost:3000';
 const TOKEN_COOKIE_NAME = 'token_name';
+const REFRESH_COOKIE_NAME = 'refresh_token';
 const REQUEST_TIMEOUT = 15_000;
 
 export type DocumentBlob = Blob & {
@@ -24,6 +25,8 @@ export interface RequestOptions {
   signal?: AbortSignal;
   timeout?: number;
   headers?: Record<string, string>;
+
+  isRetry?: boolean;
 }
 
 function resolveBaseUrl(): string {
@@ -50,6 +53,52 @@ export function setAuthToken(token: string, options?: Cookies.CookieAttributes) 
 export function clearAuthToken() {
   if (typeof window === 'undefined') return;
   Cookies.remove(TOKEN_COOKIE_NAME);
+  Cookies.remove(REFRESH_COOKIE_NAME);
+}
+
+export function getRefreshToken(): string | undefined {
+  if (typeof window === 'undefined') return undefined;
+  return Cookies.get(REFRESH_COOKIE_NAME);
+}
+
+export function setRefreshToken(token: string, options?: Cookies.CookieAttributes) {
+  if (typeof window === 'undefined') return;
+  Cookies.set(REFRESH_COOKIE_NAME, token, { sameSite: 'lax', ...options });
+}
+
+let refreshPromise: Promise<boolean> | null = null;
+
+async function refreshAccessToken(): Promise<boolean> {
+  const refreshToken = getRefreshToken();
+  if (!refreshToken) return false;
+
+  refreshPromise ??= (async () => {
+    try {
+      const response = await fetch(buildUrl('/auth/refresh'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify({ refreshToken }),
+      });
+      if (!response.ok) return false;
+
+      const envelope = (await parseJsonSafe(response)) as ApiEnvelope<{
+        accessToken: string;
+        refreshToken: string;
+      }>;
+      const data = unwrap<{ accessToken: string; refreshToken: string }>(envelope);
+      if (!data?.accessToken) return false;
+
+      setAuthToken(data.accessToken);
+      if (data.refreshToken) setRefreshToken(data.refreshToken);
+      return true;
+    } catch {
+      return false;
+    } finally {
+      refreshPromise = null;
+    }
+  })();
+
+  return refreshPromise;
 }
 
 export function hasAuthToken(): boolean {
@@ -246,6 +295,13 @@ async function request<T>(
     });
 
     if (!response.ok) {
+      if (response.status === 401 && !options.isRetry && !url.includes('/auth/refresh')) {
+        const renewed = await refreshAccessToken();
+        if (renewed) {
+          clearTimeout(timer);
+          return request<T>(url, { ...options, isRetry: true });
+        }
+      }
       const payload = await parseJsonSafe(response);
       throw toApiErrorFromStatus(response.status, payload, url);
     }

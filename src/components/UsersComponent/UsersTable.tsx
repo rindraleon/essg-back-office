@@ -2,6 +2,12 @@ import { Eye, MonitorSmartphone, Pencil, Trash2 } from 'lucide-react';
 import React from 'react';
 import { getImageUrl, formatFullName, getPersonInitials } from '@/utils';
 import type { User } from '@/types';
+import type { UserPresence } from '@/types/session.types';
+import {
+  PRESENCE_DOT_COLORS,
+  PRESENCE_LABELS,
+  PRESENCE_TEXT_COLORS,
+} from '@/constants/presence.constants';
 
 import DataTable from '../common/DataTable';
 import type { Column } from '../common/DataTable';
@@ -10,6 +16,8 @@ import { Button } from '../ui/button';
 
 interface UsersTableProps {
   data: User[];
+
+  presenceByUser?: Record<number, UserPresence>;
   totalCount: number;
   page: number;
   rowsPerPage: number;
@@ -24,6 +32,7 @@ interface UsersTableProps {
 
 const UsersTable: React.FC<UsersTableProps> = ({
   data,
+  presenceByUser = {},
   totalCount,
   page,
   rowsPerPage,
@@ -110,15 +119,25 @@ const UsersTable: React.FC<UsersTableProps> = ({
         <Badge variant={getRoleVariant(user.role)}>{getRoleLabel(user.role)}</Badge>
       ),
     },
+    
     {
-      id: 'statut',
+      id: 'presence',
       label: 'Statut',
-      minWidth: 120,
-      render: (user) => (
-        <Badge variant={user.estActif ? 'default' : 'outline'}>
-          {user.estActif ? 'Actif' : 'Inactif'}
-        </Badge>
-      ),
+      minWidth: 140,
+      render: (user) => {
+        const status = presenceByUser[user.id]?.status ?? 'offline';
+        return (
+          <span
+            className={`inline-flex items-center gap-2 text-sm ${PRESENCE_TEXT_COLORS[status]}`}
+          >
+            <span
+              className={`inline-block size-2 rounded-full ${PRESENCE_DOT_COLORS[status]}`}
+              aria-hidden="true"
+            />
+            {PRESENCE_LABELS[status]}
+          </span>
+        );
+      },
     },
     {
       id: 'actions',

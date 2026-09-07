@@ -45,13 +45,6 @@ export interface PresenceList {
   };
 }
 
-export interface LoginResponse {
-  accessToken: string;
-  email: string;
-  sessionId?: string;
-  expiresAt?: string;
-}
-
 export type SessionEventAction =
   | 'session.created'
   | 'session.touched'
@@ -82,7 +75,6 @@ export interface SessionRevokedEvent {
   at: string;
 }
 
-/** Événement `settings.updated` diffusé aux administrateurs (Spec §12). */
 export interface SettingsUpdatedEvent {
   settings: { admissionsOuvertes: boolean };
   updatedAt: string;

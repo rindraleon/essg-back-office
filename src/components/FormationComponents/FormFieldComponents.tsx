@@ -191,7 +191,6 @@ export const ArrayField: React.FC<ArrayFieldProps> = ({
   );
 };
 
-// Composant pour l'upload d'image
 interface ImageUploadProps {
   imageUrl: string;
   onImageChange: (url: string) => void;
@@ -262,7 +261,6 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
   );
 };
 
-// Composant pour un champ checkbox
 interface FormCheckboxProps {
   label: string;
   checked: boolean;

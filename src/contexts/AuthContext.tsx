@@ -1,12 +1,10 @@
-/* eslint-disable react-refresh/only-export-components -- fichier unique
-   volontaire : le contexte, le hook `useAuth` et le provider vivent ensemble
-   (demande explicite de l'équipe). Fast Refresh reste fonctionnel, il
-   recharge simplement le fichier entier lors d'une modification. */
+/* eslint-disable react-refresh/only-export-components -- contexte, hook et provider
+   regroupés volontairement dans un fichier unique. */
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
 import { login as loginService, verifyToken } from '@/services';
 import { logoutCurrentSession } from '@/services/session.service';
-import { setAuthToken, clearAuthToken, hasAuthToken } from '@/api';
+import { setAuthToken, setRefreshToken, clearAuthToken, hasAuthToken } from '@/api';
 import type { User } from '@/types';
 
 export interface AuthContextType {
@@ -48,7 +46,7 @@ function useAuthController(): AuthContextType {
   useEffect(() => {
     let cancelled = false;
     const initAuth = async () => {
-      // Pas de jeton en cookie : état déconnecté, aucune requête nécessaire.
+
       if (!hasAuthToken()) {
         if (!cancelled) {
           resetUser();
@@ -72,6 +70,7 @@ function useAuthController(): AuthContextType {
     async (email: string, password: string) => {
       const response = await loginService(email, password);
       setAuthToken(response.accessToken);
+      if (response.refreshToken) setRefreshToken(response.refreshToken);
       const verified = await verifyToken();
       applyUser(verified);
     },
@@ -80,8 +79,7 @@ function useAuthController(): AuthContextType {
 
   const logout = useCallback(async () => {
     try {
-      // Révocation côté serveur de la session courante (Spec §9) : les autres
-      // appareils du compte restent connectés.
+
       await logoutCurrentSession();
     } catch {
       // Session déjà expirée ou révoquée : la déconnexion locale reste valide.

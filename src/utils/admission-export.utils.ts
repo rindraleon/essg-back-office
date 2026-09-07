@@ -1,6 +1,7 @@
 import { getAllAdmissions, type AdmissionQuery } from '@/services';
 import { formatBacSerie } from '@/constants';
 import type { Admission } from '@/types';
+import { ADMISSION_GENRE_LABELS, ADMISSION_SOURCE_LABELS } from '@/types';
 
 const STATUS_LABELS: Record<Admission['statut'], string> = {
   en_attente: 'En attente',
@@ -57,7 +58,7 @@ export async function exportAdmissionsByParcours(
     { header: 'Référence', key: 'reference', width: 16 },
     { header: 'Nom', key: 'nom', width: 24 },
     { header: 'Prénom(s)', key: 'prenom', width: 28 },
-    { header: 'Sexe', key: 'sexe', width: 14 },
+    { header: 'Genre', key: 'genre', width: 14 },
     { header: 'Date de naissance', key: 'dateNaissance', width: 18 },
     { header: 'Lieu de naissance', key: 'lieuNaissance', width: 24 },
     { header: 'Nationalité', key: 'nationalite', width: 18 },
@@ -74,6 +75,7 @@ export async function exportAdmissionsByParcours(
     { header: "Centre d'examen", key: 'bacCentreExamen', width: 28 },
     { header: 'Ancien établissement', key: 'ancienEtablissement', width: 30 },
     { header: 'N° matricule', key: 'numeroMatricule', width: 20 },
+    { header: 'Source de reconnaissance', key: 'sourceReconnaissance', width: 26 },
     { header: 'Statut', key: 'statut', width: 20 },
     { header: 'Date de dépôt', key: 'dateDepot', width: 18 },
   ];
@@ -83,7 +85,7 @@ export async function exportAdmissionsByParcours(
       reference: `ESSG-${admission.id}`,
       nom: admission.nom,
       prenom: admission.prenom,
-      sexe: admission.sexe ?? '',
+      genre: ADMISSION_GENRE_LABELS[admission.genre ?? ''] ?? admission.genre ?? '',
       dateNaissance: admission.dateNaissance
         ? new Date(admission.dateNaissance).toLocaleDateString('fr-FR')
         : '',
@@ -102,6 +104,10 @@ export async function exportAdmissionsByParcours(
       bacCentreExamen: admission.bacCentreExamen ?? '',
       ancienEtablissement: admission.ancienEtablissement ?? admission.licenceEtablissement ?? '',
       numeroMatricule: admission.numeroMatricule ?? '',
+      sourceReconnaissance:
+        ADMISSION_SOURCE_LABELS[admission.sourceReconnaissance ?? ''] ??
+        admission.sourceReconnaissance ??
+        '',
       statut: STATUS_LABELS[admission.statut],
       dateDepot: new Date(admission.creeLe).toLocaleDateString('fr-FR'),
     });

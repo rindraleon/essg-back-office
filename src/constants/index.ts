@@ -17,6 +17,7 @@ export {
   CONDITION_ACCES_OPTIONS,
 } from './formation.constants';
 export type { FormationMention } from './formation.constants';
+export { PRESENCE_LABELS, PRESENCE_DOT_COLORS, PRESENCE_TEXT_COLORS } from './presence.constants';
 export { isNavActive, isAdminRole, getVisibleNavItems } from './navigation';
 export {
   PARTENAIRE_TYPES,

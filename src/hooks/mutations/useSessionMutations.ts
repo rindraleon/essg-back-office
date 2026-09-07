@@ -27,7 +27,6 @@ export function useRevokeSession() {
   });
 }
 
-/** Déconnexion d'un de MES autres appareils */
 export function useRevokeMySession() {
   const queryClient = useQueryClient();
   return useMutation({
@@ -39,7 +38,6 @@ export function useRevokeMySession() {
   });
 }
 
-/** Révocation administrative de TOUTES les sessions d'un utilisateur */
 export function useRevokeAllSessions() {
   const queryClient = useQueryClient();
   return useMutation({

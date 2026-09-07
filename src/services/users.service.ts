@@ -8,10 +8,8 @@ export interface UsersListResponse {
   limit: number;
 }
 
-export const getAllUsers = async (page = 1, limit = 10): Promise<UsersListResponse> => {
+export const getAllUsers = async (): Promise<UsersListResponse> => {
   const result = await apiClient.getList<User>('/users', {
-    page,
-    limit,
     sortBy: 'creeLe',
     sortOrder: 'DESC',
   });

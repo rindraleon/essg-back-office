@@ -13,17 +13,25 @@ export const logoutCurrentSession = async (): Promise<{ loggedOut: boolean }> =>
   return apiClient.post<{ loggedOut: boolean }>('/auth/logout');
 };
 
-/** Déconnecter UN de mes autres appareils (session distante). */
 export const revokeMySession = async (sessionId: string): Promise<{ revoked: boolean }> => {
   return apiClient.post<{ revoked: boolean }>(`/auth/sessions/${sessionId}/revoke`);
 };
 
-export const getUsersPresence = async (page = 1, limit = 100): Promise<PresenceList> => {
-  return apiClient.get<PresenceList>('/admin/users/presence', { page, limit });
+export const getUsersPresence = async (): Promise<PresenceList> => {
+  const result = await apiClient.getList<PresenceUser>('/admin/users/presence');
+  return {
+    items: result.data,
+    meta: {
+      total: result.meta.total,
+      page: result.meta.page,
+      limit: result.meta.limit,
+      totalPages: result.meta.totalPages,
+    },
+  };
 };
 
 export const getUserPresenceById = async (userId: number): Promise<PresenceUser> => {
-  const list = await getUsersPresence(1, 1000);
+  const list = await getUsersPresence();
   const found = list.items.find((item) => item.id === userId);
   if (!found) {
     throw new Error(`Présence introuvable pour l'utilisateur #${userId}`);

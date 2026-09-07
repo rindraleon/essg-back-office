@@ -28,13 +28,10 @@ import { ApiError } from '@/api';
 const Utilisateurs: React.FC = () => {
   useScrollToTop();
   useTitle('Utilisateurs');
-  // Même plafond (1000) que la présence : les deux requêtes doivent couvrir
-  // le même ensemble d'utilisateurs, sinon la colonne « Présence » affiche
-  // « Hors ligne » à tort pour les comptes hors page.
-  const { data = [] } = useUsersQuery(1, 1000);
-  // Présence calculée par le backend (Spec §12/§17) : le frontend n'est
-  // jamais la source de vérité du statut en ligne.
-  const { data: presenceData } = useUsersPresence(1, 1000);
+
+  const { data = [] } = useUsersQuery();
+
+  const { data: presenceData } = useUsersPresence();
   const createMutation = useCreateUser();
   const updateMutation = useUpdateUser();
   const deleteMutation = useDeleteUser();
@@ -237,6 +234,7 @@ const Utilisateurs: React.FC = () => {
 
       <UsersTable
         data={paginatedData}
+        presenceByUser={presenceByUser}
         totalCount={filteredData.length}
         page={currentPage}
         rowsPerPage={rowsPerPage}
