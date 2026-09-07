@@ -95,17 +95,13 @@ function computeFieldError<T extends Record<string, unknown> | object>(
 
   const value = data[field];
 
-  // 1. Obligatoire d'abord — mais sans court-circuiter les autres règles
-  //    quand le champ est renseigné (pattern/longueur doivent s'appliquer).
   if (config.required) {
     const requiredError = validateRequiredField(value);
     if (requiredError) return requiredError;
   }
 
-  // 2. Champ facultatif vide : pas d'autre contrôle.
   if (isEmptyValue(value)) return undefined;
 
-  // 3. Longueurs, motifs et règles personnalisées.
   return (
     validateLength(value, config as FieldConfig<unknown>) ??
     validatePattern(value, config as FieldConfig<unknown>) ??

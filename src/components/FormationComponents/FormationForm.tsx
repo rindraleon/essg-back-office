@@ -14,8 +14,7 @@ import { uploadImage } from '@/services';
 import type { FormationFormData, FormationFormProps } from '@/types';
 import { useFormValidation, useFormationMentionsQuery, useRessourcesHumainesQuery } from '@/hooks';
 import {
-  EMAIL_ERROR_MESSAGE,
-  EMAIL_PATTERN,
+  validateOptionalEmail,
   CONDITION_ACCES_OPTIONS,
   DUREE_OPTIONS,
   NIVEAU_OPTIONS,
@@ -155,7 +154,7 @@ const FormationForm: React.FC<FormationFormProps> = ({
             : undefined,
       },
       email: {
-        pattern: { regex: EMAIL_PATTERN, message: EMAIL_ERROR_MESSAGE },
+        custom: (value) => validateOptionalEmail(String(value ?? '')),
       },
     },
     stepFields: STEP_FIELDS_MAP,

@@ -5,7 +5,11 @@ export interface LoginRequest {
 
 export interface LoginResponse {
   accessToken: string;
+
+  refreshToken: string;
   email: string;
+  sessionId: string;
+  expiresAt: string;
 }
 
 export interface User {

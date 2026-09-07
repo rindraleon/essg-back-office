@@ -22,7 +22,7 @@ export const queryKeys = {
   },
   users: {
     all: ['users'] as const,
-    list: (page?: number, limit?: number) => [...queryKeys.users.all, 'list', page, limit] as const,
+    list: () => [...queryKeys.users.all, 'list'] as const,
   },
   messages: {
     all: ['messages'] as const,
@@ -52,8 +52,7 @@ export const queryKeys = {
     all: ['sessions'] as const,
     current: () => [...queryKeys.sessions.all, 'current'] as const,
     mine: () => [...queryKeys.sessions.all, 'mine'] as const,
-    presence: (page?: number, limit?: number) =>
-      [...queryKeys.sessions.all, 'presence', page, limit] as const,
+    presence: () => [...queryKeys.sessions.all, 'presence'] as const,
     user: (userId: number) => [...queryKeys.sessions.all, 'user', userId] as const,
   },
 };

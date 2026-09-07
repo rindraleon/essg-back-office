@@ -22,7 +22,6 @@ export function useCurrentSession() {
   });
 }
 
-/** Toutes les sessions du compte connecté (multi-appareils). */
 export function useMySessions() {
   const { isAuthenticated } = useAuth();
   return useQuery({
@@ -34,7 +33,6 @@ export function useMySessions() {
   });
 }
 
-/** Sessions détaillées d'un utilisateur (back-office, admin). */
 export function useUserSessions(userId: number | null) {
   const { isAdmin } = useAuth();
   return useQuery({
@@ -44,23 +42,23 @@ export function useUserSessions(userId: number | null) {
   });
 }
 
-export function useUsersPresence(page = 1, limit = 1000) {
+export function useUsersPresence() {
   const { isAdmin } = useAuth();
   const queryClient = useQueryClient();
 
   useEffect(() => {
     const unsubscribe = presenceSocket.onPresenceChanged((event) => {
-      const cacheKey = queryKeys.sessions.presence(page, limit);
+      const cacheKey = queryKeys.sessions.presence();
       queryClient.setQueryData(cacheKey, (old: PresenceList | undefined) =>
         applyPresenceChange(old, event)
       );
     });
     return unsubscribe;
-  }, [page, limit, queryClient]);
+  }, [queryClient]);
 
   return useQuery({
-    queryKey: queryKeys.sessions.presence(page, limit),
-    queryFn: () => getUsersPresence(page, limit),
+    queryKey: queryKeys.sessions.presence(),
+    queryFn: getUsersPresence,
     enabled: isAdmin,
     select: normalizePresenceList,
     refetchInterval: () => (presenceSocket.connected ? false : 15_000),
@@ -68,13 +66,11 @@ export function useUsersPresence(page = 1, limit = 1000) {
   });
 }
 
-/** Garantit une liste de présence utilisable, quelle que soit la réponse. */
 function normalizePresenceList(data: PresenceList | undefined): PresenceList {
   if (Array.isArray(data?.items)) return data;
-  return { items: [], meta: { total: 0, page: 1, limit: 1000, totalPages: 0 } };
+  return { items: [], meta: { total: 0, page: 1, limit: 0, totalPages: 0 } };
 }
 
-/** Fusion d'un événement `presence:changed` dans le cache de la liste. */
 function applyPresenceChange(
   old: Awaited<ReturnType<typeof getUsersPresence>> | undefined,
   event: PresenceChangedEvent

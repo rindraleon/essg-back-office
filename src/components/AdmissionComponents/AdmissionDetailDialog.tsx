@@ -11,7 +11,12 @@ import {
 import React from 'react';
 import { formatBacSerie, formatBacType } from '@/constants';
 import type { Admission, AdmissionFile } from '@/types';
-import { ADMISSION_FILE_TYPE_LABELS } from '@/types';
+import {
+  ADMISSION_FILE_TYPE_LABELS,
+  ADMISSION_GENRE_LABELS,
+  ADMISSION_SOURCE_LABELS,
+  REQUIRED_ADMISSION_FILE_TYPES,
+} from '@/types';
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
 import { Dialog, DialogBody, DialogContent, DialogFooter, DialogHeader } from '../ui/dialog';
@@ -90,6 +95,9 @@ const AdmissionDetailDialog: React.FC<AdmissionDetailDialogProps> = ({
   onDeleteFile,
 }) => {
   const files = admission.files ?? [];
+  const missingRequiredFiles = REQUIRED_ADMISSION_FILE_TYPES.filter(
+    (type) => !files.some((file) => file.type === type)
+  );
   const statutBadge = (
     <Badge variant={getStatusColor(admission.statut)} className="text-xs">
       {getStatusLabel(admission.statut)}
@@ -119,7 +127,10 @@ const AdmissionDetailDialog: React.FC<AdmissionDetailDialogProps> = ({
               />
               <Field label="Lieu de naissance" value={admission.lieuNaissance} />
               <Field label="Nationalité" value={admission.nationalite} />
-              <Field label="Sexe" value={admission.sexe} />
+              <Field
+                label="Genre"
+                value={ADMISSION_GENRE_LABELS[admission.genre ?? ''] ?? admission.genre}
+              />
               <div className="md:col-span-2">
                 <Field label="Adresse" value={admission.adresse} />
               </div>
@@ -156,6 +167,13 @@ const AdmissionDetailDialog: React.FC<AdmissionDetailDialogProps> = ({
           <Section icon={<Banknote className="size-4" />} title="Paiement">
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <Field label="Numéro de bordereau de versement" value={admission.numeroBordereau} />
+              <Field
+                label="Comment le candidat a connu l'ESSG"
+                value={
+                  ADMISSION_SOURCE_LABELS[admission.sourceReconnaissance ?? ''] ??
+                  admission.sourceReconnaissance
+                }
+              />
               <div>
                 <p className="mb-1 text-xs font-medium text-ink-500">Statut de la candidature</p>
                 {statutBadge}
@@ -170,6 +188,15 @@ const AdmissionDetailDialog: React.FC<AdmissionDetailDialogProps> = ({
           </Section>
 
           <Section icon={<FileText className="size-4" />} title="Pièces justificatives">
+            {missingRequiredFiles.length > 0 && (
+              <p className="mb-4 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800">
+                Pièce(s) obligatoire(s) manquante(s) :{' '}
+                {missingRequiredFiles
+                  .map((type) => ADMISSION_FILE_TYPE_LABELS[type] ?? type)
+                  .join(', ')}
+                .
+              </p>
+            )}
             {files.length === 0 ? (
               <p className="text-sm text-ink-500">Aucun fichier joint à cette candidature.</p>
             ) : (
@@ -180,8 +207,20 @@ const AdmissionDetailDialog: React.FC<AdmissionDetailDialogProps> = ({
                       <FileText className="size-5" />
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-medium text-ink-900">
+                      <p className="flex items-center gap-2 truncate text-sm font-medium text-ink-900">
                         {ADMISSION_FILE_TYPE_LABELS[file.type] ?? file.type}
+                        <Badge
+                          variant={
+                            REQUIRED_ADMISSION_FILE_TYPES.includes(file.type)
+                              ? 'default'
+                              : 'outline'
+                          }
+                          className="text-[0.65rem]"
+                        >
+                          {REQUIRED_ADMISSION_FILE_TYPES.includes(file.type)
+                            ? 'Obligatoire'
+                            : 'Facultatif'}
+                        </Badge>
                       </p>
                       <p className="truncate text-xs text-ink-500">
                         {file.originalName} · {getFileExtension(file.originalName)} ·{' '}

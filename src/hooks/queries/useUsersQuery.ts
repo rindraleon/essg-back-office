@@ -3,10 +3,10 @@ import { createUser, deleteUser, getAllUsers, updateUser, uploadAvatar } from '@
 import type { User } from '@/types';
 import { queryKeys } from './keys';
 
-export function useUsersQuery(page = 1, limit = 100) {
+export function useUsersQuery() {
   return useQuery({
-    queryKey: queryKeys.users.list(page, limit),
-    queryFn: () => getAllUsers(page, limit),
+    queryKey: queryKeys.users.list(),
+    queryFn: getAllUsers,
     select: (response) => response.data,
   });
 }

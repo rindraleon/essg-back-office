@@ -7,7 +7,7 @@ interface Activity {
   action: string;
   time: string;
   type?: 'user' | 'formation' | 'news' | 'project';
-  /** Photo de profil de l'utilisateur (facultative — sinon emplacement vide). */
+
   avatar?: string | null;
 }
 

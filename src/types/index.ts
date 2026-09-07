@@ -1,7 +1,11 @@
-// Point d'entrée unique des exports du répertoire "types".
 export type { ActivityLog, ActivityLogQuery, ActivityLogsListResponse } from './activity-log.types';
 export type { ActualiteItem, ActualiteFormData, FilterOptions } from './actualite.types';
-export { ADMISSION_FILE_TYPE_LABELS } from './admission.types';
+export {
+  ADMISSION_FILE_TYPE_LABELS,
+  ADMISSION_GENRE_LABELS,
+  ADMISSION_SOURCE_LABELS,
+  REQUIRED_ADMISSION_FILE_TYPES,
+} from './admission.types';
 export type {
   AdmissionFileType,
   AdmissionFile,

@@ -1,3 +1,11 @@
+import {
+  EMAIL_MAX_LENGTH,
+  EMAIL_REGEX,
+  isDisposableEmail,
+  isValidEmail,
+  normalizeEmail,
+} from '../validation/email';
+
 export const PERSON_NAME_PATTERN = /^\p{L}(?:[\p{L}'’ -]*\p{L})?$/u;
 
 export const PLACE_NAME_PATTERN = /^\p{L}(?:[\p{L}'’ ,.-]*[\p{L}.])?$/u;
@@ -12,12 +20,9 @@ export const BORDEREAU_PATTERN = /^[A-Za-z0-9](?:[A-Za-z0-9\-_/.\s]*[A-Za-z0-9])
 
 export const URL_PATTERN = /^https?:\/\/[^\s]+$/i;
 
-export const EMAIL_REGEX =
-  /^[A-Za-z0-9!#$%&'*+/=?^_`{|}~.-]+@[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?(?:\.[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?)*\.[A-Za-z]{2,}$/;
+export { EMAIL_REGEX, EMAIL_MAX_LENGTH, isDisposableEmail, isValidEmail, normalizeEmail };
 
 export const EMAIL_PATTERN = EMAIL_REGEX;
-
-export const EMAIL_MAX_LENGTH = 50;
 
 export const DIPLOMA_YEAR_MIN = 1980;
 
@@ -28,7 +33,9 @@ export const VALIDATION_MESSAGES = {
   nomInvalid: 'Le nom ne peut contenir que des lettres, espaces, apostrophes ou traits d’union.',
   prenomInvalid:
     'Le prénom ne peut contenir que des lettres, espaces, apostrophes ou traits d’union.',
-  emailInvalid: 'Veuillez saisir une adresse email valide.',
+  emailInvalid: 'Adresse e-mail invalide.',
+  emailDisposable: 'Le domaine de cette adresse est introuvable ou jetable. Utilisez une adresse e-mail valide.',
+  emailUndeliverable: 'Cette adresse e-mail ne semble pas pouvoir recevoir de messages.',
   phoneInvalid: 'Veuillez saisir un numéro de téléphone valide.',
   addressInvalid: 'L’adresse contient des caractères non autorisés.',
   placeInvalid: 'Veuillez saisir un lieu valide (lettres, espaces, apostrophes, traits d’union).',
@@ -59,10 +66,11 @@ export const validateOptionalFirstName = (value: string): string | undefined =>
   isEmpty(value) ? undefined : validateFirstName(value);
 
 export const validateEmail = (value: string): string | undefined => {
-  const trimmed = value.trim();
-  if (!trimmed) return VALIDATION_MESSAGES.emailInvalid;
-  if (trimmed.length > EMAIL_MAX_LENGTH) return VALIDATION_MESSAGES.emailInvalid;
-  if (!EMAIL_REGEX.test(trimmed)) return VALIDATION_MESSAGES.emailInvalid;
+  const normalized = normalizeEmail(value);
+  if (!normalized) return VALIDATION_MESSAGES.emailInvalid;
+  if (normalized.length > EMAIL_MAX_LENGTH) return VALIDATION_MESSAGES.emailInvalid;
+  if (!isValidEmail(normalized)) return VALIDATION_MESSAGES.emailInvalid;
+  if (isDisposableEmail(normalized)) return VALIDATION_MESSAGES.emailDisposable;
   return undefined;
 };
 
@@ -97,7 +105,8 @@ export const validateOptionalPhone = (value: string): string | undefined =>
 export const validateOptionalEmailOrPhone = (value: string): string | undefined => {
   if (isEmpty(value)) return undefined;
   const trimmed = value.trim();
-  if (EMAIL_REGEX.test(trimmed)) return undefined;
+  if (isValidEmail(trimmed))
+    return isDisposableEmail(trimmed) ? VALIDATION_MESSAGES.emailDisposable : undefined;
   if (isValidPhoneNumber(trimmed)) return undefined;
   return VALIDATION_MESSAGES.emailOrPhoneInvalid;
 };

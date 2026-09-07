@@ -1,7 +1,5 @@
 /* eslint-disable sonarjs/super-linear-regex, sonarjs/regex-complexity --
-   Expressions d'extraction du contenu de CV : l'entrée est bornée (taille de
-   fichier limitée à l'upload) et le comportement d'analyse est validé par
-   l'usage. Une réécriture serait un changement fonctionnel, pas un refactor. */
+   entrée bornée par la limite de taille d'upload. */
 export interface ParsedExperience {
   poste: string;
   organisation?: string;
