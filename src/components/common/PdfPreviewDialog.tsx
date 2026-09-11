@@ -117,12 +117,18 @@ const PdfPreviewDialog = ({
           setCurrentPage(1);
           setKind('pdf');
         } catch (error) {
-          console.warn('Échec dans callback useCallback — poursuite en mode dégradé', error instanceof Error ? error.message : error);
+          console.warn(
+            'Échec dans callback useCallback — poursuite en mode dégradé',
+            error instanceof Error ? error.message : error
+          );
           setKind('unsupported');
         }
       }
     } catch (err) {
-      console.warn('Échec dans callback useCallback — poursuite en mode dégradé', err instanceof Error ? err.message : err);
+      console.warn(
+        'Échec dans callback useCallback — poursuite en mode dégradé',
+        err instanceof Error ? err.message : err
+      );
       setError(
         err instanceof ApiError
           ? err.message

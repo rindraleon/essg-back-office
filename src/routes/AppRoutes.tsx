@@ -6,6 +6,8 @@ import { useAuth } from '@/contexts';
 import { isAdminRole } from '@/constants';
 
 const Login = lazy(() => import('@/pages/LoginPage/Login'));
+const ForgotPassword = lazy(() => import('@/pages/LoginPage/ForgotPassword'));
+const ResetPassword = lazy(() => import('@/pages/LoginPage/ResetPassword'));
 // ESSG-PERF-02 : le Layout (et le baril de composants qu'il entraîne :
 // cartographie, galeries, etc.) n'est chargé qu'après authentification.
 const Layout = lazy(() => import('@/components/Layout/Layout'));
@@ -102,6 +104,17 @@ const AppRoutes = () => {
             </PublicRoute>
           }
         />
+
+        <Route
+          path={routesStatic.forgotPassword}
+          element={
+            <PublicRoute>
+              <ForgotPassword />
+            </PublicRoute>
+          }
+        />
+
+        <Route path={routesStatic.resetPassword} element={<ResetPassword />} />
 
         <Route path="/" element={<Navigate to={routesStatic.login} replace />} />
 
