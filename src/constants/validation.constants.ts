@@ -1,5 +1,6 @@
 import {
   EMAIL_MAX_LENGTH,
+  EMAIL_REGEX,
   isDisposableEmail,
   isValidEmail,
   normalizeEmail,
@@ -19,10 +20,9 @@ export const BORDEREAU_PATTERN = /^[A-Za-z0-9](?:[A-Za-z0-9\-_/.\s]*[A-Za-z0-9])
 
 export const URL_PATTERN = /^https?:\/\/[^\s]+$/i;
 
-export { EMAIL_REGEX } from '../validation/email';
-export { EMAIL_MAX_LENGTH, isDisposableEmail, isValidEmail, normalizeEmail };
+export { EMAIL_REGEX, EMAIL_MAX_LENGTH, isDisposableEmail, isValidEmail, normalizeEmail };
 
-
+export const EMAIL_PATTERN = EMAIL_REGEX;
 
 export const DIPLOMA_YEAR_MIN = 1980;
 
@@ -141,5 +141,3 @@ export const validateOptionalBacNumber = (value: string): string | undefined => 
     ? undefined
     : VALIDATION_MESSAGES.bacNumberInvalid;
 };
-
-export {EMAIL_REGEX as EMAIL_PATTERN} from '../validation/email';

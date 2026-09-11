@@ -1,6 +1,8 @@
 const routesStatic = {
   home: '/',
   login: '/login',
+  forgotPassword: '/forgot-password',
+  resetPassword: '/reset-password',
   dashboard: '/dashboard',
   actualites: '/actualites',
   ressourcesHumaines: '/ressources-humaines',
