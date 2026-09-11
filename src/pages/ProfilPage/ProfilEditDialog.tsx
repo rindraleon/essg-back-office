@@ -128,6 +128,7 @@ const ProfilEditDialog: React.FC<ProfilEditDialogProps> = ({ open, onClose, user
       setAvatarState('success');
       toast.success('Photo de profil mise à jour');
     } catch (error) {
+      console.warn('Échec dans handleAvatarChange — poursuite en mode dégradé', error instanceof Error ? error.message : error);
       setAvatarState('error');
       const message =
         error instanceof Error ? error.message : 'Échec du téléversement de la photo.';
@@ -156,6 +157,7 @@ const ProfilEditDialog: React.FC<ProfilEditDialogProps> = ({ open, onClose, user
       toast.success('Profil mis à jour avec succès');
       onClose();
     } catch (error) {
+      console.warn('Échec dans handleSubmit — poursuite en mode dégradé', error instanceof Error ? error.message : error);
       toast.error(
         error instanceof Error ? error.message : "Erreur lors de l'enregistrement du profil."
       );

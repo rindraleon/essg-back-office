@@ -4,12 +4,18 @@ import {
   Eye,
   FileText,
   GraduationCap,
+  LoaderCircle,
   Mail,
+  ScanSearch,
   Trash2,
   User as UserIcon,
 } from 'lucide-react';
-import React from 'react';
+import React, { useState } from 'react';
+import { toast } from 'sonner';
 import { formatBacSerie, formatBacType } from '@/constants';
+import AdmissionVerificationSection from './AdmissionVerificationSection';
+import { useVerifyAdmission } from '@/hooks';
+import { ApiError } from '@/api';
 import type { Admission, AdmissionFile } from '@/types';
 import {
   ADMISSION_FILE_TYPE_LABELS,
@@ -86,6 +92,12 @@ const Field = ({ label, value }: { label: string; value?: string | null }) => (
   </div>
 );
 
+function getVerificationErrorMessage(error: unknown): string {
+  if (error instanceof ApiError) return error.message;
+  if (error instanceof Error) return error.message;
+  return 'Erreur lors de la vérification';
+}
+
 const AdmissionDetailDialog: React.FC<AdmissionDetailDialogProps> = ({
   admission,
   open,
@@ -103,6 +115,24 @@ const AdmissionDetailDialog: React.FC<AdmissionDetailDialogProps> = ({
       {getStatusLabel(admission.statut)}
     </Badge>
   );
+
+  // Vérification directe — bouton visible directement dans ce fichier (demande utilisateur)
+  const verifyMutation = useVerifyAdmission();
+  const [directVerifying, setDirectVerifying] = useState(false);
+  const handleDirectVerify = async (): Promise<void> => {
+    setDirectVerifying(true);
+    try {
+      await verifyMutation.mutateAsync(admission.id);
+      toast.success('Vérification des pièces lancée avec succès');
+    } catch (error: unknown) {
+      console.warn('Échec dans handleDirectVerify — poursuite en mode dégradé', error instanceof Error ? error.message : error);
+      const msg = getVerificationErrorMessage(error);
+      toast.error(msg);
+    } finally {
+      setDirectVerifying(false);
+    }
+  };
+  const isVerifying = verifyMutation.isPending || directVerifying;
 
   return (
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
@@ -151,7 +181,7 @@ const AdmissionDetailDialog: React.FC<AdmissionDetailDialogProps> = ({
               <Field label="Numéro d'inscription au Bac" value={admission.numeroBaccalaureat} />
               <Field label="Année d'obtention du Bac" value={admission.bacAnneeObtention} />
               <Field label="Centre d'examen du Bac" value={admission.bacCentreExamen} />
-              <Field
+              {/* <Field
                 label="Ancien établissement"
                 value={admission.ancienEtablissement || admission.licenceEtablissement}
               />
@@ -160,7 +190,7 @@ const AdmissionDetailDialog: React.FC<AdmissionDetailDialogProps> = ({
               <Field
                 label="Année d'obtention de la Licence"
                 value={admission.licenceAnneeObtention}
-              />
+              /> */}
             </div>
           </Section>
 
@@ -260,6 +290,54 @@ const AdmissionDetailDialog: React.FC<AdmissionDetailDialogProps> = ({
               <Mail className="size-3.5" />
               Les fichiers sont consultables directement dans le back-office.
             </p>
+          </Section>
+
+          <Section icon={<ScanSearch className="size-4" />} title="Vérification des pièces">
+            {/* Bouton directement dans AdmissionDetailDialog — visible dans ce fichier unique (exigence) */}
+            <div className="mb-4 rounded-xl border border-brand-200 bg-brand-50 p-4">
+              <div className="flex flex-wrap items-center justify-between gap-4">
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-semibold text-ink-900">
+                    Contrôle automatique des documents
+                  </p>
+                  <p className="text-xs leading-relaxed text-ink-500">
+                    Le système identifie les pièces (diplôme, relevé, bordereau...), extrait le
+                    texte (PDF natif → OCR si nécessaire) et compare avec les données saisies.
+                  </p>
+                </div>
+                <Button
+                  onClick={() => void handleDirectVerify()}
+                  disabled={isVerifying}
+                  className="shrink-0 gap-2 bg-brand-700 text-white hover:bg-brand-800"
+                  size="default"
+                >
+                  {isVerifying ? (
+                    <LoaderCircle className="size-4 animate-spin" />
+                  ) : (
+                    <ScanSearch className="size-4" />
+                  )}
+                  Vérifier les pièces
+                </Button>
+              </div>
+              {isVerifying && (
+                <div className="mt-3 rounded-lg border border-brand-200 bg-white px-3 py-2">
+                  <p className="flex items-center gap-2 text-xs font-medium text-brand-700">
+                    <LoaderCircle className="size-3.5 animate-spin" />
+                    Analyse des documents...
+                  </p>
+                  <ol className="mt-2 grid grid-cols-1 gap-1 text-xs text-ink-500 sm:grid-cols-5">
+                    <li>1. Identification</li>
+                    <li>2. Extraction</li>
+                    <li>3. OCR</li>
+                    <li>4. Comparaison</li>
+                    <li>5. Résultat</li>
+                  </ol>
+                </div>
+              )}
+            </div>
+
+            {/* Détails / résultats — logique conservée dans le service dédié */}
+            <AdmissionVerificationSection admission={admission} hideButton />
           </Section>
         </DialogBody>
 

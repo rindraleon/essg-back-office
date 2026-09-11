@@ -125,7 +125,7 @@ const RessourcesHumaines: React.FC = () => {
         console.error('Error saving ressource humaine:', error);
       }
     },
-    [formMode, selectedRessource]
+    [formMode, selectedRessource, createMutation, updateMutation]
   );
 
   const handleResetFilters = useCallback(() => {

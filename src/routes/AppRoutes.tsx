@@ -2,11 +2,13 @@ import { Fingerprint } from 'lucide-react';
 import React, { lazy, Suspense } from 'react';
 import { Route, Routes, Navigate, useLocation } from 'react-router-dom';
 import routesStatic from './routes';
-import { Layout } from '@/components';
 import { useAuth } from '@/contexts';
 import { isAdminRole } from '@/constants';
 
 const Login = lazy(() => import('@/pages/LoginPage/Login'));
+// ESSG-PERF-02 : le Layout (et le baril de composants qu'il entraîne :
+// cartographie, galeries, etc.) n'est chargé qu'après authentification.
+const Layout = lazy(() => import('@/components/Layout/Layout'));
 const Dashboard = lazy(() => import('@/pages/DashboardPage/Dashboard'));
 const Actualites = lazy(() => import('@/pages/ActualitesPage/Actualites'));
 const RessourcesHumaines = lazy(() => import('@/pages/RessourcesHumainesPage/RessourcesHumaines'));

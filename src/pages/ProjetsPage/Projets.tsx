@@ -113,7 +113,7 @@ const Projets: React.FC = () => {
         console.error('Error saving projet:', error);
       }
     },
-    [formMode, selectedProjet]
+    [formMode, selectedProjet, createMutation, updateMutation]
   );
 
   const handleResetFilters = useCallback(() => {

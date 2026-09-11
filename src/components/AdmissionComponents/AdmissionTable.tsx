@@ -1,6 +1,6 @@
 import { CircleCheck, Eye, Trash2 } from 'lucide-react';
 import React, { useMemo } from 'react';
-import type { Admission, AdmissionFile } from '@/types';
+import type { Admission } from '@/types';
 import DataTable from '../common/DataTable';
 import type { Column } from '../common/DataTable';
 import { Badge } from '../ui/badge';
@@ -18,7 +18,6 @@ interface AdmissionTableProps {
   onView: (admission: Admission) => void;
   onEdit: (admission: Admission) => void;
   onDelete: (id: number) => void;
-  onPreviewFile?: (admission: Admission, file: AdmissionFile) => void;
   loading?: boolean;
   emptyMessage?: string;
 }
@@ -56,7 +55,6 @@ const getStatusLabel = (statut: string): string => {
 const AdmissionTable: React.FC<AdmissionTableProps> = ({
   data,
   totalCount,
-  onPreviewFile,
   page,
   rowsPerPage,
   onPageChange,
@@ -200,7 +198,7 @@ const AdmissionTable: React.FC<AdmissionTableProps> = ({
         ),
       },
     ],
-    [onView, onEdit, onDelete, onPreviewFile]
+    [onView, onEdit, onDelete]
   );
 
   if (loading) {

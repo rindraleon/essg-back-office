@@ -215,6 +215,8 @@ async function extractFromPdf(
 
   const pdfjs = await loadPdfjs();
   const buffer = await file.arrayBuffer();
+  // pdf.js v6+ : le scripting/eval des PDF n'est plus exposé par l'API de rendu,
+  // la montée de version couvre l'avis GHSA-hq66-cqwq-w95j (ESSG-SEC-02).
   const document_ = await pdfjs.getDocument({ data: buffer }).promise;
 
   const pageCount = Math.min(document_.numPages, 10);

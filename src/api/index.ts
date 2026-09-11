@@ -4,8 +4,7 @@ export {
   clearAuthToken,
   hasAuthToken,
   getAuthToken,
-  getRefreshToken,
-  setRefreshToken,
+  tryRestoreSession,
   registerAuthFailureHandler,
   apiClient,
 } from './client/http';

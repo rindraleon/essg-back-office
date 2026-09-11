@@ -138,6 +138,7 @@ const PartenaireForm: React.FC<PartenaireFormProps> = ({
       setLogoPreview(getImageUrl(url));
       toast.success('Logo téléversé avec succès');
     } catch (err) {
+      console.warn('Échec dans handleImageUpload — poursuite en mode dégradé', err instanceof Error ? err.message : err);
       const message = err instanceof Error ? err.message : 'Échec du téléversement du logo.';
       toast.error(message);
     } finally {
@@ -199,7 +200,7 @@ const PartenaireForm: React.FC<PartenaireFormProps> = ({
         <FloatingSelect
           label="Type *"
           value={formData.type}
-          onValueChange={(v, _eventDetails) => v && handleChange('type', v)}
+          onValueChange={(v) => v && handleChange('type', v)}
           options={[...PARTENAIRE_TYPES]}
           error={errors.type}
         />

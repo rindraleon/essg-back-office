@@ -23,7 +23,7 @@ const Breadcrumb: React.FC = () => {
     contacts: 'Contacts',
     admissions: 'Admissions',
     'activity-logs': 'Journal',
-    'ressources-humaines': 'Ressources humaines',
+    'ressources-humaines': 'Equipes pédagogiques',
     utilisateurs: 'Utilisateurs',
     example: 'Example',
     profil: 'Profil',

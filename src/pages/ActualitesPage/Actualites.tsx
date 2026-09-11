@@ -111,7 +111,7 @@ const Actualites: React.FC = () => {
         console.error('Error saving actualite:', error);
       }
     },
-    [formMode, selectedActualite]
+    [formMode, selectedActualite, createMutation, updateMutation]
   );
 
   const handleResetFilters = useCallback(() => {

@@ -34,7 +34,7 @@ const NAV_ITEMS: NavItem[] = [
   { name: 'Contacts', label: 'Contacts', href: routesStatic.contacts, icon: Mail },
   { name: 'Admissions', label: 'Admissions', href: routesStatic.admissions, icon: UserCheck },
   {
-    name: 'Ressources Humaines',
+    name: 'Equipes pédagogiques',
     label: 'Ressources',
     href: routesStatic.ressourcesHumaines,
     icon: Users,

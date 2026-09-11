@@ -11,7 +11,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { getImageUrl, formatFullName } from '@/utils';
 import { uploadImage } from '@/services';
-import type { FormationFormData, FormationFormProps } from '@/types';
+import type { Formation, FormationFormData, FormationFormProps } from '@/types';
 import { useFormValidation, useFormationMentionsQuery, useRessourcesHumainesQuery } from '@/hooks';
 import {
   validateOptionalEmail,
@@ -42,6 +42,22 @@ const STEPS = [
 type ArrayField = 'objectifs' | 'debouches' | 'programme' | 'competences';
 
 type FormationField = keyof FormationFormData;
+
+function toFormDataSource(formation: Formation): FormationFormData {
+  const source: Record<string, unknown> = { ...formation };
+  delete source.id;
+  delete source.slug;
+  delete source.creeLe;
+  delete source.misAJourLe;
+  return source as FormationFormData;
+}
+
+/** Classes du bouton d'étape du stepper selon son état. */
+function getStepButtonClass(isActive: boolean, isCompleted: boolean): string {
+  if (isActive) return 'bg-brand-600 text-white';
+  if (isCompleted) return 'bg-brand-50 text-brand-700 hover:bg-brand-100';
+  return 'bg-ink-100 text-ink-400';
+}
 
 const STEP_FIELDS_MAP: Record<number, FormationField[]> = {
   0: ['mention', 'titre', 'niveau', 'duree', 'credits', 'description'],
@@ -166,7 +182,7 @@ const FormationForm: React.FC<FormationFormProps> = ({
     if (!open) return;
 
     if (mode === 'edit' && initialData) {
-      const { id: _id, slug: _slug, creeLe: _c, misAJourLe: _m, ...rest } = initialData;
+      const rest = toFormDataSource(initialData);
 
       const mention =
         rest.mention || rest.domaine?.[0] || findMentionByTitre(rest.titre, mentions)?.label || '';
@@ -251,6 +267,7 @@ const FormationForm: React.FC<FormationFormProps> = ({
       setImagePreview(getImageUrl(url));
       toast.success('Image téléversée avec succès');
     } catch (err) {
+      console.warn('Échec dans handleImageUpload — poursuite en mode dégradé', err instanceof Error ? err.message : err);
       toast.error(err instanceof Error ? err.message : "Échec du téléversement de l'image.");
     } finally {
       setUploadingImage(false);
@@ -492,6 +509,12 @@ const FormationForm: React.FC<FormationFormProps> = ({
 
   const stepRenderers = [renderStep0, renderStep1, renderStep2];
 
+  const submitLabel = (() => {
+    if (submitting) return 'Enregistrement…';
+    if (mode === 'create') return 'Créer';
+    return 'Enregistrer';
+  })();
+
   return (
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
       <DialogContent className="w-[95vw] gap-0 overflow-hidden bg-white p-0 sm:max-w-3xl">
@@ -514,13 +537,7 @@ const FormationForm: React.FC<FormationFormProps> = ({
                   <button
                     type="button"
                     onClick={() => handleStepClick(index)}
-                    className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
-                      isActive
-                        ? 'bg-brand-600 text-white'
-                        : isCompleted
-                          ? 'bg-brand-50 text-brand-700 hover:bg-brand-100'
-                          : 'bg-ink-100 text-ink-400'
-                    }`}
+                    className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${getStepButtonClass(isActive, isCompleted)}`}
                   >
                     {isCompleted ? <CircleCheck className="h-4 w-4" /> : step.icon}
                     <span className="hidden sm:inline">{step.label}</span>
@@ -572,7 +589,7 @@ const FormationForm: React.FC<FormationFormProps> = ({
               ) : (
                 <Button type="button" size="sm" onClick={handleSubmit} disabled={submitting}>
                   <CircleCheck className="h-3.5 w-3.5" />
-                  {submitting ? 'Enregistrement…' : mode === 'create' ? 'Créer' : 'Enregistrer'}
+                  {submitLabel}
                 </Button>
               )}
             </div>

@@ -1,10 +1,8 @@
-/* eslint-disable react-refresh/only-export-components -- contexte, hook et provider
-   regroupés volontairement dans un fichier unique. */
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
 import { login as loginService, verifyToken } from '@/services';
 import { logoutCurrentSession } from '@/services/session.service';
-import { setAuthToken, setRefreshToken, clearAuthToken, hasAuthToken } from '@/api';
+import { setAuthToken, clearAuthToken, hasAuthToken, tryRestoreSession } from '@/api';
 import type { User } from '@/types';
 
 export interface AuthContextType {
@@ -46,7 +44,9 @@ function useAuthController(): AuthContextType {
   useEffect(() => {
     let cancelled = false;
     const initAuth = async () => {
-
+      if (!hasAuthToken()) {
+        await tryRestoreSession();
+      }
       if (!hasAuthToken()) {
         if (!cancelled) {
           resetUser();
@@ -70,7 +70,6 @@ function useAuthController(): AuthContextType {
     async (email: string, password: string) => {
       const response = await loginService(email, password);
       setAuthToken(response.accessToken);
-      if (response.refreshToken) setRefreshToken(response.refreshToken);
       const verified = await verifyToken();
       applyUser(verified);
     },
@@ -79,10 +78,12 @@ function useAuthController(): AuthContextType {
 
   const logout = useCallback(async () => {
     try {
-
       await logoutCurrentSession();
-    } catch {
-      // Session déjà expirée ou révoquée : la déconnexion locale reste valide.
+    } catch (error) {
+      console.warn(
+        'Déconnexion serveur ignorée (session déjà expirée ou révoquée)',
+        error instanceof Error ? error.message : error
+      );
     } finally {
       clearAuthToken();
       resetUser();

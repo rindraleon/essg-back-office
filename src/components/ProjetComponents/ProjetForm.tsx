@@ -150,6 +150,8 @@ const ProjetForm: React.FC<ProjetFormProps> = ({ open, onClose, onSubmit, initia
       resetForm();
       setImagePreview('');
     }
+    // Hydratation volontairement limitée à l'ouverture / au changement d'enregistrement.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, mode, initialId]);
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -162,6 +164,7 @@ const ProjetForm: React.FC<ProjetFormProps> = ({ open, onClose, onSubmit, initia
       setImagePreview(url);
       toast.success('Image téléversée avec succès');
     } catch (err) {
+      console.warn('Échec dans handleImageUpload — poursuite en mode dégradé', err instanceof Error ? err.message : err);
       const message = err instanceof Error ? err.message : "Échec du téléversement de l'image.";
       toast.error(message);
     } finally {
@@ -223,14 +226,14 @@ const ProjetForm: React.FC<ProjetFormProps> = ({ open, onClose, onSubmit, initia
         <FloatingSelect
           label="Type *"
           value={formData.type}
-          onValueChange={(v, _eventDetails) => v && handleChange('type', v)}
+          onValueChange={(v) => v && handleChange('type', v)}
           options={[...PROJET_TYPES]}
           error={errors.type}
         />
         <FloatingSelect
           label="Statut *"
           value={formData.statut}
-          onValueChange={(v, _eventDetails) => v && handleChange('statut', v)}
+          onValueChange={(v) => v && handleChange('statut', v)}
           options={[...PROJET_STATUTS]}
           error={errors.statut}
         />

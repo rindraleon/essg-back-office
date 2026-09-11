@@ -4,15 +4,21 @@ import { Input } from '../ui/input';
 import { Textarea } from '../ui/textarea';
 import { cn } from '@/lib';
 
+function stripProps(
+  props: Record<string, unknown>,
+  keys: readonly string[]
+): Record<string, unknown> {
+  return Object.fromEntries(Object.entries(props).filter(([key]) => !keys.includes(key)));
+}
+
 export function Box({
   className,
   children,
-  sx: _sx,
-  component: _c,
   ...props
 }: React.HTMLAttributes<HTMLDivElement> & { sx?: unknown; component?: string }) {
+  const domProps = stripProps(props, ['sx', 'component']) as React.HTMLAttributes<HTMLDivElement>;
   return (
-    <div className={className} {...props}>
+    <div className={className} {...domProps}>
       {children}
     </div>
   );
@@ -40,14 +46,13 @@ export function Typography({
 export function Card({
   className,
   children,
-  variant: _v,
-  sx: _sx,
   ...props
 }: React.HTMLAttributes<HTMLDivElement> & { variant?: string; sx?: unknown }) {
+  const domProps = stripProps(props, ['variant', 'sx']) as React.HTMLAttributes<HTMLDivElement>;
   return (
     <div
       className={cn('rounded-xl border border-ink-100 bg-white shadow-card', className)}
-      {...props}
+      {...domProps}
     >
       {children}
     </div>
@@ -111,9 +116,6 @@ export function Avatar({
 export function Grid({
   children,
   className,
-  container: _c,
-  spacing: _s,
-  size: _size,
 }: React.HTMLAttributes<HTMLDivElement> & {
   container?: boolean;
   spacing?: number;
@@ -128,8 +130,6 @@ export function IconButton({
   onClick,
   disabled,
   type = 'button',
-  color: _c,
-  size: _s,
 }: React.ButtonHTMLAttributes<HTMLButtonElement> & { color?: string; size?: string }) {
   return (
     <button
@@ -152,8 +152,6 @@ export function Button({
   variant = 'contained',
   startIcon,
   fullWidth,
-  sx: _sx,
-  size: _size,
   ...props
 }: React.ButtonHTMLAttributes<HTMLButtonElement> & {
   variant?: string;
@@ -168,11 +166,15 @@ export function Button({
     return 'default';
   };
   const mapped = getVariant();
+  const forwardedProps = stripProps(props, [
+    'sx',
+    'size',
+  ]) as React.ButtonHTMLAttributes<HTMLButtonElement>;
   return (
     <UiButton
       className={cn(fullWidth && 'w-full', className)}
       variant={mapped as 'default' | 'outline' | 'ghost'}
-      {...props}
+      {...forwardedProps}
     >
       {startIcon}
       {children}
@@ -187,9 +189,7 @@ export function TextField({
   multiline,
   rows,
   fullWidth,
-  size: _size,
   className,
-  InputLabelProps: _inputLabelProps,
   ...props
 }: Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'> & {
   label?: string;
@@ -201,6 +201,7 @@ export function TextField({
   size?: string;
   InputLabelProps?: unknown;
 }) {
+  const fieldProps = stripProps(props, ['size', 'InputLabelProps']);
   return (
     <div className={cn('space-y-1.5', fullWidth && 'w-full', className)}>
       {label && <label className="text-sm font-medium text-ink-700">{label}</label>}
@@ -208,10 +209,13 @@ export function TextField({
         <Textarea
           rows={rows}
           className={cn(error && 'border-red-400')}
-          {...(props as React.TextareaHTMLAttributes<HTMLTextAreaElement>)}
+          {...(fieldProps as React.TextareaHTMLAttributes<HTMLTextAreaElement>)}
         />
       ) : (
-        <Input className={cn(error && 'border-red-400')} {...props} />
+        <Input
+          className={cn(error && 'border-red-400')}
+          {...(fieldProps as React.InputHTMLAttributes<HTMLInputElement>)}
+        />
       )}
       {helperText && (
         <p className={cn('text-xs', error ? 'text-red-500' : 'text-ink-500')}>{helperText}</p>
@@ -224,7 +228,6 @@ export function FormControl({
   children,
   className,
   fullWidth,
-  error: _e,
   size,
 }: React.HTMLAttributes<HTMLDivElement> & { fullWidth?: boolean; size?: string; error?: boolean }) {
   return (
@@ -243,8 +246,6 @@ export function Select({
   value,
   onChange,
   onBlur,
-  multiple: _m,
-  renderValue: _r,
 }: Readonly<{
   children?: React.ReactNode;
   value?: string | string[];

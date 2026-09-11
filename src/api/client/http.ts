@@ -1,4 +1,3 @@
-import Cookies from 'js-cookie';
 import {
   ApiError,
   EMPTY_META,
@@ -9,9 +8,13 @@ import {
 } from '../types/api';
 
 const DEFAULT_API_URL = 'http://localhost:3000';
-const TOKEN_COOKIE_NAME = 'token_name';
-const REFRESH_COOKIE_NAME = 'refresh_token';
 const REQUEST_TIMEOUT = 15_000;
+
+let accessToken: string | undefined;
+
+/** Noms des anciens cookies JS (pré-ESSG-SEC-01), nettoyés à la migration. */
+const LEGACY_TOKEN_COOKIE = 'token_name';
+const LEGACY_REFRESH_COOKIE = 'refresh_token';
 
 export type DocumentBlob = Blob & {
   inlineViewable: boolean;
@@ -36,62 +39,72 @@ function resolveBaseUrl(): string {
 
 export const API_BASE_URL = resolveBaseUrl();
 
+/** Efface un cookie JavaScript accessible en le faisant expirer. */
+function expireLegacyCookie(name: string): void {
+  if (typeof document === 'undefined') return;
+  document.cookie = `${name}=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax`;
+}
+
+/** Nettoyage unique des cookies de jetons créés par JavaScript (migration). */
+let legacyCookiesCleaned = false;
+function cleanupLegacyTokenCookies(): void {
+  if (legacyCookiesCleaned || typeof document === 'undefined') return;
+  legacyCookiesCleaned = true;
+  expireLegacyCookie(LEGACY_TOKEN_COOKIE);
+  expireLegacyCookie(LEGACY_REFRESH_COOKIE);
+}
+cleanupLegacyTokenCookies();
+
 function getToken(): string | undefined {
-  if (typeof window === 'undefined') return undefined;
-  return Cookies.get(TOKEN_COOKIE_NAME);
+  return accessToken;
 }
 
 export function getAuthToken(): string | undefined {
   return getToken();
 }
 
-export function setAuthToken(token: string, options?: Cookies.CookieAttributes) {
-  if (typeof window === 'undefined') return;
-  Cookies.set(TOKEN_COOKIE_NAME, token, { sameSite: 'lax', ...options });
+export function setAuthToken(token: string): void {
+  accessToken = token;
+  cleanupLegacyTokenCookies();
 }
 
-export function clearAuthToken() {
-  if (typeof window === 'undefined') return;
-  Cookies.remove(TOKEN_COOKIE_NAME);
-  Cookies.remove(REFRESH_COOKIE_NAME);
+export function clearAuthToken(): void {
+  accessToken = undefined;
+  cleanupLegacyTokenCookies();
 }
 
-export function getRefreshToken(): string | undefined {
-  if (typeof window === 'undefined') return undefined;
-  return Cookies.get(REFRESH_COOKIE_NAME);
-}
-
-export function setRefreshToken(token: string, options?: Cookies.CookieAttributes) {
-  if (typeof window === 'undefined') return;
-  Cookies.set(REFRESH_COOKIE_NAME, token, { sameSite: 'lax', ...options });
+export function hasAuthToken(): boolean {
+  return Boolean(getToken());
 }
 
 let refreshPromise: Promise<boolean> | null = null;
 
+/**
+ * Renouvelle le jeton d'accès via le cookie HttpOnly de refresh token :
+ * aucune valeur sensible n'est lue ni écrite par JavaScript. Le cookie est
+ * envoyé automatiquement (`credentials: 'include'`), le serveur applique la
+ * rotation et réémet le cookie.
+ */
 async function refreshAccessToken(): Promise<boolean> {
-  const refreshToken = getRefreshToken();
-  if (!refreshToken) return false;
-
   refreshPromise ??= (async () => {
     try {
       const response = await fetch(buildUrl('/auth/refresh'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-        body: JSON.stringify({ refreshToken }),
+        credentials: 'include',
       });
       if (!response.ok) return false;
 
       const envelope = (await parseJsonSafe(response)) as ApiEnvelope<{
         accessToken: string;
-        refreshToken: string;
       }>;
-      const data = unwrap<{ accessToken: string; refreshToken: string }>(envelope);
+      const data = unwrap<{ accessToken: string }>(envelope);
       if (!data?.accessToken) return false;
 
       setAuthToken(data.accessToken);
-      if (data.refreshToken) setRefreshToken(data.refreshToken);
       return true;
-    } catch {
+    } catch (error) {
+      console.warn('Échec dans callback — poursuite en mode dégradé', error instanceof Error ? error.message : error);
       return false;
     } finally {
       refreshPromise = null;
@@ -101,8 +114,14 @@ async function refreshAccessToken(): Promise<boolean> {
   return refreshPromise;
 }
 
-export function hasAuthToken(): boolean {
-  return Boolean(getToken());
+/**
+ * Restaure une session après rechargement de la page : le jeton d'accès
+ * n'étant conservé qu'en mémoire, on tente un rafraîchissement silencieux
+ * via le cookie HttpOnly avant de considérer l'utilisateur déconnecté.
+ */
+export async function tryRestoreSession(): Promise<boolean> {
+  if (hasAuthToken()) return true;
+  return refreshAccessToken();
 }
 
 let onAuthFailure: (() => void) | null = null;
@@ -111,11 +130,12 @@ export function registerAuthFailureHandler(fn: () => void) {
 }
 
 function handleUnauthorized(requestUrl: string): void {
-  const isAuthProbe =
+  const isAuthEndpoint =
     requestUrl.includes('/auth/verify') ||
     requestUrl.includes('/auth/me') ||
-    requestUrl.includes('/auth/session');
-  if (isAuthProbe) return;
+    requestUrl.includes('/auth/session') ||
+    requestUrl.includes('/auth/login');
+  if (isAuthEndpoint) return;
   try {
     clearAuthToken();
   } catch (error) {
@@ -156,7 +176,14 @@ function readValidationMessage(payload: unknown): string | undefined {
 function toApiErrorFromStatus(status: number, payload: unknown, requestUrl: string): ApiError {
   if (status === 401) {
     handleUnauthorized(requestUrl);
-    return new ApiError('Votre session a expiré. Veuillez vous reconnecter.', {
+    const fallback = readValidationMessage(payload);
+    if (requestUrl.includes('/auth/login')) {
+      return new ApiError(fallback || 'Email ou mot de passe incorrect', {
+        statusCode: status,
+        kind: 'unauthorized',
+      });
+    }
+    return new ApiError(fallback || 'Votre session a expiré. Veuillez vous reconnecter.', {
       statusCode: status,
       kind: 'unauthorized',
     });
@@ -186,6 +213,13 @@ function toApiErrorFromStatus(status: number, payload: unknown, requestUrl: stri
     return new ApiError(fallback || 'Cette valeur est déjà utilisée.', {
       statusCode: status,
       kind: 'conflict',
+      details: payload,
+    });
+  }
+  if (status === 429) {
+    return new ApiError(fallback || 'Trop de tentatives. Réessayez dans quelques minutes.', {
+      statusCode: status,
+      kind: 'server',
       details: payload,
     });
   }
@@ -245,7 +279,8 @@ async function parseJsonSafe(response: Response): Promise<unknown> {
   if (!text) return null;
   try {
     return JSON.parse(text) as unknown;
-  } catch {
+  } catch (error) {
+    console.warn('Échec dans parseJsonSafe — poursuite en mode dégradé', error instanceof Error ? error.message : error);
     return text;
   }
 }

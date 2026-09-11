@@ -119,7 +119,7 @@ const UsersTable: React.FC<UsersTableProps> = ({
         <Badge variant={getRoleVariant(user.role)}>{getRoleLabel(user.role)}</Badge>
       ),
     },
-    
+
     {
       id: 'presence',
       label: 'Statut',

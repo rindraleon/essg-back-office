@@ -86,3 +86,77 @@ export const deleteAdmissionFile = async (id: number, fileId: number): Promise<v
 export const deleteAdmission = async (id: number): Promise<void> => {
   await apiClient.delete(`/admissions/${id}`);
 };
+
+// --- Vérification des pièces justificatives (OCR) ---
+
+export type VerificationFieldStatus = 'conforme' | 'a_verifier' | 'non_conforme' | 'non_detecte';
+export type VerificationGlobalStatus =
+  'conforme' | 'verification_manuelle' | 'incompatible' | 'impossible';
+
+export interface VerificationFieldResult {
+  champ: string;
+  label: string;
+  valeurSaisie: string | null;
+  valeurExtraite: string | null;
+  statut: VerificationFieldStatus;
+  score: number;
+  confiance: number;
+  explication: string;
+  details?: Record<string, unknown>;
+}
+
+export interface VerificationDocumentInfo {
+  fileId: number | null;
+  type: string;
+  originalName: string | null;
+  mimetype: string | null;
+  methode: 'native' | 'ocr' | 'none';
+  taille: number | null;
+  texteExtraitLongueur: number;
+  confianceExtraction?: number;
+  erreur?: string | null;
+}
+
+export interface AdmissionVerification {
+  id: number;
+  admissionId: number;
+  adminId: number | null;
+  adminEmail: string | null;
+  statut: VerificationGlobalStatus;
+  score: number;
+  resultats: VerificationFieldResult[];
+  documentsAnalyses: VerificationDocumentInfo[];
+  textesExtraits: Record<string, string>;
+  erreurs: string[] | null;
+  dureeMs: number | null;
+  creeLe: string;
+}
+
+export const verifyAdmissionDocuments = async (
+  admissionId: number
+): Promise<AdmissionVerification> => {
+  return apiClient.post<AdmissionVerification>(`/admissions/${admissionId}/verification`, {});
+};
+
+export const getAdmissionVerifications = async (
+  admissionId: number
+): Promise<AdmissionVerification[]> => {
+  return apiClient.get<AdmissionVerification[]>(`/admissions/${admissionId}/verification/history`);
+};
+
+export const getLatestAdmissionVerification = async (
+  admissionId: number
+): Promise<AdmissionVerification | null> => {
+  return apiClient.get<AdmissionVerification | null>(
+    `/admissions/${admissionId}/verification/latest`
+  );
+};
+
+export const getAdmissionVerification = async (
+  admissionId: number,
+  verificationId: number
+): Promise<AdmissionVerification> => {
+  return apiClient.get<AdmissionVerification>(
+    `/admissions/${admissionId}/verification/${verificationId}`
+  );
+};

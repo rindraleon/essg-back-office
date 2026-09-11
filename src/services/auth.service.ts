@@ -36,7 +36,8 @@ export const verifyToken = async (): Promise<User | null> => {
       };
     }
     return null;
-  } catch {
+  } catch (error) {
+    console.warn('Échec dans verifyToken — poursuite en mode dégradé', error instanceof Error ? error.message : error);
     return null;
   }
 };

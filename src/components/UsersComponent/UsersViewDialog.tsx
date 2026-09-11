@@ -30,6 +30,12 @@ const ROLE_LABELS: Record<string, string> = {
 
 const getRoleLabel = (role: string): string => ROLE_LABELS[role] ?? role;
 
+const ROLE_VARIANTS: Record<User['role'], 'default' | 'secondary' | 'outline'> = {
+  admin: 'default',
+  editeur: 'secondary',
+  lecteur: 'outline',
+};
+
 function InfoItem({ label, value, icon }: Readonly<InfoItemProps>) {
   return (
     <div className="group flex min-w-0 items-start gap-3 rounded-xl border border-ink-100 bg-ink-50/50 p-3.5 transition-colors hover:bg-ink-50">
@@ -81,8 +87,7 @@ function UsersViewDialog({ open, onClose, user }: Readonly<UsersViewDialogProps>
   const initials = getPersonInitials(user);
   const roleLabel = getRoleLabel(user.role);
 
-  const roleVariant =
-    user.role === 'admin' ? 'default' : user.role === 'editeur' ? 'secondary' : 'outline';
+  const roleVariant = ROLE_VARIANTS[user.role] ?? 'outline';
 
   return (
     <Dialog

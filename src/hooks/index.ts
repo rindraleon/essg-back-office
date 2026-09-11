@@ -13,6 +13,9 @@ export {
   useUpdateAdmissionStatus,
   useDeleteAdmission,
   useDeleteAdmissionFile,
+  useVerifyAdmission,
+  useAdmissionVerifications,
+  useLatestAdmissionVerification,
 } from './queries/useAdmissionsQuery';
 export { useDashboardStatsQuery, useRecentActivitiesQuery } from './queries/useDashboardQuery';
 export { useFormationMentionsQuery } from './queries/useFormationMentionsQuery';
