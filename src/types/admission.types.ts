@@ -102,3 +102,46 @@ export const ADMISSION_GENRE_LABELS: Record<string, string> = {
   masculin: 'Masculin',
   autre: 'Autre / non précisé',
 };
+
+export type VerificationFieldStatus = 'conforme' | 'a_verifier' | 'non_conforme' | 'non_detecte';
+export type VerificationGlobalStatus =
+  'conforme' | 'verification_manuelle' | 'incompatible' | 'impossible';
+
+export interface VerificationFieldResult {
+  champ: string;
+  label: string;
+  valeurSaisie: string | null;
+  valeurExtraite: string | null;
+  statut: VerificationFieldStatus;
+  score: number;
+  confiance: number;
+  explication: string;
+  details?: Record<string, unknown>;
+}
+
+export interface VerificationDocumentInfo {
+  fileId: number | null;
+  type: string;
+  originalName: string | null;
+  mimetype: string | null;
+  methode: 'native' | 'ocr' | 'none';
+  taille: number | null;
+  texteExtraitLongueur: number;
+  confianceExtraction?: number;
+  erreur?: string | null;
+}
+
+export interface AdmissionVerification {
+  id: number;
+  admissionId: number;
+  adminId: number | null;
+  adminEmail: string | null;
+  statut: VerificationGlobalStatus;
+  score: number;
+  resultats: VerificationFieldResult[];
+  documentsAnalyses: VerificationDocumentInfo[];
+  textesExtraits: Record<string, string>;
+  erreurs: string[] | null;
+  dureeMs: number | null;
+  creeLe: string;
+}

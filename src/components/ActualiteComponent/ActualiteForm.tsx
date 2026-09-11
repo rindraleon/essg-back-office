@@ -126,6 +126,8 @@ const ActualiteForm: React.FC<ActualiteFormProps> = ({
       resetForm();
       setImagePreview('');
     }
+    // Hydratation volontairement limitée à l'ouverture / au changement d'enregistrement.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, mode, initialId]);
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -138,6 +140,7 @@ const ActualiteForm: React.FC<ActualiteFormProps> = ({
       setImagePreview(getImageUrl(url));
       toast.success('Image téléversée avec succès');
     } catch (err) {
+      console.warn('Échec dans handleImageUpload — poursuite en mode dégradé', err instanceof Error ? err.message : err);
       const message = err instanceof Error ? err.message : "Échec du téléversement de l'image.";
       toast.error(message);
     } finally {
@@ -219,7 +222,7 @@ const ActualiteForm: React.FC<ActualiteFormProps> = ({
       <FloatingSelect
         label="Catégorie *"
         value={formData.categorie}
-        onValueChange={(v, _eventDetails) => v && handleChange('categorie', v)}
+        onValueChange={(v) => v && handleChange('categorie', v)}
         options={categories.map((cat) => ({ label: cat, value: cat }))}
         error={errors.categorie}
       />
@@ -303,7 +306,7 @@ const ActualiteForm: React.FC<ActualiteFormProps> = ({
         <FloatingSelect
           label="Statut *"
           value={formData.statut}
-          onValueChange={(v, _eventDetails) => v && handleChange('statut', v)}
+          onValueChange={(v) => v && handleChange('statut', v)}
           options={statuts}
           error={errors.statut}
         />

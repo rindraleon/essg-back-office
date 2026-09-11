@@ -1,6 +1,5 @@
 import {
   EMAIL_MAX_LENGTH,
-  EMAIL_REGEX,
   isDisposableEmail,
   isValidEmail,
   normalizeEmail,
@@ -20,9 +19,10 @@ export const BORDEREAU_PATTERN = /^[A-Za-z0-9](?:[A-Za-z0-9\-_/.\s]*[A-Za-z0-9])
 
 export const URL_PATTERN = /^https?:\/\/[^\s]+$/i;
 
-export { EMAIL_REGEX, EMAIL_MAX_LENGTH, isDisposableEmail, isValidEmail, normalizeEmail };
+export { EMAIL_REGEX } from '../validation/email';
+export { EMAIL_MAX_LENGTH, isDisposableEmail, isValidEmail, normalizeEmail };
 
-export const EMAIL_PATTERN = EMAIL_REGEX;
+
 
 export const DIPLOMA_YEAR_MIN = 1980;
 
@@ -34,7 +34,8 @@ export const VALIDATION_MESSAGES = {
   prenomInvalid:
     'Le prénom ne peut contenir que des lettres, espaces, apostrophes ou traits d’union.',
   emailInvalid: 'Adresse e-mail invalide.',
-  emailDisposable: 'Le domaine de cette adresse est introuvable ou jetable. Utilisez une adresse e-mail valide.',
+  emailDisposable:
+    'Le domaine de cette adresse est introuvable ou jetable. Utilisez une adresse e-mail valide.',
   emailUndeliverable: 'Cette adresse e-mail ne semble pas pouvoir recevoir de messages.',
   phoneInvalid: 'Veuillez saisir un numéro de téléphone valide.',
   addressInvalid: 'L’adresse contient des caractères non autorisés.',
@@ -140,3 +141,5 @@ export const validateOptionalBacNumber = (value: string): string | undefined => 
     ? undefined
     : VALIDATION_MESSAGES.bacNumberInvalid;
 };
+
+export {EMAIL_REGEX as EMAIL_PATTERN} from '../validation/email';

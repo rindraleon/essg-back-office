@@ -12,11 +12,20 @@ export {
   getAdmissionFileBlob,
   deleteAdmissionFile,
   deleteAdmission,
+  verifyAdmissionDocuments,
+  getAdmissionVerifications,
+  getLatestAdmissionVerification,
+  getAdmissionVerification,
 } from './admissions.service';
 export type {
   AdmissionQuery,
   AdmissionsListResponse,
   AdmissionDecisionPayload,
+  AdmissionVerification,
+  VerificationFieldResult,
+  VerificationDocumentInfo,
+  VerificationFieldStatus,
+  VerificationGlobalStatus,
 } from './admissions.service';
 export { login, verifyToken } from './auth.service';
 export { getDashboardStats, getRecentActivities } from './dashboard.service';

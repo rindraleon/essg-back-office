@@ -17,7 +17,7 @@ import { Dialog, DialogContent } from '../ui/dialog';
 import { ApiError } from '@/api';
 import type { DocumentBlob } from '@/api';
 import { getDocument, GlobalWorkerOptions } from 'pdfjs-dist';
-import type { PDFDocumentProxy, PDFPageProxy } from 'pdfjs-dist';
+import type { PDFDocumentLoadingTask, PDFDocumentProxy, PDFPageProxy } from 'pdfjs-dist';
 
 const workerUrl = new URL('pdfjs-dist/build/pdf.worker.min.mjs', import.meta.url).href;
 GlobalWorkerOptions.workerSrc = workerUrl;
@@ -77,6 +77,7 @@ const PdfPreviewDialog = ({
   const containerRef = useRef<HTMLDivElement | null>(null);
   const renderTaskRef = useRef<{ cancel: () => void } | null>(null);
   const currentPdfRef = useRef<PDFDocumentProxy | null>(null);
+  const loadingTaskRef = useRef<PDFDocumentLoadingTask | null>(null);
 
   const openDocument = useCallback(async () => {
     setLoading(true);
@@ -95,25 +96,33 @@ const PdfPreviewDialog = ({
         if (prev) URL.revokeObjectURL(prev);
         return URL.createObjectURL(blob);
       });
+      // pdf.js v6+ : le scripting/eval des PDF n'est plus exposé par l'API de
+      // rendu ; la montée de version couvre GHSA-hq66-cqwq-w95j (ESSG-SEC-02).
       if (detected === 'pdf') {
-        const doc = await getDocument({ data: await blob.arrayBuffer() }).promise;
+        const task = getDocument({ data: await blob.arrayBuffer() });
+        loadingTaskRef.current = task;
+        const doc = await task.promise;
         currentPdfRef.current = doc;
         setPdf(doc);
         setPageCount(doc.numPages);
         setCurrentPage(1);
       } else if (detected === 'unsupported') {
         try {
-          const doc = await getDocument({ data: await blob.arrayBuffer() }).promise;
+          const task = getDocument({ data: await blob.arrayBuffer() });
+          loadingTaskRef.current = task;
+          const doc = await task.promise;
           currentPdfRef.current = doc;
           setPdf(doc);
           setPageCount(doc.numPages);
           setCurrentPage(1);
           setKind('pdf');
-        } catch {
+        } catch (error) {
+          console.warn('Échec dans callback useCallback — poursuite en mode dégradé', error instanceof Error ? error.message : error);
           setKind('unsupported');
         }
       }
     } catch (err) {
+      console.warn('Échec dans callback useCallback — poursuite en mode dégradé', err instanceof Error ? err.message : err);
       setError(
         err instanceof ApiError
           ? err.message
@@ -130,9 +139,10 @@ const PdfPreviewDialog = ({
 
     return () => {
       renderTaskRef.current?.cancel();
-      const doc = currentPdfRef.current;
       currentPdfRef.current = null;
-      if (doc) void doc.destroy();
+      const task = loadingTaskRef.current;
+      loadingTaskRef.current = null;
+      if (task) void task.destroy();
     };
   }, [open, openDocument]);
 

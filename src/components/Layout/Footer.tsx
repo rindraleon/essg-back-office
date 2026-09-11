@@ -1,11 +1,8 @@
-/* eslint-disable sonarjs/super-linear-regex */
 import { ExternalLink, Globe, Link2 } from 'lucide-react';
-import React, { useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
-import LogoITDC from '../../assets/files/images/logo/itdc_logo.png';
+import LogoESSG from '../../assets/files/images/logo/EssG.png';
 import type { FooterProps, SocialItem } from '@/types';
-import { FloatingInput } from '../ui/floating-input';
-import { Button } from '../ui/button';
 
 function SocialIcon({ kind }: Readonly<{ kind: SocialItem['kind'] }>) {
   switch (kind) {
@@ -22,78 +19,50 @@ function SocialIcon({ kind }: Readonly<{ kind: SocialItem['kind'] }>) {
 
 const Footer: React.FC<FooterProps> = (props: Readonly<FooterProps>) => {
   const {
-    companyName = 'ITDC Mada',
+    companyName = 'ESSG',
     navLinks = [
-      { label: 'Accueil', to: '/' },
-      { label: 'Example', to: '/example' },
+      { label: 'Tableau de bord', to: '/' },
+      { label: 'Admissions', to: '/admissions' },
     ],
     contact = {
-      email: 'contact@itdcmada.mg',
-      phone: '+261 34 28 085 30',
-      address: 'Fianarantsoa, Madagascar',
+      email: 'essg@univ-fianarantsoa.mg',
+      phone: '+261 38 18 282 49',
+      address: 'Campus Andrainjato, Université de Fianarantsoa, Madagascar',
     },
     socials = [
-      { href: 'https://itdcmada.mg/', kind: 'web', ariaLabel: 'Site Web' },
+      { href: 'https://essg.itdcmada.com', kind: 'web', ariaLabel: 'Site officiel ESSG' },
       {
-        href: 'https://www.linkedin.com/company/itdcmada',
+        href: 'https://www.linkedin.com/company/essg',
         kind: 'linkedin',
-        ariaLabel: 'LinkedIn',
+        ariaLabel: 'LinkedIn ESSG',
       },
-      { href: 'https://www.facebook.com/itdcmada', kind: 'facebook', ariaLabel: 'Facebook' },
+      {
+        href: 'https://www.facebook.com/profile.php?id=61588935937597',
+        kind: 'facebook',
+        ariaLabel: 'Facebook ESSG',
+      },
     ],
-    onSubscribe,
   } = props;
-
-  const [email, setEmail] = useState('');
-  const [submitting, setSubmitting] = useState(false);
-  const [message, setMessage] = useState<string | null>(null);
-
-  const handleSubscribe = async (e: React.SyntheticEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setMessage(null);
-
-    if (!/^\S+@\S+\.\S+$/.test(email)) {
-      setMessage('Adresse e-mail invalide.');
-      return;
-    }
-
-    try {
-      setSubmitting(true);
-      if (onSubscribe) {
-        await onSubscribe(email);
-      } else {
-        console.info('Subscribe (template):', email);
-      }
-      setMessage('Merci ! Vérifie ta boîte mail.');
-      setEmail('');
-    } catch (err) {
-      console.error(err);
-      setMessage('Une erreur est survenue, réessaye plus tard.');
-    } finally {
-      setSubmitting(false);
-    }
-  };
 
   return (
     <footer className="bg-ink-900 text-ink-100">
-      <div className="max-w-7xl mx-auto px-6 py-12">
+      <div className="max-w-7xl mx-auto px-6 py-10">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="space-y-4">
             <Link to="/" className="inline-flex items-center gap-3">
               <img
-                src={LogoITDC}
+                src={LogoESSG}
                 alt={`${companyName} logo`}
                 loading="lazy"
-                className="w-12 h-12 object-contain"
+                decoding="async"
+                className="w-10 h-10 object-contain bg-white rounded-lg p-1"
               />
-              <span className="text-2xl font-bold tracking-tight text-primary">{companyName}</span>
+              <span className="text-xl font-bold tracking-tight text-white">{companyName}</span>
             </Link>
-
             <p className="text-sm text-ink-300 max-w-xs">
-              Petit texte à propos du site. Personnalise-le pour présenter ta mission, ton produit
-              ou un slogan court et percutant.
+              École Supérieure des Sciences Géomatiques — Université de Fianarantsoa. Formation,
+              recherche et innovation géospatiale.
             </p>
-
             <div className="flex items-center gap-2">
               {socials.map((s) => (
                 <a
@@ -102,7 +71,7 @@ const Footer: React.FC<FooterProps> = (props: Readonly<FooterProps>) => {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={s.ariaLabel ?? `Ouvrir ${companyName} social`}
-                  className="p-2 rounded-lg text-ink-300 hover:text-primary hover:bg-primary/5 transition-colors"
+                  className="p-2 rounded-lg text-ink-300 hover:text-white hover:bg-white/10 transition-colors"
                 >
                   <SocialIcon kind={s.kind} />
                 </a>
@@ -113,12 +82,12 @@ const Footer: React.FC<FooterProps> = (props: Readonly<FooterProps>) => {
           <div className="md:col-span-2 grid grid-cols-2 gap-6">
             <div>
               <h4 className="text-sm font-semibold text-ink-100 uppercase tracking-wider">
-                Liens utiles
+                Navigation
               </h4>
               <ul className="mt-4 space-y-2 text-sm text-ink-300">
                 {navLinks.map((link) => (
                   <li key={link.to}>
-                    <Link to={link.to} className="hover:text-primary transition-colors">
+                    <Link to={link.to} className="hover:text-white transition-colors">
                       {link.label}
                     </Link>
                   </li>
@@ -135,7 +104,7 @@ const Footer: React.FC<FooterProps> = (props: Readonly<FooterProps>) => {
                   <li>
                     <a
                       href={`mailto:${contact.email}`}
-                      className="hover:text-primary transition-colors"
+                      className="hover:text-white transition-colors break-all"
                     >
                       {contact.email}
                     </a>
@@ -144,8 +113,8 @@ const Footer: React.FC<FooterProps> = (props: Readonly<FooterProps>) => {
                 {contact.phone && (
                   <li>
                     <a
-                      href={`tel:${contact.phone}`}
-                      className="hover:text-primary transition-colors"
+                      href={`tel:${contact.phone.replaceAll(/\s+/g, '')}`}
+                      className="hover:text-white transition-colors"
                     >
                       {contact.phone}
                     </a>
@@ -158,33 +127,15 @@ const Footer: React.FC<FooterProps> = (props: Readonly<FooterProps>) => {
 
           <div className="space-y-3">
             <h4 className="text-sm font-semibold text-ink-100 uppercase tracking-wider">
-              Newsletter
+              Université de Fianarantsoa
             </h4>
             <p className="text-sm text-ink-300">
-              Reçois les nouveautés et ressources utiles — une ou deux fois par mois.
+              Campus Andrainjato, BP 1264
+              <br />
+              Fianarantsoa 301, Madagascar
             </p>
-
-            <form onSubmit={handleSubscribe} className="mt-3 flex items-center gap-2">
-              <FloatingInput
-                id="footer-newsletter"
-                label="Email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                placeholder="ton.email@exemple.com"
-                className="flex-1 bg-primary/5"
-                aria-label="Adresse e-mail pour la newsletter"
-              />
-              <Button type="submit" disabled={submitting} size="sm">
-                {submitting ? '...' : "S'inscrire"}
-              </Button>
-            </form>
-
-            {message && <p className="text-xs text-ink-300 mt-2">{message}</p>}
-
-            <p className="text-xs text-ink-400 mt-2 max-w-[18rem]">
-              Nous respectons ta vie privée. Aucun spam — tu peux te désinscrire à tout moment.
+            <p className="text-xs text-ink-400 mt-4">
+              © {new Date().getFullYear()} ESSG. Tous droits réservés.
             </p>
           </div>
         </div>

@@ -18,6 +18,12 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/
 import { Badge } from '../ui/badge';
 import { useRecentAdmissionsQuery, useRecentMessagesQuery } from '@/hooks';
 
+/** Classe des liens de navigation selon l'état actif. */
+const navLinkClassName = ({ isActive }: { isActive: boolean }): string =>
+  `py-2.5 px-3 rounded-md text-sm font-medium ${
+    isActive ? 'bg-brand-50 text-brand-600' : 'text-ink-700 hover:bg-ink-50'
+  }`;
+
 const Header: React.FC = () => {
   const [open, setOpen] = useState(false);
   const [logoutDialogOpen, setLogoutDialogOpen] = useState(false);
@@ -365,89 +371,75 @@ const Header: React.FC = () => {
               <NavLink
                 to={routesStatic.dashboard}
                 onClick={() => setOpen(false)}
-                className={({ isActive }) =>
-                  `py-2.5 px-3 rounded-md text-sm font-medium ${
-                    isActive ? 'bg-brand-50 text-brand-600' : 'text-ink-700 hover:bg-ink-50'
-                  }`
-                }
+                className={navLinkClassName}
               >
                 Dashboard
               </NavLink>
               <NavLink
                 to={routesStatic.admissions}
                 onClick={() => setOpen(false)}
-                className={({ isActive }) =>
-                  `py-2.5 px-3 rounded-md text-sm font-medium ${
-                    isActive ? 'bg-brand-50 text-brand-600' : 'text-ink-700 hover:bg-ink-50'
-                  }`
-                }
+                className={navLinkClassName}
               >
                 Admissions
               </NavLink>
               <NavLink
+                to={routesStatic.actualites}
+                onClick={() => setOpen(false)}
+                className={navLinkClassName}
+              >
+                Actualités
+              </NavLink>
+              <NavLink
                 to={routesStatic.contacts}
                 onClick={() => setOpen(false)}
-                className={({ isActive }) =>
-                  `py-2.5 px-3 rounded-md text-sm font-medium ${
-                    isActive ? 'bg-brand-50 text-brand-600' : 'text-ink-700 hover:bg-ink-50'
-                  }`
-                }
+                className={navLinkClassName}
               >
                 Contacts
               </NavLink>
               <NavLink
                 to={routesStatic.projets}
                 onClick={() => setOpen(false)}
-                className={({ isActive }) =>
-                  `py-2.5 px-3 rounded-md text-sm font-medium ${
-                    isActive ? 'bg-brand-50 text-brand-600' : 'text-ink-700 hover:bg-ink-50'
-                  }`
-                }
+                className={navLinkClassName}
               >
                 Projets
               </NavLink>
               <NavLink
                 to={routesStatic.formations}
                 onClick={() => setOpen(false)}
-                className={({ isActive }) =>
-                  `py-2.5 px-3 rounded-md text-sm font-medium ${
-                    isActive ? 'bg-brand-50 text-brand-600' : 'text-ink-700 hover:bg-ink-50'
-                  }`
-                }
+                className={navLinkClassName}
               >
                 Formations
               </NavLink>
               <NavLink
                 to={routesStatic.partenaires}
                 onClick={() => setOpen(false)}
-                className={({ isActive }) =>
-                  `py-2.5 px-3 rounded-md text-sm font-medium ${
-                    isActive ? 'bg-brand-50 text-brand-600' : 'text-ink-700 hover:bg-ink-50'
-                  }`
-                }
+                className={navLinkClassName}
               >
                 Partenaires
               </NavLink>
               <NavLink
-                to={routesStatic.actualites}
+                to={routesStatic.ressourcesHumaines}
                 onClick={() => setOpen(false)}
-                className={({ isActive }) =>
-                  `py-2.5 px-3 rounded-md text-sm font-medium ${
-                    isActive ? 'bg-brand-50 text-brand-600' : 'text-ink-700 hover:bg-ink-50'
-                  }`
-                }
+                className={navLinkClassName}
               >
-                Actualités
+                Equipes pédagogiques
               </NavLink>
+              {user?.role === 'admin' && (
+                <NavLink
+                to={routesStatic.utilisateurs}
+                onClick={() => setOpen(false)}
+                className={navLinkClassName}
+              >
+                Utilisateurs
+              </NavLink>
+              )
+              }
+              
               {user?.role === 'admin' && (
                 <NavLink
                   to={routesStatic.activityLogs}
                   onClick={() => setOpen(false)}
-                  className={({ isActive }) =>
-                    `py-2.5 px-3 rounded-md text-sm font-medium ${
-                      isActive ? 'bg-brand-50 text-brand-600' : 'text-ink-700 hover:bg-ink-50'
-                    }`
-                  }
+                  className={navLinkClassName}
                 >
                   Journal des actions
                 </NavLink>

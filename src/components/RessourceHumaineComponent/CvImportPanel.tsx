@@ -53,6 +53,7 @@ const CvImportPanel: React.FC<CvImportPanelProps> = ({ onApply, disabled = false
       setStatus('done');
       toast.success('CV analysé — vérifiez les données avant enregistrement');
     } catch (error) {
+      console.warn('Échec dans callback useCallback — poursuite en mode dégradé', error instanceof Error ? error.message : error);
       const message =
         error instanceof OcrError ? error.message : "L'analyse du document a échoué. Réessayez.";
       setErrorMessage(message);

@@ -64,6 +64,7 @@ export default function MultiImageUpload({
         uploaded.length > 1 ? `${uploaded.length} images ajoutées` : 'Image ajoutée à la galerie'
       );
     } catch (error) {
+      console.warn('Échec dans uploadFiles — poursuite en mode dégradé', error instanceof Error ? error.message : error);
       toast.error(error instanceof Error ? error.message : "Échec du téléversement d'une image.");
       if (uploaded.length > 0) onChange([...value, ...uploaded]);
     } finally {

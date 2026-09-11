@@ -2,6 +2,7 @@ import { useState, type ComponentProps } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { AlertCircle, Eye, EyeOff, LoaderCircle, Lock, LogIn, Mail } from 'lucide-react';
 import { useAuth } from '@/contexts';
+import { ApiError } from '@/api';
 import { routesStatic } from '@/routes';
 import loginBg from '../../assets/files/images/background/login-bg.webp';
 import loginBgMobile from '../../assets/files/images/background/login-bg-mobile.webp';
@@ -76,6 +77,21 @@ const TOPO_PATTERN =
 
 type FormSubmitEvent = Parameters<NonNullable<ComponentProps<'form'>['onSubmit']>>[0];
 
+function getLoginErrorMessage(error: unknown): string {
+  if (error instanceof ApiError) {
+    if (error.kind === 'unauthorized') return 'Email ou mot de passe incorrect';
+    if (error.kind === 'network') {
+      return 'Serveur inaccessible. Vérifiez votre connexion et réessayez.';
+    }
+    if (error.kind === 'timeout') return 'La requête a expiré. Veuillez réessayer.';
+    if (error.statusCode === 429) return 'Trop de tentatives. Réessayez dans quelques minutes.';
+    if (error.kind === 'server') {
+      return 'Service temporairement indisponible. Réessayez plus tard.';
+    }
+  }
+  return 'Une erreur inattendue est survenue. Réessayez.';
+}
+
 export default function Login() {
   useScrollToTop();
   useTitle('Authentification');
@@ -130,7 +146,7 @@ export default function Login() {
       await login(email, password);
       navigate(fromPath, { replace: true });
     } catch (err) {
-      setError('Email ou mot de passe incorrect');
+      setError(getLoginErrorMessage(err));
       console.error(err);
     } finally {
       setLoading(false);
@@ -151,7 +167,7 @@ export default function Login() {
     <>
       <style>{styles}</style>
 
-      <div className="relative flex min-h-[100dvh] items-center justify-center overflow-hidden bg-brand-950 px-4 py-8 sm:px-6">
+      <main className="relative flex min-h-[100dvh] items-center justify-center overflow-hidden bg-brand-950 px-4 py-8 sm:px-6">
         <div aria-hidden className="pointer-events-none absolute inset-0">
           <div className="absolute inset-0 overflow-hidden">
             <picture>
@@ -202,7 +218,7 @@ export default function Login() {
               </p>
             </header>
 
-            <form onSubmit={handleSubmit} noValidate className="space-y-4">
+            <form onSubmit={handleSubmit} noValidate aria-busy={loading} className="space-y-4">
               {error && (
                 <div
                   role="alert"
@@ -230,6 +246,8 @@ export default function Login() {
                     id="email"
                     type="email"
                     autoComplete="email"
+                    required
+                    aria-required="true"
                     value={email}
                     onChange={(e) => {
                       setEmail(e.target.value);
@@ -270,6 +288,8 @@ export default function Login() {
                     id="password"
                     type={showPassword ? 'text' : 'password'}
                     autoComplete="current-password"
+                    required
+                    aria-required="true"
                     value={password}
                     onChange={(e) => {
                       setPassword(e.target.value);
@@ -289,7 +309,7 @@ export default function Login() {
                     aria-label={
                       showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'
                     }
-                    className="absolute inset-y-0 right-0 flex items-center rounded-r-xl pr-4 pl-2 text-ink-400 transition-colors hover:text-brand-700 focus-visible:text-brand-700 focus-visible:outline-none"
+                    className="absolute inset-y-0 right-0 flex items-center rounded-r-xl pr-4 pl-2 text-ink-400 transition-colors hover:text-brand-700 focus-visible:text-brand-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/50 focus-visible:ring-inset"
                   >
                     {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
                   </button>
@@ -332,7 +352,7 @@ export default function Login() {
             </footer>
           </div>
         </div>
-      </div>
+      </main>
     </>
   );
 }

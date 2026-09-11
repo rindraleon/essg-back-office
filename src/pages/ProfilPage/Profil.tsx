@@ -143,7 +143,8 @@ const MySessionsSection: React.FC = () => {
     try {
       await revokeMySessionMutation.mutateAsync(sessionId);
       toast.success('Appareil déconnecté');
-    } catch {
+    } catch (error) {
+      console.warn('Échec dans handleRevoke — poursuite en mode dégradé', error instanceof Error ? error.message : error);
       toast.error('Impossible de déconnecter cet appareil');
     }
   };

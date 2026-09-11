@@ -11,6 +11,11 @@ export type {
   AdmissionFile,
   Admission,
   AdmissionStatus,
+  VerificationFieldStatus,
+  VerificationGlobalStatus,
+  VerificationFieldResult,
+  VerificationDocumentInfo,
+  AdmissionVerification,
 } from './admission.types';
 export type { LoginRequest, LoginResponse, User, UserFormData } from './auth.types';
 export type { DashboardStats, Activity, Overview } from './dashboard.types';

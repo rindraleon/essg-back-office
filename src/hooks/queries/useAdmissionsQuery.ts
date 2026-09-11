@@ -3,8 +3,11 @@ import {
   deleteAdmission,
   deleteAdmissionFile,
   getAdmissionById,
+  getAdmissionVerifications,
   getAllAdmissions,
+  getLatestAdmissionVerification,
   updateAdmissionStatus,
+  verifyAdmissionDocuments,
   type AdmissionQuery,
 } from '@/services';
 import type { AdmissionStatus } from '@/types';
@@ -88,5 +91,36 @@ export function useDeleteAdmissionFile() {
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: queryKeys.admissions.all });
     },
+  });
+}
+
+// --- Vérification documentaire ---
+
+export function useVerifyAdmission() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (admissionId: number) => verifyAdmissionDocuments(admissionId),
+    onSuccess: (_data, admissionId) => {
+      void queryClient.invalidateQueries({ queryKey: queryKeys.admissions.detail(admissionId) });
+      void queryClient.invalidateQueries({
+        queryKey: [...queryKeys.admissions.all, 'verification', admissionId],
+      });
+    },
+  });
+}
+
+export function useAdmissionVerifications(admissionId: number | null) {
+  return useQuery({
+    queryKey: [...queryKeys.admissions.all, 'verification', admissionId ?? 0, 'history'] as const,
+    queryFn: () => getAdmissionVerifications(admissionId as number),
+    enabled: admissionId !== null,
+  });
+}
+
+export function useLatestAdmissionVerification(admissionId: number | null) {
+  return useQuery({
+    queryKey: [...queryKeys.admissions.all, 'verification', admissionId ?? 0, 'latest'] as const,
+    queryFn: () => getLatestAdmissionVerification(admissionId as number),
+    enabled: admissionId !== null,
   });
 }

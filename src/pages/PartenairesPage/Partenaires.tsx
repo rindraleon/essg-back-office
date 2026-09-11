@@ -111,7 +111,7 @@ const Partenaires: React.FC = () => {
         console.error('Error saving partenaire:', error);
       }
     },
-    [formMode, selectedPartenaire]
+    [formMode, selectedPartenaire, createMutation, updateMutation]
   );
 
   const handleResetFilters = useCallback(() => {

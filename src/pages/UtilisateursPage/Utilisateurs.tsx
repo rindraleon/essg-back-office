@@ -205,7 +205,7 @@ const Utilisateurs: React.FC = () => {
         console.error('Error saving user:', error);
       }
     },
-    [formMode, selectedUser]
+    [formMode, selectedUser, createMutation, updateMutation]
   );
 
   return (

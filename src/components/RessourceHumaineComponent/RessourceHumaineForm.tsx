@@ -185,6 +185,7 @@ const RessourceHumaineForm: React.FC<RessourceHumaineFormProps> = ({
       setImagePreview(getImageUrl(url));
       toast.success('Photo téléversée avec succès');
     } catch (err) {
+      console.warn('Échec dans handleImageUpload — poursuite en mode dégradé', err instanceof Error ? err.message : err);
       const message = err instanceof Error ? err.message : 'Échec du téléversement de la photo.';
       toast.error(message);
     } finally {
@@ -271,7 +272,7 @@ const RessourceHumaineForm: React.FC<RessourceHumaineFormProps> = ({
       <FloatingSelect
         label="Poste *"
         value={formData.poste}
-        onValueChange={(v, _eventDetails) => v && handleChange('poste', v)}
+        onValueChange={(v) => v && handleChange('poste', v)}
         options={postes.map((poste) => ({ label: poste, value: poste }))}
         error={errors.poste}
       />

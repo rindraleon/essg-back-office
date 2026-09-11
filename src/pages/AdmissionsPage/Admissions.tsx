@@ -89,7 +89,7 @@ const Admissions = () => {
   const deleteMutation = useDeleteAdmission();
   const deleteFileMutation = useDeleteAdmissionFile();
   const detailQuery = useAdmissionDetailQuery(detailId);
-  const admissions = data?.data ?? [];
+  const admissions = useMemo(() => data?.data ?? [], [data]);
   const totalItems = data?.total ?? 0;
   const detailAdmission = detailQuery.data ?? selectedAdmission;
   const niveaux = useMemo(
@@ -151,6 +151,7 @@ const Admissions = () => {
           : 'Décision enregistrée. L’email a été transmis au candidat.'
       );
     } catch (error) {
+      console.warn('Échec dans handleSaveDecision — poursuite en mode dégradé', error instanceof Error ? error.message : error);
       const message = error instanceof ApiError ? error.message : "Impossible d'envoyer l'email";
       toast.error(message);
     } finally {
@@ -177,6 +178,7 @@ const Admissions = () => {
       toast.success('Fichier supprimé avec succès');
       setFileToDelete(null);
     } catch (error) {
+      console.warn('Échec dans handleConfirmDeleteFile — poursuite en mode dégradé', error instanceof Error ? error.message : error);
       toast.error(
         error instanceof ApiError ? error.message : 'Erreur lors de la suppression du fichier'
       );
@@ -189,7 +191,8 @@ const Admissions = () => {
       await deleteMutation.mutateAsync(deleteTarget.id);
       toast.success('Candidature supprimée avec succès');
       setDeleteTarget(null);
-    } catch {
+    } catch (error) {
+      console.warn('Échec dans handleConfirmDelete — poursuite en mode dégradé', error instanceof Error ? error.message : error);
       toast.error('Une erreur est survenue lors de la suppression.');
     }
   };
@@ -213,6 +216,7 @@ const Admissions = () => {
         `${count} candidature${count !== 1 ? 's' : ''} exportée${count !== 1 ? 's' : ''}.`
       );
     } catch (error) {
+      console.warn('Échec dans handleExport — poursuite en mode dégradé', error instanceof Error ? error.message : error);
       toast.error(error instanceof Error ? error.message : "Impossible de générer l'export Excel.");
     } finally {
       setExporting(false);
@@ -324,7 +328,6 @@ const Admissions = () => {
           const admission = admissions.find((item) => item.id === id);
           if (admission) setDeleteTarget(admission);
         }}
-        onPreviewFile={openPreview}
         emptyMessage={getEmptyMessage()}
       />
 

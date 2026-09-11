@@ -159,6 +159,7 @@ const UsersForm: React.FC<UsersFormProps> = ({ open, onClose, onSubmit, initialD
           setAvatarFile(null);
         }
       } catch (error) {
+        console.warn('Échec dans handleSubmit — poursuite en mode dégradé', error instanceof Error ? error.message : error);
         const message =
           error instanceof Error ? error.message : "Erreur lors de l'upload de l'avatar";
         setAvatarError(message);
@@ -314,7 +315,7 @@ const UsersForm: React.FC<UsersFormProps> = ({ open, onClose, onSubmit, initialD
             <FloatingSelect
               label="Rôle *"
               value={formData.role || 'lecteur'}
-              onValueChange={(v, _eventDetails) => v && handleChange('role', v)}
+              onValueChange={(v) => v && handleChange('role', v)}
               options={ROLE_OPTIONS}
               error={errors.role}
             />

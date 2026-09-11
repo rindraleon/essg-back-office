@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 import {
   Button,
@@ -70,7 +70,7 @@ const Contacts = () => {
   const markReadMutation = useMarkMessageRead();
   const replyMutation = useReplyToMessage();
   const deleteMutation = useDeleteMessage();
-  const messages = data?.data ?? [];
+  const messages = useMemo(() => data?.data ?? [], [data]);
   const totalItems = data?.total ?? 0;
   const loading = isLoading;
 
@@ -87,30 +87,40 @@ const Contacts = () => {
     setCurrentPage(1);
   }, []);
 
-  const handleMarkAsRead = async (id: number, silent = false) => {
-    try {
-      await markReadMutation.mutateAsync(id);
-      if (!silent) toast.success('Message marqué comme lu');
-    } catch {
-      if (!silent) toast.error('Erreur lors de la mise à jour du message');
-    }
-  };
+  const handleMarkAsRead = useCallback(
+    async (id: number, silent = false) => {
+      try {
+        await markReadMutation.mutateAsync(id);
+        if (!silent) toast.success('Message marqué comme lu');
+      } catch (error) {
+        console.warn('Échec dans callback useCallback — poursuite en mode dégradé', error instanceof Error ? error.message : error);
+        if (!silent) toast.error('Erreur lors de la mise à jour du message');
+      }
+    },
+    [markReadMutation]
+  );
 
-  const handleViewMessage = useCallback((message: Message) => {
-    setSelectedMessage(message);
-    setViewDialogOpen(true);
-    if (!message.lu) {
-      void handleMarkAsRead(message.id, true);
-    }
-  }, []);
+  const handleViewMessage = useCallback(
+    (message: Message) => {
+      setSelectedMessage(message);
+      setViewDialogOpen(true);
+      if (!message.lu) {
+        void handleMarkAsRead(message.id, true);
+      }
+    },
+    [handleMarkAsRead]
+  );
 
-  const handleReply = useCallback((message: Message) => {
-    setSelectedMessage(message);
-    setReplyOpen(true);
-    if (!message.lu) {
-      void handleMarkAsRead(message.id, true);
-    }
-  }, []);
+  const handleReply = useCallback(
+    (message: Message) => {
+      setSelectedMessage(message);
+      setReplyOpen(true);
+      if (!message.lu) {
+        void handleMarkAsRead(message.id, true);
+      }
+    },
+    [handleMarkAsRead]
+  );
 
   const handleSendReply = async (payload: { sujet: string; message: string }) => {
     if (!selectedMessage) return;
@@ -126,6 +136,7 @@ const Contacts = () => {
       setViewDialogOpen(false);
       setSelectedMessage(null);
     } catch (error) {
+      console.warn('Échec dans handleSendReply — poursuite en mode dégradé', error instanceof Error ? error.message : error);
       const message = error instanceof ApiError ? error.message : "Impossible d'envoyer l'email";
       toast.error(message);
     } finally {
@@ -155,7 +166,8 @@ const Contacts = () => {
       }
       setDeleteDialogOpen(false);
       setMessageToDelete(null);
-    } catch {
+    } catch (error) {
+      console.warn('Échec dans callback useCallback — poursuite en mode dégradé', error instanceof Error ? error.message : error);
       toast.error('Erreur lors de la suppression du message');
     }
   }, [messageToDelete, selectedMessage, deleteMutation]);
