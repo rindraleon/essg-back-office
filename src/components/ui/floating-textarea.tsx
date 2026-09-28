@@ -22,7 +22,7 @@ const FloatingTextarea = React.forwardRef<HTMLTextAreaElement, FloatingTextareaP
           aria-invalid={error ? true : undefined}
           aria-describedby={error && errorId ? errorId : undefined}
           className={cn(
-            'peer w-full rounded-md border bg-white px-3 pt-5 pb-2 text-sm',
+            'peer w-full rounded-md border bg-card px-3 pt-5 pb-2 text-sm',
             'resize-none outline-none transition-all',
             'focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20',
             'placeholder-transparent',
@@ -36,10 +36,10 @@ const FloatingTextarea = React.forwardRef<HTMLTextAreaElement, FloatingTextareaP
           className={cn(
             'pointer-events-none absolute left-3 origin-[0] transition-all duration-200',
             hasValue
-              ? 'top-0 bg-white px-1 text-xs font-bold text-brand-700'
+              ? 'top-0 bg-card px-1 text-xs font-bold text-brand-700'
               : 'top-5 text-sm text-ink-400',
-            'peer-focus:top-0 peer-focus:bg-white peer-focus:px-1 peer-focus:text-xs peer-focus:font-bold',
-            'peer-[:not(:placeholder-shown)]:top-0 peer-[:not(:placeholder-shown)]:bg-white peer-[:not(:placeholder-shown)]:px-1 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:font-bold',
+            'peer-focus:top-0 peer-focus:bg-card peer-focus:px-1 peer-focus:text-xs peer-focus:font-bold',
+            'peer-[:not(:placeholder-shown)]:top-0 peer-[:not(:placeholder-shown)]:bg-card peer-[:not(:placeholder-shown)]:px-1 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:font-bold',
             error ? 'text-red-500 peer-focus:text-red-500' : 'peer-focus:text-brand-700'
           )}
         >

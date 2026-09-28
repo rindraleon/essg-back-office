@@ -37,7 +37,7 @@ const LoadingScreen = () => (
         />
         <Fingerprint />
       </div>
-      <p className="text-sage-300/60 text-sm tracking-widest animate-pulse">Vérification...</p>
+      <p className="text-sage-300/60 dark:text-[#b7d897]/60 text-sm tracking-widest animate-pulse">Vérification...</p>
     </div>
     <style>{`
       @keyframes spin {

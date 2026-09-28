@@ -216,7 +216,7 @@ const UsersForm: React.FC<UsersFormProps> = ({ open, onClose, onSubmit, initialD
                       onClick={handleDeleteAvatar}
                       disabled={uploading}
                       aria-label="Retirer la photo"
-                      className="absolute -top-1 -right-1 size-7 rounded-full bg-white shadow-soft"
+                      className="absolute -top-1 -right-1 size-7 rounded-full bg-card shadow-soft"
                     >
                       <Trash2 className="size-3.5" aria-hidden="true" />
                     </Button>
@@ -325,7 +325,7 @@ const UsersForm: React.FC<UsersFormProps> = ({ open, onClose, onSubmit, initialD
                 id="estActif"
                 checked={formData.estActif}
                 onCheckedChange={(checked) => handleChange('estActif', checked as boolean)}
-                className="bg-white"
+                className="bg-card"
               />
               <Label htmlFor="estActif" className="cursor-pointer text-sm">
                 Utilisateur actif

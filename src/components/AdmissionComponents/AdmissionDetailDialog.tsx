@@ -308,7 +308,7 @@ const AdmissionDetailDialog: React.FC<AdmissionDetailDialogProps> = ({
                 <Button
                   onClick={() => void handleDirectVerify()}
                   disabled={isVerifying}
-                  className="shrink-0 gap-2 bg-brand-700 text-white hover:bg-brand-800"
+                  className="shrink-0 gap-2 bg-brand-700 text-white hover:bg-brand-800 dark:bg-brand-600 dark:hover:bg-brand-500"
                   size="default"
                 >
                   {isVerifying ? (
@@ -320,7 +320,7 @@ const AdmissionDetailDialog: React.FC<AdmissionDetailDialogProps> = ({
                 </Button>
               </div>
               {isVerifying && (
-                <div className="mt-3 rounded-lg border border-brand-200 bg-white px-3 py-2">
+                <div className="mt-3 rounded-lg border border-brand-200 bg-card px-3 py-2">
                   <p className="flex items-center gap-2 text-xs font-medium text-brand-700">
                     <LoaderCircle className="size-3.5 animate-spin" />
                     Analyse des documents...

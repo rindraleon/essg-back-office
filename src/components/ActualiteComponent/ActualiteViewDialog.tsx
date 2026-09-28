@@ -36,7 +36,7 @@ const ActualiteViewDialog: React.FC<ActualiteViewDialogProps> = ({ open, onClose
           overflow-hidden
           rounded-[30px]
           border-2 border-ink-100
-          bg-white
+          bg-card
           p-0
           shadow-[0_24px_80px_rgba(15,23,42,0.35)]
         "
@@ -62,7 +62,7 @@ const ActualiteViewDialog: React.FC<ActualiteViewDialogProps> = ({ open, onClose
               <div>
                 <h2 className="text-2xl font-bold leading-tight text-white">{actualite.titre}</h2>
                 <div className="mt-3 flex flex-wrap gap-2">
-                  <Badge className="rounded-full bg-white text-ink-900">
+                  <Badge className="rounded-full bg-card text-ink-900">
                     <Tag className="mr-1 h-3.5 w-3.5" />
                     {actualite.categorie}
                   </Badge>
@@ -103,7 +103,7 @@ const ActualiteViewDialog: React.FC<ActualiteViewDialogProps> = ({ open, onClose
           </aside>
 
           <section className="flex min-h-0 flex-col">
-            <DialogHeader className="shrink-0 border-b border-ink-100 bg-white px-5 py-4 lg:px-6">
+            <DialogHeader className="shrink-0 border-b border-ink-100 bg-card px-5 py-4 lg:px-6">
               <div className="flex items-start justify-between gap-4">
                 <div className="min-w-0">
                   <DialogTitle className="text-xl font-bold text-ink-900">
@@ -117,7 +117,7 @@ const ActualiteViewDialog: React.FC<ActualiteViewDialogProps> = ({ open, onClose
                   variant="ghost"
                   size="icon"
                   onClick={onClose}
-                  className="h-10 w-10 shrink-0 rounded-full border border-ink-100 bg-white hover:bg-ink-100"
+                  className="h-10 w-10 shrink-0 rounded-full border border-ink-100 bg-card hover:bg-ink-100"
                   aria-label="Fermer"
                 >
                   <X className="h-4 w-4" />
@@ -127,7 +127,7 @@ const ActualiteViewDialog: React.FC<ActualiteViewDialogProps> = ({ open, onClose
 
             <div className="min-h-0 flex-1 overflow-y-auto px-5 py-5 lg:px-6">
               <div className="mb-5 lg:hidden">
-                <div className="overflow-hidden rounded-2xl border border-ink-100 bg-white shadow-sm">
+                <div className="overflow-hidden rounded-2xl border border-ink-100 bg-card shadow-sm">
                   <CoverImage
                     src={actualite.image}
                     alt={actualite.titre}
@@ -200,7 +200,7 @@ const ActualiteViewDialog: React.FC<ActualiteViewDialogProps> = ({ open, onClose
               </div>
             </div>
 
-            <div className="flex shrink-0 items-center justify-end border-t border-ink-100 bg-white px-5 py-4 lg:px-6">
+            <div className="flex shrink-0 items-center justify-end border-t border-ink-100 bg-card px-5 py-4 lg:px-6">
               <Button type="button" onClick={onClose} variant="outline" className="rounded-xl">
                 Fermer
               </Button>

@@ -64,7 +64,7 @@ export default function ForgotPassword() {
         <h1 className="text-xl font-bold tracking-tight text-white sm:text-2xl">
           Mot de passe oublié
         </h1>
-        <p className="mt-1.5 text-sm text-brand-100/90">
+        <p className="mt-1.5 text-sm text-brand-100/90 dark:text-brand-400/90">
           Indiquez votre adresse email pour recevoir un lien de réinitialisation
         </p>
       </header>
@@ -73,15 +73,15 @@ export default function ForgotPassword() {
         <output className="login-fade login-s2 block space-y-5">
           <div className="flex flex-col items-center gap-3 rounded-xl border border-emerald-400/40 bg-emerald-500/15 px-4 py-6 text-center backdrop-blur-sm">
             <MailCheck className="size-8 text-emerald-300" />
-            <p className="text-sm text-emerald-100">{GENERIC_CONFIRMATION}</p>
-            <p className="text-xs text-emerald-100/80">
+            <p className="text-sm text-emerald-100 dark:text-emerald-300">{GENERIC_CONFIRMATION}</p>
+            <p className="text-xs text-emerald-100/80 dark:text-emerald-300/80">
               Le lien est valable 30 minutes. Pensez à vérifier vos courriers indésirables.
             </p>
           </div>
 
           <Link
             to={routesStatic.login}
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-white text-sm font-bold text-brand-800 shadow-[0_12px_30px_-10px_rgba(0,0,0,0.55)] ring-1 ring-white/20 transition-all duration-200 hover:bg-brand-50 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white/30"
+            className="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-white text-sm font-bold text-brand-800 dark:text-brand-600 shadow-[0_12px_30px_-10px_rgba(0,0,0,0.55)] ring-1 ring-white/20 transition-all duration-200 hover:bg-brand-50 dark:hover:bg-white/90 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white/30"
           >
             <ArrowLeft className="size-4" />
             Retour à la connexion
@@ -92,7 +92,7 @@ export default function ForgotPassword() {
           {globalError && (
             <div
               role="alert"
-              className="login-fade flex items-start gap-2.5 rounded-xl border border-red-400/40 bg-red-500/15 px-4 py-3 text-sm text-red-100 backdrop-blur-sm"
+              className="login-fade flex items-start gap-2.5 rounded-xl border border-red-400/40 bg-red-500/15 px-4 py-3 text-sm text-red-100 dark:text-red-300 backdrop-blur-sm"
             >
               <AlertCircle className="mt-0.5 size-4 shrink-0" />
               <span>{globalError}</span>
@@ -143,7 +143,7 @@ export default function ForgotPassword() {
             <button
               type="submit"
               disabled={loading}
-              className="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-white text-sm font-bold text-brand-800 shadow-[0_12px_30px_-10px_rgba(0,0,0,0.55)] ring-1 ring-white/20 transition-all duration-200 hover:bg-brand-50 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white/30 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-70 motion-reduce:transition-none"
+              className="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-white text-sm font-bold text-brand-800 dark:text-brand-600 shadow-[0_12px_30px_-10px_rgba(0,0,0,0.55)] ring-1 ring-white/20 transition-all duration-200 hover:bg-brand-50 dark:hover:bg-white/90 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white/30 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-70 motion-reduce:transition-none"
             >
               {loading ? (
                 <>

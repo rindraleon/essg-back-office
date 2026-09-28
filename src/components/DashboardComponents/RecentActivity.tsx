@@ -19,7 +19,7 @@ interface RecentActivityProps {
 const RecentActivity: React.FC<RecentActivityProps> = ({ activities = [], loading = false }) => {
   if (loading) {
     return (
-      <div className="bg-white rounded-lg shadow-sm border border-ink-100 p-6">
+      <div className="bg-card rounded-lg shadow-sm border border-ink-100 p-6">
         <h3 className="text-lg font-semibold text-ink-900 mb-4">Activité Récente</h3>
         <div className="space-y-4">
           {Array.from({ length: 4 }).map((_, index) => (
@@ -44,7 +44,7 @@ const RecentActivity: React.FC<RecentActivityProps> = ({ activities = [], loadin
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-ink-100 p-6">
+    <div className="bg-card rounded-lg shadow-sm border border-ink-100 p-6">
       <h3 className="text-lg font-semibold text-ink-900 mb-4">Activité Récente</h3>
       {activities.length === 0 ? (
         <p className="py-6 text-center text-sm text-ink-400">Aucune activité récente.</p>

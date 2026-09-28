@@ -50,7 +50,7 @@ const PartenaireViewDialog: React.FC<PartenaireViewDialogProps> = ({
           overflow-hidden
           rounded-2xl
           border border-ink-100
-          bg-white
+          bg-card
           p-0
           shadow-[0_24px_70px_rgba(15,23,42,0.18)]
         "
@@ -62,7 +62,7 @@ const PartenaireViewDialog: React.FC<PartenaireViewDialogProps> = ({
               <span className="text-[10px] font-bold uppercase tracking-wider text-brand-600">
                 Fiche Partenaire
               </span>
-              <DialogTitle className="mt-0.5 truncate text-lg font-bold text-ink-950 sm:text-xl">
+              <DialogTitle className="mt-0.5 truncate text-lg font-bold text-ink-950 dark:text-ink-900 sm:text-xl">
                 {partenaire.nom}
               </DialogTitle>
             </div>
@@ -98,7 +98,7 @@ const PartenaireViewDialog: React.FC<PartenaireViewDialogProps> = ({
                   flex size-20
                   shrink-0 items-center justify-center
                   overflow-hidden rounded-xl
-                  border border-ink-100 bg-white
+                  border border-ink-100 bg-card
                   shadow-sm
                   sm:size-24
                   lg:size-28
@@ -209,7 +209,7 @@ const PartenaireViewDialog: React.FC<PartenaireViewDialogProps> = ({
                       rel="noopener noreferrer"
                       className="
                         group flex items-center gap-3
-                        rounded-xl border border-ink-100 bg-white
+                        rounded-xl border border-ink-100 bg-card
                         p-3 transition-all
                         hover:border-brand-200 hover:bg-brand-50/20
                       "
@@ -225,7 +225,7 @@ const PartenaireViewDialog: React.FC<PartenaireViewDialogProps> = ({
                           {partenaire.siteWeb.replace(/^https?:\/\/(www\.)?/, '')}
                         </span>
                       </div>
-                      <ExternalLink className="size-3.5 shrink-0 text-ink-300 group-hover:text-brand-500 transition-colors" />
+                      <ExternalLink className="size-3.5 shrink-0 text-ink-300 dark:text-ink-500 group-hover:text-brand-500 transition-colors" />
                     </a>
                   )}
 
@@ -238,7 +238,7 @@ const PartenaireViewDialog: React.FC<PartenaireViewDialogProps> = ({
                       }
                       className="
                         group flex items-center gap-3
-                        rounded-xl border border-ink-100 bg-white
+                        rounded-xl border border-ink-100 bg-card
                         p-3 transition-all
                         hover:border-brand-200 hover:bg-brand-50/20
                       "

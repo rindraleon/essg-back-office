@@ -16,7 +16,7 @@ const StatCard: React.FC<StatCardProps> = ({ title, value, change, icon, loading
 
   if (loading) {
     return (
-      <div className="rounded-xl border border-ink-100 bg-white p-5 shadow-card">
+      <div className="rounded-xl border border-ink-100 bg-card p-5 shadow-card">
         <div className="animate-pulse">
           <div className="mb-2 h-4 w-1/2 rounded bg-ink-100" />
           <div className="mb-2 h-8 w-3/4 rounded bg-ink-100" />
@@ -57,7 +57,7 @@ const StatCard: React.FC<StatCardProps> = ({ title, value, change, icon, loading
   );
 
   const className =
-    'group relative block overflow-hidden rounded-sm border border-ink-100 bg-white p-5 text-left transition-all duration-200 hover:border-brand-200 hover:shadow-card-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/40';
+    'group relative block overflow-hidden rounded-sm border border-ink-100 bg-card p-5 text-left transition-all duration-200 hover:border-brand-200 hover:shadow-card-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/40';
 
   if (to) {
     return (

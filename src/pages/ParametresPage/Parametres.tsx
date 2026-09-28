@@ -43,7 +43,7 @@ const Parametres: React.FC = () => {
       </div>
 
       {isLoading && (
-        <div className="flex flex-col items-center gap-3 rounded-xl border border-ink-100 bg-white p-10 text-ink-500">
+        <div className="flex flex-col items-center gap-3 rounded-xl border border-ink-100 bg-card p-10 text-ink-500">
           <LoaderCircle className="size-7 animate-spin text-brand-600" />
           <p className="text-sm">Chargement des paramètres...</p>
         </div>
@@ -59,7 +59,7 @@ const Parametres: React.FC = () => {
       )}
 
       {data && (
-        <section className="rounded-xl border border-ink-100 bg-white p-5 shadow-card">
+        <section className="rounded-xl border border-ink-100 bg-card p-5 shadow-card">
           <div className="flex items-start gap-4">
             <div className="grid size-11 shrink-0 place-items-center rounded-xl bg-brand-50 text-brand-700">
               <GraduationCap className="size-5" />
@@ -92,7 +92,7 @@ const Parametres: React.FC = () => {
                     disabled={saving}
                     className={`rounded-md px-4 py-1.5 text-sm font-medium transition-colors disabled:opacity-60 ${
                       !data.admissionsOuvertes
-                        ? 'bg-ink-700 text-white shadow-sm'
+                        ? 'bg-ink-700 text-white shadow-sm dark:bg-night-700'
                         : 'text-ink-500 hover:text-ink-700'
                     }`}
                   >

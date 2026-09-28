@@ -17,9 +17,9 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: 'bg-primary text-primary-foreground hover:bg-brand-700',
+        default: 'bg-primary text-primary-foreground hover:bg-brand-700 dark:hover:bg-brand-500',
         outline:
-          'border-ink-200 bg-white text-ink-700 hover:bg-ink-50 hover:text-ink-900 aria-expanded:bg-ink-50',
+          'border-ink-200 bg-card text-ink-700 hover:bg-ink-50 hover:text-ink-900 aria-expanded:bg-ink-50',
         secondary: 'bg-secondary text-secondary-foreground hover:bg-brand-200',
         ghost: 'text-ink-600 hover:bg-ink-100 hover:text-ink-900 aria-expanded:bg-ink-100',
         destructive: 'bg-destructive/10 text-destructive hover:bg-destructive/20',

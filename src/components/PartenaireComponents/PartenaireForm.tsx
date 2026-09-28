@@ -313,7 +313,7 @@ const PartenaireForm: React.FC<PartenaireFormProps> = ({
         className="
           sm:max-w-3xl
           w-[95vw]
-          bg-white
+          bg-card
           p-0
           gap-0
           overflow-hidden

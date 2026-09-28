@@ -73,7 +73,7 @@ const SourcesField = ({ value, error, onChange }: SourcesFieldProps) => {
                     value={source.title}
                     onChange={(e) => updateSource(index, { title: e.target.value })}
                     placeholder="Ex: Données SIG de la région"
-                    className="rounded-xl bg-white"
+                    className="rounded-xl bg-card"
                   />
                   <FloatingInput
                     label={`URL ${index + 1}`}
@@ -85,7 +85,7 @@ const SourcesField = ({ value, error, onChange }: SourcesFieldProps) => {
                       }
                     }}
                     placeholder="https://exemple.com/donnees"
-                    className="rounded-xl bg-white"
+                    className="rounded-xl bg-card"
                   />
                 </div>
                 <Button

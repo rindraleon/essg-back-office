@@ -140,7 +140,7 @@ const Formations: React.FC = () => {
       />
 
       {filtersOpen && (
-        <div className="rounded-xl border border-ink-100 bg-white p-4 shadow-card">
+        <div className="rounded-xl border border-ink-100 bg-card p-4 shadow-card">
           <FormationFilters
             filters={filters}
             onUpdateFilter={(key, value) => {

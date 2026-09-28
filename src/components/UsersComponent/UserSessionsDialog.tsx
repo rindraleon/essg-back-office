@@ -159,7 +159,7 @@ const UserSessionsDialog: React.FC<UserSessionsDialogProps> = ({ open, onClose, 
       <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
         <DialogContent
           showCloseButton={false}
-          className="!w-[96vw] !max-w-3xl rounded-[24px] border-2 border-ink-100 bg-white p-0 shadow-[0_24px_80px_rgba(15,23,42,0.35)]"
+          className="!w-[96vw] !max-w-3xl rounded-[24px] border-2 border-ink-100 bg-card p-0 shadow-[0_24px_80px_rgba(15,23,42,0.35)]"
         >
           <DialogHeader className="border-b border-ink-100 px-6 py-4">
             <div className="flex items-start justify-between gap-4">

@@ -95,7 +95,7 @@ const ActivityLogs = () => {
       />
 
       {filtersOpen && (
-        <div className="rounded-xl border border-ink-100 bg-white p-4 shadow-card">
+        <div className="rounded-xl border border-ink-100 bg-card p-4 shadow-card">
           <div className="rounded-xl border border-ink-100 bg-ink-50 p-4">
             <div className="mb-3 flex items-center justify-between">
               <span className="text-sm font-semibold text-ink-700">Filtres avancés</span>

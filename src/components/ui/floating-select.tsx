@@ -39,7 +39,7 @@ const FloatingSelect: React.FC<FloatingSelectProps> = ({
           aria-invalid={error ? true : undefined}
           aria-describedby={error ? errorId : undefined}
           className={cn(
-            'h-12 min-h-12 w-full bg-white px-3 pt-5 pb-2 text-sm',
+            'h-12 min-h-12 w-full bg-card px-3 pt-5 pb-2 text-sm',
             'focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20',
             error ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : 'border-ink-300',
             className
@@ -47,7 +47,7 @@ const FloatingSelect: React.FC<FloatingSelectProps> = ({
         >
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>
-        <SelectContent className="bg-white">
+        <SelectContent className="bg-card">
           {options.map((opt) => (
             <SelectItem key={opt.value} value={opt.value} className="hover:bg-ink-100">
               {opt.label}
@@ -59,7 +59,7 @@ const FloatingSelect: React.FC<FloatingSelectProps> = ({
         className={cn(
           'pointer-events-none absolute left-3 origin-[0] transition-all duration-200',
           hasValue
-            ? 'top-0 bg-white px-1 text-xs font-bold text-brand-700'
+            ? 'top-0 bg-card px-1 text-xs font-bold text-brand-700'
             : 'top-[1.35rem] text-sm text-ink-400',
           error && 'text-red-500'
         )}

@@ -111,7 +111,7 @@ const AdmissionFilters: React.FC<AdmissionFiltersProps> = ({
               value={filters.dateDebut || ''}
               max={filters.dateFin || undefined}
               onChange={(event) => onUpdateFilter('dateDebut', event.target.value || '')}
-              className="bg-white"
+              className="bg-card"
             />
           </div>
 
@@ -123,7 +123,7 @@ const AdmissionFilters: React.FC<AdmissionFiltersProps> = ({
               value={filters.dateFin || ''}
               min={filters.dateDebut || undefined}
               onChange={(event) => onUpdateFilter('dateFin', event.target.value || '')}
-              className="bg-white"
+              className="bg-card"
             />
           </div>
         </div>

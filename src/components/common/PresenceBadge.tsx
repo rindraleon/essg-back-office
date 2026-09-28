@@ -33,7 +33,7 @@ const PresenceBadge: React.FC<{
   return (
     <span className={`inline-flex items-center gap-1.5 ${className}`}>
       <span
-        className={`inline-flex items-center gap-1.5 rounded-full border border-ink-100 bg-white px-2.5 py-1 text-xs font-medium ${PRESENCE_TEXT_COLORS[status]}`}
+        className={`inline-flex items-center gap-1.5 rounded-full border border-ink-100 bg-card px-2.5 py-1 text-xs font-medium ${PRESENCE_TEXT_COLORS[status]}`}
         title={
           presence?.lastActivityAt
             ? `Dernière activité : ${formatRelativeTime(presence.lastActivityAt)}`

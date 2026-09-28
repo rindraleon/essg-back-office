@@ -392,7 +392,7 @@ const RessourceHumaineForm: React.FC<RessourceHumaineFormProps> = ({
           id="actif"
           checked={formData.actif}
           onCheckedChange={(checked) => handleChange('actif', checked as boolean)}
-          className="bg-white"
+          className="bg-card"
         />
         <Label htmlFor="actif" className="cursor-pointer text-sm">
           Ressource active
@@ -409,7 +409,7 @@ const RessourceHumaineForm: React.FC<RessourceHumaineFormProps> = ({
         className="
           sm:max-w-3xl
           w-[95vw]
-          bg-white
+          bg-card
           p-0
           gap-0
           overflow-hidden

@@ -42,8 +42,8 @@ const dialogContentVariants = cva(
   [
     'relative z-50 flex w-full flex-col overflow-hidden',
     'max-h-[calc(100dvh-2rem)] sm:max-h-[calc(100dvh-4rem)]',
-    'rounded-2xl bg-white text-sm text-foreground',
-    'shadow-elevated ring-1 ring-ink-950/10 outline-none',
+    'rounded-2xl bg-card text-sm text-foreground',
+    'shadow-elevated ring-1 ring-ink-950/10 outline-none dark:ring-white/10',
     'pointer-events-auto',
     'transition-[opacity,transform] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)]',
     'data-[starting-style]:translate-y-2 data-[starting-style]:scale-[0.96] data-[starting-style]:opacity-0',
@@ -141,7 +141,7 @@ function DialogHeader({
     <div
       data-slot="dialog-header"
       className={cn(
-        'flex shrink-0 flex-col gap-2 border-b border-ink-100 bg-white px-5 py-4 sm:px-6',
+        'flex shrink-0 flex-col gap-2 border-b border-ink-100 bg-card px-5 py-4 sm:px-6',
         className
       )}
       {...props}
@@ -199,7 +199,7 @@ function DialogFooter({
     <div
       data-slot="dialog-footer"
       className={cn(
-        'flex shrink-0 flex-col-reverse gap-2 border-t border-ink-100 bg-white px-5 py-4 sm:flex-row sm:items-center sm:justify-end sm:px-6',
+        'flex shrink-0 flex-col-reverse gap-2 border-t border-ink-100 bg-card px-5 py-4 sm:flex-row sm:items-center sm:justify-end sm:px-6',
         className
       )}
       {...props}

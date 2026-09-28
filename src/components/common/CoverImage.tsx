@@ -25,7 +25,7 @@ const CoverImage: React.FC<CoverImageProps> = ({
     <div
       className={cn(
         'w-full overflow-hidden rounded-2xl border',
-        dark ? 'border-white/10 bg-ink-800' : 'border-ink-100 bg-ink-50',
+        dark ? 'border-white/10 bg-ink-800 dark:bg-night-800' : 'border-ink-100 bg-ink-50',
         aspect,
         className
       )}

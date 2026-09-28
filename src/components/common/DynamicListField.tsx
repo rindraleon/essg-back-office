@@ -40,7 +40,7 @@ const DynamicListField = ({
               label={`${itemPlaceholder} ${index + 1}`}
               value={item}
               onChange={(e) => onChange(index, e.target.value)}
-              className="rounded-xl bg-white"
+              className="rounded-xl bg-card"
             />
 
             {items.length > 1 && (

@@ -45,7 +45,7 @@ const Footer: React.FC<FooterProps> = (props: Readonly<FooterProps>) => {
   } = props;
 
   return (
-    <footer className="bg-ink-900 text-ink-100">
+    <footer className="bg-ink-900 text-ink-100 dark:bg-night-900 dark:text-ink-400">
       <div className="max-w-7xl mx-auto px-6 py-10">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="space-y-4">
@@ -59,7 +59,7 @@ const Footer: React.FC<FooterProps> = (props: Readonly<FooterProps>) => {
               />
               <span className="text-xl font-bold tracking-tight text-white">{companyName}</span>
             </Link>
-            <p className="text-sm text-ink-300 max-w-xs">
+            <p className="text-sm text-ink-300 dark:text-ink-400 max-w-xs">
               École Supérieure des Sciences Géomatiques — Université de Fianarantsoa. Formation,
               recherche et innovation géospatiale.
             </p>
@@ -71,7 +71,7 @@ const Footer: React.FC<FooterProps> = (props: Readonly<FooterProps>) => {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={s.ariaLabel ?? `Ouvrir ${companyName} social`}
-                  className="p-2 rounded-lg text-ink-300 hover:text-white hover:bg-white/10 transition-colors"
+                  className="p-2 rounded-lg text-ink-300 hover:text-white hover:bg-white/10 transition-colors dark:text-ink-400"
                 >
                   <SocialIcon kind={s.kind} />
                 </a>
@@ -81,10 +81,10 @@ const Footer: React.FC<FooterProps> = (props: Readonly<FooterProps>) => {
 
           <div className="md:col-span-2 grid grid-cols-2 gap-6">
             <div>
-              <h4 className="text-sm font-semibold text-ink-100 uppercase tracking-wider">
+              <h4 className="text-sm font-semibold text-ink-100 uppercase tracking-wider dark:text-ink-400">
                 Navigation
               </h4>
-              <ul className="mt-4 space-y-2 text-sm text-ink-300">
+              <ul className="mt-4 space-y-2 text-sm text-ink-300 dark:text-ink-400">
                 {navLinks.map((link) => (
                   <li key={link.to}>
                     <Link to={link.to} className="hover:text-white transition-colors">
@@ -96,10 +96,10 @@ const Footer: React.FC<FooterProps> = (props: Readonly<FooterProps>) => {
             </div>
 
             <div>
-              <h4 className="text-sm font-semibold text-ink-100 uppercase tracking-wider">
+              <h4 className="text-sm font-semibold text-ink-100 uppercase tracking-wider dark:text-ink-400">
                 Contact
               </h4>
-              <ul className="mt-4 space-y-2 text-sm text-ink-300">
+              <ul className="mt-4 space-y-2 text-sm text-ink-300 dark:text-ink-400">
                 {contact.email && (
                   <li>
                     <a
@@ -120,21 +120,23 @@ const Footer: React.FC<FooterProps> = (props: Readonly<FooterProps>) => {
                     </a>
                   </li>
                 )}
-                {contact.address && <li className="text-ink-400">{contact.address}</li>}
+                {contact.address && (
+                  <li className="text-ink-400 dark:text-ink-500">{contact.address}</li>
+                )}
               </ul>
             </div>
           </div>
 
           <div className="space-y-3">
-            <h4 className="text-sm font-semibold text-ink-100 uppercase tracking-wider">
+            <h4 className="text-sm font-semibold text-ink-100 uppercase tracking-wider dark:text-ink-400">
               Université de Fianarantsoa
             </h4>
-            <p className="text-sm text-ink-300">
+            <p className="text-sm text-ink-300 dark:text-ink-400">
               Campus Andrainjato, BP 1264
               <br />
               Fianarantsoa 301, Madagascar
             </p>
-            <p className="text-xs text-ink-400 mt-4">
+            <p className="text-xs text-ink-400 mt-4 dark:text-ink-500">
               © {new Date().getFullYear()} ESSG. Tous droits réservés.
             </p>
           </div>

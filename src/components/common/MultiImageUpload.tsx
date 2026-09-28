@@ -141,7 +141,7 @@ export default function MultiImageUpload({
           size="sm"
           disabled={disabled || uploading || remaining === 0}
           onClick={() => inputRef.current?.click()}
-          className="h-8 gap-1.5 bg-white text-xs"
+          className="h-8 gap-1.5 bg-card text-xs"
         >
           {uploading ? (
             <LoaderCircle className="h-3.5 w-3.5 animate-spin" />

@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import loginBg from '../../assets/files/images/background/login-bg.webp';
 import loginBgMobile from '../../assets/files/images/background/login-bg-mobile.webp';
+import { ThemeToggle } from '../../components/ui/theme-toggle';
 
 const styles = `
   @keyframes login-rise {
@@ -74,6 +75,12 @@ export default function AuthLayout({ children }: Readonly<{ children: ReactNode 
       <style>{styles}</style>
 
       <main className="relative flex min-h-[100dvh] items-center justify-center overflow-hidden bg-brand-950 px-4 py-8 sm:px-6">
+        <div className="absolute right-4 top-4 z-20 sm:right-6 sm:top-6">
+          <ThemeToggle
+            variant="cycle"
+            className="border border-white/20 bg-white/10 text-white backdrop-blur-md hover:bg-white/20 hover:text-white"
+          />
+        </div>
         <div aria-hidden className="pointer-events-none absolute inset-0">
           <div className="absolute inset-0 overflow-hidden">
             <picture>

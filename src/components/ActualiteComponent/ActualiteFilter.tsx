@@ -80,7 +80,7 @@ const ActualiteFilters: React.FC<ActualiteFiltersProps> = ({
               type="date"
               value={filters.dateDebut}
               onChange={(e) => onUpdateFilter('dateDebut', e.target.value)}
-              className="bg-white"
+              className="bg-card"
             />
           </div>
 
@@ -91,7 +91,7 @@ const ActualiteFilters: React.FC<ActualiteFiltersProps> = ({
               type="date"
               value={filters.dateFin}
               onChange={(e) => onUpdateFilter('dateFin', e.target.value)}
-              className="bg-white"
+              className="bg-card"
             />
           </div>
         </div>

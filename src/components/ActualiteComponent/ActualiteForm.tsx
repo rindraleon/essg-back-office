@@ -284,7 +284,7 @@ const ActualiteForm: React.FC<ActualiteFormProps> = ({
               onClick={() => fileInputRef.current?.click()}
               disabled={uploadingImage}
               size="sm"
-              className="gap-1.5 bg-white text-xs h-8"
+              className="gap-1.5 bg-card text-xs h-8"
             >
               <Upload className="h-3.5 w-3.5" />
               {uploadingImage ? 'Upload...' : 'Choisir une image'}
@@ -316,7 +316,7 @@ const ActualiteForm: React.FC<ActualiteFormProps> = ({
             id="enVedette"
             checked={formData.enVedette}
             onCheckedChange={(checked) => handleChange('enVedette', checked as boolean)}
-            className="bg-white"
+            className="bg-card"
           />
           <Label htmlFor="enVedette" className="cursor-pointer text-sm">
             Mettre en vedette
@@ -334,7 +334,7 @@ const ActualiteForm: React.FC<ActualiteFormProps> = ({
         className="
           sm:max-w-3xl
           w-[95vw]
-          bg-white
+          bg-card
           p-0
           gap-0
           overflow-hidden

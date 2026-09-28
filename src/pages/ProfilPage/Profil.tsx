@@ -57,8 +57,8 @@ const Profil: React.FC = () => {
   if (isLoading) {
     return (
       <div className="mx-auto max-w-4xl space-y-4 p-4 sm:p-6 lg:p-8">
-        <div className="h-32 animate-pulse rounded-xl border border-ink-100 bg-white" />
-        <div className="h-56 animate-pulse rounded-xl border border-ink-100 bg-white" />
+        <div className="h-32 animate-pulse rounded-xl border border-ink-100 bg-card" />
+        <div className="h-56 animate-pulse rounded-xl border border-ink-100 bg-card" />
       </div>
     );
   }
@@ -66,7 +66,7 @@ const Profil: React.FC = () => {
   if (!user) {
     return (
       <div className="mx-auto max-w-4xl p-4 sm:p-6 lg:p-8">
-        <div className="rounded-xl border border-ink-100 bg-white p-8 text-center">
+        <div className="rounded-xl border border-ink-100 bg-card p-8 text-center">
           <p className="text-sm text-ink-500">Profil indisponible. Reconnectez-vous.</p>
         </div>
       </div>
@@ -78,7 +78,7 @@ const Profil: React.FC = () => {
 
   return (
     <div className="mx-auto max-w-4xl space-y-4 p-4 sm:p-6 lg:p-8">
-      <section className="rounded-xl border border-ink-100 bg-white p-5 shadow-card">
+      <section className="rounded-xl border border-ink-100 bg-card p-5 shadow-card">
         <div className="flex flex-col items-center gap-5 sm:flex-row">
           {showAvatar ? (
             <img
@@ -109,7 +109,7 @@ const Profil: React.FC = () => {
         </div>
       </section>
 
-      <section className="rounded-xl border border-ink-100 bg-white p-5 shadow-card">
+      <section className="rounded-xl border border-ink-100 bg-card p-5 shadow-card">
         <h2 className="mb-3 flex items-center gap-2 text-base font-semibold text-ink-900">
           <UserIcon className="size-4 text-brand-600" />
           Informations personnelles
@@ -203,7 +203,7 @@ const MySessionsSection: React.FC = () => {
   }
 
   return (
-    <section className="rounded-xl border border-ink-100 bg-white p-5 shadow-card">
+    <section className="rounded-xl border border-ink-100 bg-card p-5 shadow-card">
       <h2 className="mb-1 flex items-center gap-2 text-base font-semibold text-ink-900">
         <MonitorSmartphone className="size-4 text-brand-600" />
         Mes sessions

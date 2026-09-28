@@ -26,7 +26,7 @@ const QuickActions: React.FC = () => {
   ];
 
   return (
-    <div className="rounded-xl border border-ink-100 bg-white p-5 shadow-card">
+    <div className="rounded-xl border border-ink-100 bg-card p-5 shadow-card">
       <h3 className="mb-4 text-lg font-semibold text-ink-900">Actions Rapides</h3>
       <div className="grid gap-2 sm:grid-cols-2">
         {actions.map((action) => (

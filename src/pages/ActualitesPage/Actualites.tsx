@@ -139,7 +139,7 @@ const Actualites: React.FC = () => {
       />
 
       {filtersOpen && (
-        <div className="bg-white rounded-xl border border-ink-100 p-4 shadow-card">
+        <div className="bg-card rounded-xl border border-ink-100 p-4 shadow-card">
           <ActualiteFilters
             filters={filters}
             onUpdateFilter={(key, value) => {

@@ -32,7 +32,7 @@ const ContactFilters: React.FC<ContactFiltersProps> = ({
   if (!open) return null;
 
   return (
-    <div className="rounded-xl border border-ink-100 bg-white p-4 shadow-card">
+    <div className="rounded-xl border border-ink-100 bg-card p-4 shadow-card">
       <div className="mb-3 flex items-center justify-between">
         <span className="text-sm font-semibold text-ink-700">Filtres avancés</span>
         <Button variant="ghost" size="icon" onClick={onToggle} className="h-8 w-8">
@@ -47,10 +47,10 @@ const ContactFilters: React.FC<ContactFiltersProps> = ({
             value={filters.sujet}
             onValueChange={(value) => onUpdateFilter('sujet', value || 'all')}
           >
-            <SelectTrigger className="w-full bg-white">
+            <SelectTrigger className="w-full bg-card">
               <SelectValue placeholder="Tous" />
             </SelectTrigger>
-            <SelectContent className="bg-white">
+            <SelectContent className="bg-card">
               <SelectItem value="all">Tous</SelectItem>
               <SelectItem value="information">Demande d'information</SelectItem>
               <SelectItem value="admission">Admission</SelectItem>
@@ -66,10 +66,10 @@ const ContactFilters: React.FC<ContactFiltersProps> = ({
             value={filters.statut}
             onValueChange={(value) => onUpdateFilter('statut', value || 'all')}
           >
-            <SelectTrigger className="w-full bg-white">
+            <SelectTrigger className="w-full bg-card">
               <SelectValue placeholder="Tous" />
             </SelectTrigger>
-            <SelectContent className="bg-white">
+            <SelectContent className="bg-card">
               <SelectItem value="all">Tous</SelectItem>
               <SelectItem value="non_lu">Non lus</SelectItem>
               <SelectItem value="lu">Lus</SelectItem>
@@ -84,7 +84,7 @@ const ContactFilters: React.FC<ContactFiltersProps> = ({
             type="date"
             value={filters.dateDebut}
             onChange={(e) => onUpdateFilter('dateDebut', e.target.value)}
-            className="bg-white"
+            className="bg-card"
           />
         </div>
 
@@ -95,7 +95,7 @@ const ContactFilters: React.FC<ContactFiltersProps> = ({
             type="date"
             value={filters.dateFin}
             onChange={(e) => onUpdateFilter('dateFin', e.target.value)}
-            className="bg-white"
+            className="bg-card"
           />
         </div>
       </div>

@@ -103,16 +103,14 @@ export default function Login() {
         <h1 className="text-xl font-bold tracking-tight text-white sm:text-2xl">
           Bienvenue à l'Admin ESSG
         </h1>
-        <p className="mt-1.5 text-sm text-brand-100/90">
+        <p className="mt-1.5 text-sm text-brand-100/90 dark:text-brand-400/90">
           Connectez-vous pour accéder à votre tableau de bord
         </p>
       </header>
 
       <form onSubmit={handleSubmit} noValidate aria-busy={loading} className="space-y-4">
         {resetSuccess && (
-          <output
-            className="login-fade flex items-start gap-2.5 rounded-xl border border-emerald-400/40 bg-emerald-500/15 px-4 py-3 text-sm text-emerald-100 backdrop-blur-sm"
-          >
+          <output className="login-fade flex items-start gap-2.5 rounded-xl border border-emerald-400/40 bg-emerald-500/15 px-4 py-3 text-sm text-emerald-100 dark:text-emerald-300 backdrop-blur-sm">
             <CheckCircle2 className="mt-0.5 size-4 shrink-0" />
             <span>
               Votre mot de passe a été réinitialisé avec succès. Vous pouvez maintenant vous
@@ -124,7 +122,7 @@ export default function Login() {
         {error && (
           <div
             role="alert"
-            className="login-fade flex items-start gap-2.5 rounded-xl border border-red-400/40 bg-red-500/15 px-4 py-3 text-sm text-red-100 backdrop-blur-sm"
+            className="login-fade flex items-start gap-2.5 rounded-xl border border-red-400/40 bg-red-500/15 px-4 py-3 text-sm text-red-100 dark:text-red-300 backdrop-blur-sm"
           >
             <AlertCircle className="mt-0.5 size-4 shrink-0" />
             <span>{error}</span>
@@ -183,7 +181,7 @@ export default function Login() {
             </label>
             <Link
               to={routesStatic.forgotPassword}
-              className="text-xs font-medium text-brand-200 transition-colors hover:text-white hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400/60 rounded-sm"
+              className="text-xs font-medium text-brand-200 dark:text-brand-400 transition-colors hover:text-white hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400/60 rounded-sm"
             >
               Mot de passe oublié ?
             </Link>
@@ -236,7 +234,7 @@ export default function Login() {
           <button
             type="submit"
             disabled={loading}
-            className="group relative flex h-12 w-full items-center justify-center gap-2 overflow-hidden rounded-xl bg-white text-sm font-bold text-brand-800 shadow-[0_12px_30px_-10px_rgba(0,0,0,0.55)] ring-1 ring-white/20 transition-all duration-200 hover:bg-brand-50 hover:text-brand-900 hover:shadow-[0_16px_36px_-10px_rgba(0,0,0,0.6)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white/30 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-70 motion-reduce:transition-none"
+            className="group relative flex h-12 w-full items-center justify-center gap-2 overflow-hidden rounded-xl bg-white text-sm font-bold text-brand-800 dark:text-brand-600 shadow-[0_12px_30px_-10px_rgba(0,0,0,0.55)] ring-1 ring-white/20 transition-all duration-200 hover:bg-brand-50 hover:text-brand-900 dark:hover:bg-white/90 hover:shadow-[0_16px_36px_-10px_rgba(0,0,0,0.6)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white/30 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-70 motion-reduce:transition-none"
           >
             {loading ? (
               <>
