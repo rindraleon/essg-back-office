@@ -1,4 +1,4 @@
-import { Bell, CircleHelp, LogOut, Mail, Menu, Settings, User, X } from 'lucide-react';
+import { Bell, CircleHelp, LogOut, Mail, Menu, Moon, Settings, Sun, User, X } from 'lucide-react';
 import React, { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { routesStatic } from '@/routes';
@@ -16,6 +16,8 @@ import {
 } from '../ui/dropdown-menu';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip';
 import { Badge } from '../ui/badge';
+import { ThemeToggle } from '../ui/theme-toggle';
+import { useTheme } from '@/contexts/ThemeContext';
 import { useRecentAdmissionsQuery, useRecentMessagesQuery } from '@/hooks';
 
 /** Classe des liens de navigation selon l'état actif. */
@@ -29,6 +31,7 @@ const Header: React.FC = () => {
   const [logoutDialogOpen, setLogoutDialogOpen] = useState(false);
   const navigate = useNavigate();
   const { isAuthenticated, user, username, isAdmin, logout } = useAuth();
+  const { resolvedTheme, toggleTheme } = useTheme();
   const { data: recentAdmissions = [] } = useRecentAdmissionsQuery(4, isAuthenticated);
   const { data: recentMessagesResponse } = useRecentMessagesQuery(4, isAuthenticated);
   const recentMessages = recentMessagesResponse?.data ?? [];
@@ -108,7 +111,7 @@ const Header: React.FC = () => {
   };
 
   return (
-    <header className="bg-white shadow-sm z-20 sticky top-0">
+    <header className="bg-card shadow-sm z-20 sticky top-0">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-1">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
@@ -119,6 +122,7 @@ const Header: React.FC = () => {
 
           {isAuthenticated && (
             <div className="hidden md:flex items-center gap-1 lg:gap-2">
+              <ThemeToggle />
               <DropdownMenu>
                 <TooltipProvider>
                   <Tooltip>
@@ -146,7 +150,7 @@ const Header: React.FC = () => {
 
                 <DropdownMenuContent
                   align="end"
-                  className="w-80 shadow-none ring-0 bg-white border border-ink-100"
+                  className="w-80 shadow-none ring-0 bg-card border border-ink-100"
                 >
                   <div className="px-3 py-2 border-b border-ink-100">
                     <h3 className="text-sm font-semibold text-ink-900">Messages</h3>
@@ -220,7 +224,7 @@ const Header: React.FC = () => {
 
                 <DropdownMenuContent
                   align="end"
-                  className="w-80 shadow-none ring-0 bg-white border border-ink-100"
+                  className="w-80 shadow-none ring-0 bg-card border border-ink-100"
                 >
                   <div className="px-3 py-2 border-b border-ink-100">
                     <h3 className="text-sm font-semibold text-ink-900">Notifications</h3>
@@ -302,7 +306,7 @@ const Header: React.FC = () => {
 
                 <DropdownMenuContent
                   align="end"
-                  className="w-48 shadow-none ring-0 bg-white border border-ink-100"
+                  className="w-48 shadow-none ring-0 bg-card border border-ink-100"
                 >
                   <DropdownMenuItem onClick={() => navigate(routesStatic.profil)}>
                     <User className="h-4 w-4 mr-2" />
@@ -342,7 +346,7 @@ const Header: React.FC = () => {
       </div>
 
       {open && (
-        <div className="md:hidden bg-white border-t shadow-sm">
+        <div className="md:hidden bg-card border-t shadow-sm">
           <div className="px-4 sm:px-6 py-4 flex flex-col gap-4">
             {isAuthenticated && (
               <div className="flex items-center justify-between pb-4 border-b border-ink-100">
@@ -426,15 +430,14 @@ const Header: React.FC = () => {
               </NavLink>
               {user?.role === 'admin' && (
                 <NavLink
-                to={routesStatic.utilisateurs}
-                onClick={() => setOpen(false)}
-                className={navLinkClassName}
-              >
-                Utilisateurs
-              </NavLink>
-              )
-              }
-              
+                  to={routesStatic.utilisateurs}
+                  onClick={() => setOpen(false)}
+                  className={navLinkClassName}
+                >
+                  Utilisateurs
+                </NavLink>
+              )}
+
               {user?.role === 'admin' && (
                 <NavLink
                   to={routesStatic.activityLogs}
@@ -472,6 +475,24 @@ const Header: React.FC = () => {
                     <Badge variant="default" className="ml-auto px-1.5 py-0.5 text-xs">
                       {unreadMessagesCount}
                     </Badge>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={toggleTheme}
+                    className="flex items-center gap-3 py-2.5 px-3 rounded-md text-sm font-medium text-ink-700 hover:bg-ink-50"
+                    aria-label={
+                      resolvedTheme === 'dark'
+                        ? 'Activer le thème clair'
+                        : 'Activer le thème sombre'
+                    }
+                  >
+                    {resolvedTheme === 'dark' ? (
+                      <Sun className="size-4" />
+                    ) : (
+                      <Moon className="size-4" />
+                    )}
+                    <span>Thème {resolvedTheme === 'dark' ? 'clair' : 'sombre'}</span>
                   </button>
 
                   <button
@@ -525,7 +546,7 @@ const Header: React.FC = () => {
       )}
 
       <Dialog open={logoutDialogOpen} onOpenChange={setLogoutDialogOpen}>
-        <DialogContent className="bg-white border-2 border-ink-100 shadow-2xl">
+        <DialogContent className="bg-card border-2 border-ink-100 shadow-2xl">
           <DialogHeader className="bg-gradient-to-r from-brand-500 to-purple-600 -mx-4 -mt-4 px-6 py-4 rounded-t-xl">
             <DialogTitle className="text-white text-xl font-bold">
               Confirmer la déconnexion
@@ -548,7 +569,7 @@ const Header: React.FC = () => {
             <Button
               variant="destructive"
               onClick={handleLogoutConfirm}
-              className="bg-red-600 hover:bg-red-700 text-white"
+              className="bg-red-600 hover:bg-red-700 text-white dark:hover:bg-red-500"
             >
               <LogOut className="h-4 w-4 mr-2" />
               Se déconnecter

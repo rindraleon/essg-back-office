@@ -42,7 +42,7 @@ function InfoItem({ label, value, icon }: Readonly<InfoItemProps>) {
       {icon ? (
         <div
           aria-hidden="true"
-          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white text-ink-500 shadow-sm ring-1 ring-ink-100"
+          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-card text-ink-500 shadow-sm ring-1 ring-ink-100"
         >
           {icon}
         </div>
@@ -73,7 +73,7 @@ function SectionHeader({
         {icon}
       </div>
 
-      <h3 className="text-sm font-semibold text-ink-950">{title}</h3>
+      <h3 className="text-sm font-semibold text-ink-950 dark:text-ink-900">{title}</h3>
     </div>
   );
 }
@@ -106,7 +106,7 @@ function UsersViewDialog({ open, onClose, user }: Readonly<UsersViewDialogProps>
           overflow-hidden
           rounded-2xl
           border-ink-100
-          bg-white
+          bg-card
           p-0
           shadow-[0_24px_80px_rgba(15,23,42,0.18)]
         "
@@ -145,7 +145,7 @@ function UsersViewDialog({ open, onClose, user }: Readonly<UsersViewDialogProps>
               </div>
 
               <div className="min-w-0">
-                <DialogTitle className="truncate text-xl font-bold tracking-tight text-ink-950">
+                <DialogTitle className="truncate text-xl font-bold tracking-tight text-ink-950 dark:text-ink-900">
                   {fullName}
                 </DialogTitle>
 

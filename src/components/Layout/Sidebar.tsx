@@ -11,7 +11,7 @@ const Sidebar: React.FC = () => {
   const items = getVisibleNavItems(user?.role);
 
   return (
-    <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 flex-col border-r border-ink-100 bg-white lg:flex">
+    <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 flex-col border-r border-ink-100 bg-card lg:flex">
       <div className="flex h-16 shrink-0 items-center border-b border-ink-100 px-5">
         <Link to="/" className="flex items-center" aria-label="Accueil ESSG">
           <img src={EssG} alt="Logo ESSG" className="h-12 w-auto object-contain" />

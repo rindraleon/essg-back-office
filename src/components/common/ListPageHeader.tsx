@@ -44,7 +44,7 @@ const ListPageHeader: React.FC<ListPageHeaderProps> = ({
   return (
     <div
       className={cn(
-        'rounded-xl border border-ink-100 bg-white p-4 shadow-card',
+        'rounded-xl border border-ink-100 bg-card p-4 shadow-card',
         'flex flex-col gap-3 lg:flex-row lg:items-center',
         className
       )}

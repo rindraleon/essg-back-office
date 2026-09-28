@@ -52,34 +52,6 @@ function toFormDataSource(formation: Formation): FormationFormData {
   return source as FormationFormData;
 }
 
-function getEditFormData(
-  initialData: Formation,
-  mentions: ReturnType<typeof useFormationMentionsQuery>['data']
-): FormationFormData {
-  const rest = toFormDataSource(initialData);
-  const mention =
-    rest.mention || rest.domaine?.[0] || findMentionByTitre(rest.titre, mentions ?? [])?.label || '';
-  const legacyCondition = (initialData.conditionsAcces ?? '').trim();
-  const conditions = [...(rest.conditions ?? [])];
-
-  if (legacyCondition && !conditions.some((item) => item.trim() === legacyCondition)) {
-    conditions.push(legacyCondition);
-  }
-
-  return {
-    ...defaultFormData,
-    ...rest,
-    mention,
-    conditions: conditions.map((item) => item.trim()).filter(Boolean),
-    competences: rest.competences?.length ? rest.competences : [''],
-    programme: rest.programme?.length ? rest.programme : [''],
-    objectifs: rest.objectifs?.length ? rest.objectifs : [''],
-    debouches: rest.debouches?.length ? rest.debouches : [''],
-    responsableId: rest.responsableId ?? null,
-    responsable: rest.responsable ?? '',
-  };
-}
-
 /** Classes du bouton d'étape du stepper selon son état. */
 function getStepButtonClass(isActive: boolean, isCompleted: boolean): string {
   if (isActive) return 'bg-brand-600 text-white';
@@ -210,9 +182,30 @@ const FormationForm: React.FC<FormationFormProps> = ({
     if (!open) return;
 
     if (mode === 'edit' && initialData) {
-      const formData = getEditFormData(initialData, mentions);
-      setFormData(formData);
-      setImagePreview(formData.image ? getImageUrl(formData.image) : '');
+      const rest = toFormDataSource(initialData);
+
+      const mention =
+        rest.mention || rest.domaine?.[0] || findMentionByTitre(rest.titre, mentions)?.label || '';
+
+      const legacyCondition = (initialData.conditionsAcces ?? '').trim();
+      const conditions = [...(rest.conditions ?? [])];
+      if (legacyCondition && !conditions.some((item) => item.trim() === legacyCondition)) {
+        conditions.push(legacyCondition);
+      }
+
+      setFormData({
+        ...defaultFormData,
+        ...rest,
+        mention,
+        conditions: conditions.map((item) => item.trim()).filter(Boolean),
+        competences: rest.competences?.length ? rest.competences : [''],
+        programme: rest.programme?.length ? rest.programme : [''],
+        objectifs: rest.objectifs?.length ? rest.objectifs : [''],
+        debouches: rest.debouches?.length ? rest.debouches : [''],
+        responsableId: rest.responsableId ?? null,
+        responsable: rest.responsable ?? '',
+      });
+      setImagePreview(rest.image ? getImageUrl(rest.image) : '');
     } else {
       resetForm();
       setImagePreview('');
@@ -505,7 +498,7 @@ const FormationForm: React.FC<FormationFormProps> = ({
           id="enVedette"
           checked={formData.enVedette}
           onCheckedChange={(checked) => handleChange('enVedette', checked as boolean)}
-          className="bg-white"
+          className="bg-card"
         />
         <Label htmlFor="enVedette" className="cursor-pointer text-sm">
           Mettre en vedette
@@ -524,7 +517,7 @@ const FormationForm: React.FC<FormationFormProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
-      <DialogContent className="w-[95vw] gap-0 overflow-hidden bg-white p-0 sm:max-w-3xl">
+      <DialogContent className="w-[95vw] gap-0 overflow-hidden bg-card p-0 sm:max-w-3xl">
         <DialogHeader className="border-b bg-ink-50/80 px-5 pt-4 pb-3">
           <DialogTitle className="text-lg font-bold text-ink-900">{dialogTitle}</DialogTitle>
 

@@ -57,7 +57,7 @@ export default function ActivityLogViewDialog({
               <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-ink-400">
                 Métadonnées
               </p>
-              <pre className="max-h-48 overflow-auto rounded-lg bg-ink-950 p-3 text-xs text-sage-100">
+              <pre className="max-h-48 overflow-auto rounded-lg bg-ink-950 p-3 text-xs text-sage-100 dark:text-[#d8e9c2]">
                 {JSON.stringify(log.metadata, null, 2)}
               </pre>
             </div>

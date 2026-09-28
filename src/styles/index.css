@@ -1,5 +1,11 @@
 @import 'tailwindcss';
 
+/* Mode sombre piloté par la classe `.dark` sur <html> (et non par la seule
+   préférence système), afin de laisser l'utilisateur choisir via le bouton
+   dédié du back-office. Le script inline de index.html applique la classe
+   avant le montage de React pour éviter tout flash de thème incorrect. */
+@custom-variant dark (&:where(.dark, .dark *));
+
 /* Polices identiques au site public (frontend) : Manrope pour le texte,
    Outfit pour les titres, Space Mono pour les accents techniques.
    Fichiers auto-hébergés dans src/assets/fonts. */
@@ -73,6 +79,15 @@
   --color-ink-800: #3c4247;
   --color-ink-900: #2b3034;
   --color-ink-950: #1b1f22;
+
+  /* Surfaces toujours sombres (pied de page, panneaux latéraux des
+     dialogues de consultation, champs de code…). Contrairement à l'échelle
+     « ink », ces valeurs ne sont PAS réinterprétées en mode sombre :
+     elles fournissent un ancrage sombre constant dans les deux thèmes. */
+  --color-night-700: #333940;
+  --color-night-800: #262b31;
+  --color-night-900: #1b1f24;
+  --color-night-950: #101317;
 
   --color-danger-50: #fdecea;
   --color-danger-100: #fbd5d1;
@@ -152,10 +167,138 @@
 
 }
 
+/* ============================================================
+   MODE SOMBRE
+   Les utilitaires Tailwind v4 référencent les variables de thème
+   (`bg-ink-50` → `var(--color-ink-50)`) : il suffit donc de
+   redéfinir les variables sous `.dark` pour re-thémer toute
+   l'interface sans toucher aux composants.
+
+   Principe de transposition :
+   - les nuances claires de « ink » (50→300) deviennent des surfaces
+     et bordures sombres (fond de page, cartes, traits) ;
+   - les nuances foncées (400→900) deviennent des niveaux de texte
+     clairs, du placeholder au titre principal ;
+   - « ink-950 » et l'échelle « night » restent sombres : ce sont les
+     surfaces déjà sombres en thème clair (panneaux, overlays, code) ;
+   - les voiles pastel de la marque (brand-50→200) deviennent des
+     voiles vert foncé, les nuances « texte » de la marque (700/800)
+     s'éclaircissent ; 400→600 restent inchangés (identité) ;
+   - les pastels de statut (red/amber/emerald/slate/violet/yellow)
+     suivent la même logique : fonds en teintes sombres, textes
+     associés éclaircis.
+   ============================================================ */
+.dark {
+  --color-ink-50: #131519;
+  --color-ink-100: #1f2328;
+  --color-ink-200: #2b3138;
+  --color-ink-300: #3d444c;
+  --color-ink-400: #8b95a0;
+  --color-ink-500: #a4adb7;
+  --color-ink-600: #b9c1ca;
+  --color-ink-700: #ced5dc;
+  --color-ink-800: #dfe3e8;
+  --color-ink-900: #e9ecef;
+
+  --color-brand-50: #1d2613;
+  --color-brand-100: #25311a;
+  --color-brand-200: #2e3d21;
+  --color-brand-300: #3c4e2c;
+  --color-brand-700: #a6ca80;
+  --color-brand-800: #c0da9e;
+
+  --color-sage-50: #1d2613;
+  --color-sage-100: #25311a;
+  --color-sage-200: #2e3d21;
+  --color-sage-300: #3c4e2c;
+  --color-sage-600: #a6ca80;
+  --color-sage-700: #c0da9e;
+
+  /* Danger légèrement éclairci pour rester lisible sur fond sombre. */
+  --color-danger-500: #f2605c;
+  --color-danger-600: #ef5350;
+  --color-danger-700: #f87070;
+
+  /* Jetons sémantiques de l'interface. */
+  --color-background: #131519;
+  --color-foreground: #e9ecef;
+  --color-primary: #6b9c44;
+  --color-primary-foreground: #ffffff;
+  --color-secondary: #25311a;
+  --color-secondary-foreground: #c0da9e;
+  --color-muted: #24282e;
+  --color-muted-foreground: #a4adb7;
+  --color-accent: #202a15;
+  --color-accent-foreground: #d8e9c2;
+  --color-card: #1d2126;
+  --color-card-foreground: #e9ecef;
+  --color-popover: #20252b;
+  --color-popover-foreground: #e9ecef;
+  --color-input: #3d444c;
+  --color-border: #2b3138;
+  --color-ring: #8fbf62;
+  --color-destructive: #ef5350;
+  --color-destructive-foreground: #ffffff;
+
+  /* Ombres : plus profondes et neutres, sans halo clair. */
+  --shadow-card: 0 1px 2px rgb(0 0 0 / 0.4), 0 4px 16px -4px rgb(0 0 0 / 0.5);
+  --shadow-card-hover: 0 2px 4px rgb(0 0 0 / 0.4), 0 16px 40px -12px rgb(0 0 0 / 0.6);
+  --shadow-soft: 0 1px 3px rgb(0 0 0 / 0.4), 0 8px 24px -8px rgb(0 0 0 / 0.5);
+  --shadow-elevated: 0 8px 20px -6px rgb(0 0 0 / 0.5), 0 24px 56px -16px rgb(0 0 0 / 0.7);
+  --shadow-focus: 0 0 0 4px rgb(143 191 98 / 0.28);
+
+  /* Pastels de statut issus de la palette Tailwind par défaut :
+     fonds en voiles sombres, bordures atténuées, textes éclaircis. */
+  --color-red-50: #2b1512;
+  --color-red-100: #351b17;
+  --color-red-200: #5f2c25;
+  --color-red-600: #ef4444;
+  --color-red-700: #f9a8a4;
+
+  --color-amber-50: #2b2312;
+  --color-amber-100: #352b17;
+  --color-amber-200: #5f4c24;
+  --color-amber-700: #fbbf24;
+  --color-amber-800: #fcd34d;
+  --color-amber-900: #fde68a;
+
+  --color-emerald-50: #10261c;
+  --color-emerald-100: #143024;
+  --color-emerald-200: #1d4d37;
+  --color-emerald-600: #10b981;
+  --color-emerald-700: #6ee7b7;
+
+  --color-slate-50: #1a1d22;
+  --color-slate-200: #2e343b;
+  --color-slate-600: #cbd5e1;
+
+  --color-violet-100: #262043;
+  --color-violet-700: #c4b5fd;
+
+  --color-yellow-100: #322c13;
+  --color-yellow-300: #854d0e;
+  --color-yellow-800: #fde047;
+}
+
+/* Cartes Leaflet : atténuer la tuile claire d'OpenStreetMap pour
+   qu'elle ne "bouche" pas l'interface en mode sombre. */
+.dark .leaflet-tile {
+  filter: brightness(0.82) contrast(1.05) saturate(0.75);
+}
+
+.dark .leaflet-container {
+  background: var(--color-ink-100);
+}
+
 @layer base {
   html {
     scroll-behavior: smooth;
     -webkit-text-size-adjust: 100%;
+    color-scheme: light;
+  }
+
+  html.dark {
+    color-scheme: dark;
   }
 
   body {

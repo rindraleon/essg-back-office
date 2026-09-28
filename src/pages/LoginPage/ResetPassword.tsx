@@ -133,7 +133,7 @@ export default function ResetPassword() {
     return (
       <AuthLayout>
         <div className="flex flex-col items-center gap-4 py-10" role="status" aria-live="polite">
-          <LoaderCircle className="size-8 animate-spin text-brand-300" />
+          <LoaderCircle className="size-8 animate-spin text-brand-300 dark:text-brand-400" />
           <p className="text-sm text-brand-100/90">Vérification du lien de réinitialisation…</p>
         </div>
       </AuthLayout>
@@ -151,7 +151,7 @@ export default function ResetPassword() {
         </header>
 
         <div className="login-fade login-s2 space-y-4">
-          <div className="flex items-start gap-2.5 rounded-xl border border-amber-400/40 bg-amber-500/15 px-4 py-3 text-sm text-amber-100 backdrop-blur-sm">
+          <div className="flex items-start gap-2.5 rounded-xl border border-amber-400/40 bg-amber-500/15 px-4 py-3 text-sm text-amber-100 dark:text-amber-300 backdrop-blur-sm">
             <AlertCircle className="mt-0.5 size-4 shrink-0" />
             <span>
               Pour des raisons de sécurité, chaque lien est à usage unique et valable 30 minutes.
@@ -160,7 +160,7 @@ export default function ResetPassword() {
 
           <Link
             to={routesStatic.forgotPassword}
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-white text-sm font-bold text-brand-800 shadow-[0_12px_30px_-10px_rgba(0,0,0,0.55)] ring-1 ring-white/20 transition-all duration-200 hover:bg-brand-50 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white/30"
+            className="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-white text-sm font-bold text-brand-800 dark:text-brand-600 shadow-[0_12px_30px_-10px_rgba(0,0,0,0.55)] ring-1 ring-white/20 transition-all duration-200 hover:bg-brand-50 dark:hover:bg-white/90 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white/30"
           >
             <KeyRound className="size-4" />
             Demander un nouveau lien de réinitialisation
@@ -195,7 +195,7 @@ export default function ResetPassword() {
         {globalError && (
           <div
             role="alert"
-            className="login-fade flex items-start gap-2.5 rounded-xl border border-red-400/40 bg-red-500/15 px-4 py-3 text-sm text-red-100 backdrop-blur-sm"
+            className="login-fade flex items-start gap-2.5 rounded-xl border border-red-400/40 bg-red-500/15 px-4 py-3 text-sm text-red-100 dark:text-red-300 backdrop-blur-sm"
           >
             <AlertCircle className="mt-0.5 size-4 shrink-0" />
             <span>{globalError}</span>
@@ -306,7 +306,7 @@ export default function ResetPassword() {
           <button
             type="submit"
             disabled={submitting}
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-white text-sm font-bold text-brand-800 shadow-[0_12px_30px_-10px_rgba(0,0,0,0.55)] ring-1 ring-white/20 transition-all duration-200 hover:bg-brand-50 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white/30 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-70 motion-reduce:transition-none"
+            className="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-white text-sm font-bold text-brand-800 dark:text-brand-600 shadow-[0_12px_30px_-10px_rgba(0,0,0,0.55)] ring-1 ring-white/20 transition-all duration-200 hover:bg-brand-50 dark:hover:bg-white/90 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white/30 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-70 motion-reduce:transition-none"
           >
             {submitting ? (
               <>

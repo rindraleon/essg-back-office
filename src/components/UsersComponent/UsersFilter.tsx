@@ -49,7 +49,7 @@ const UsersFilter: React.FC<UsersFilterProps> = ({
                 placeholder="Nom, prénom, email..."
                 value={filters.search}
                 onChange={(e) => onUpdateFilter('search', e.target.value)}
-                className="pl-9 bg-white"
+                className="pl-9 bg-card"
               />
             </div>
           </div>

@@ -235,7 +235,7 @@ const Contacts = () => {
         </div>
       )}
 
-      <div className="rounded-lg border border-ink-100 bg-white">
+      <div className="rounded-lg border border-ink-100 bg-card">
         <MessageTable
           data={messages}
           totalCount={totalItems}

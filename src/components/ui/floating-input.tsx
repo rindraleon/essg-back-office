@@ -22,7 +22,7 @@ const FloatingInput = React.forwardRef<HTMLInputElement, FloatingInputProps>(
           aria-invalid={error ? true : undefined}
           aria-describedby={error && errorId ? errorId : undefined}
           className={cn(
-            'peer h-12 w-full rounded-md border border-ink-300 bg-white px-3 pt-5 pb-2 text-sm',
+            'peer h-12 w-full rounded-md border border-ink-300 bg-card px-3 pt-5 pb-2 text-sm',
             'focus-visible:border-brand-800',
             'focus-visible:ring-0',
             'focus-visible:ring-offset-0',
@@ -36,7 +36,7 @@ const FloatingInput = React.forwardRef<HTMLInputElement, FloatingInputProps>(
           htmlFor={id}
           className={cn(
             'pointer-events-none absolute left-[10px] top-0 z-10',
-            'bg-white px-1 text-xs font-bold text-brand-700',
+            'bg-card px-1 text-xs font-bold text-brand-700',
             'transition-all duration-200',
             'peer-placeholder-shown:top-[1.35rem]',
             'peer-placeholder-shown:left-[10px]',
@@ -47,7 +47,7 @@ const FloatingInput = React.forwardRef<HTMLInputElement, FloatingInputProps>(
             'peer-placeholder-shown:text-ink-400',
             'peer-focus:top-0',
             'peer-focus:left-2',
-            'peer-focus:bg-white',
+            'peer-focus:bg-card',
             'peer-focus:px-1',
             'peer-focus:text-xs',
             'peer-focus:font-bold',

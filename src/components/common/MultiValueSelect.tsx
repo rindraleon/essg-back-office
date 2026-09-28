@@ -107,7 +107,7 @@ const MultiValueSelect: React.FC<MultiValueSelectProps> = ({
         aria-expanded={open}
         aria-controls={open ? listboxId : undefined}
         className={cn(
-          'flex min-h-12 w-full items-center gap-2 rounded-md border bg-white px-3 pt-4 pb-1.5 text-left text-sm',
+          'flex min-h-12 w-full items-center gap-2 rounded-md border bg-card px-3 pt-4 pb-1.5 text-left text-sm',
           'transition-colors focus:outline-none focus:ring-2 motion-reduce:transition-none',
           hasError
             ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20'
@@ -150,7 +150,7 @@ const MultiValueSelect: React.FC<MultiValueSelectProps> = ({
         className={cn(
           'pointer-events-none absolute left-3 origin-[0] transition-all duration-200 motion-reduce:transition-none',
           hasValues || open
-            ? 'top-0 bg-white px-1 text-xs font-bold text-brand-700'
+            ? 'top-0 bg-card px-1 text-xs font-bold text-brand-700'
             : 'top-[1.35rem] text-sm text-ink-400',
           hasError && 'text-red-500'
         )}
@@ -159,7 +159,7 @@ const MultiValueSelect: React.FC<MultiValueSelectProps> = ({
       </span>
 
       {open && (
-        <div className="absolute z-50 mt-1 w-full overflow-hidden rounded-md border border-ink-200 bg-white shadow-elevated">
+        <div className="absolute z-50 mt-1 w-full overflow-hidden rounded-md border border-ink-200 bg-card shadow-elevated">
           <div className="flex items-center gap-2 border-b border-ink-100 px-3 py-2">
             <Search className="size-4 shrink-0 text-ink-400" />
             <input

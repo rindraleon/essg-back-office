@@ -203,7 +203,7 @@ const AdmissionTable: React.FC<AdmissionTableProps> = ({
 
   if (loading) {
     return (
-      <div className="border border-ink-100 rounded-xl overflow-hidden bg-white p-8">
+      <div className="border border-ink-100 rounded-xl overflow-hidden bg-card p-8">
         <div className="text-center">
           <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-ink-300 border-t-brand-600"></div>
           <p className="mt-2 text-ink-600">Chargement des admissions...</p>

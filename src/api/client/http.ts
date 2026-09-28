@@ -12,9 +12,9 @@ const REQUEST_TIMEOUT = 15_000;
 
 let accessToken: string | undefined;
 
+/** Noms des anciens cookies JS (pré-ESSG-SEC-01), nettoyés à la migration. */
 const LEGACY_TOKEN_COOKIE = 'token_name';
 const LEGACY_REFRESH_COOKIE = 'refresh_token';
-const HAS_SESSION_FLAG = 'essg_has_session';
 
 export type DocumentBlob = Blob & {
   inlineViewable: boolean;
@@ -28,6 +28,7 @@ export interface RequestOptions {
   signal?: AbortSignal;
   timeout?: number;
   headers?: Record<string, string>;
+
   isRetry?: boolean;
 }
 
@@ -38,11 +39,13 @@ function resolveBaseUrl(): string {
 
 export const API_BASE_URL = resolveBaseUrl();
 
+/** Efface un cookie JavaScript accessible en le faisant expirer. */
 function expireLegacyCookie(name: string): void {
   if (typeof document === 'undefined') return;
   document.cookie = `${name}=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax`;
 }
 
+/** Nettoyage unique des cookies de jetons créés par JavaScript (migration). */
 let legacyCookiesCleaned = false;
 function cleanupLegacyTokenCookies(): void {
   if (legacyCookiesCleaned || typeof document === 'undefined') return;
@@ -63,27 +66,11 @@ export function getAuthToken(): string | undefined {
 export function setAuthToken(token: string): void {
   accessToken = token;
   cleanupLegacyTokenCookies();
-  try {
-    localStorage.setItem(HAS_SESSION_FLAG, '1');
-  } catch (error: unknown) {
-    console.warn(
-      'Impossible de persister le flag de session dans localStorage',
-      error instanceof Error ? error.message : error,
-    );
-  }
 }
 
 export function clearAuthToken(): void {
   accessToken = undefined;
   cleanupLegacyTokenCookies();
-  try {
-    localStorage.removeItem(HAS_SESSION_FLAG);
-  } catch (error: unknown) {
-    console.warn(
-      'Impossible de supprimer le flag de session dans localStorage',
-      error instanceof Error ? error.message : error,
-    );
-  }
 }
 
 export function hasAuthToken(): boolean {
@@ -92,16 +79,19 @@ export function hasAuthToken(): boolean {
 
 let refreshPromise: Promise<boolean> | null = null;
 
+/**
+ * Renouvelle le jeton d'accès via le cookie HttpOnly de refresh token :
+ * aucune valeur sensible n'est lue ni écrite par JavaScript. Le cookie est
+ * envoyé automatiquement (`credentials: 'include'`), le serveur applique la
+ * rotation et réémet le cookie.
+ */
 async function refreshAccessToken(): Promise<boolean> {
-  if (refreshPromise) return refreshPromise;
-
-  refreshPromise = (async () => {
+  refreshPromise ??= (async () => {
     try {
       const response = await fetch(buildUrl('/auth/refresh'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
         credentials: 'include',
-        body: JSON.stringify({}),
       });
       if (!response.ok) return false;
 
@@ -113,11 +103,8 @@ async function refreshAccessToken(): Promise<boolean> {
 
       setAuthToken(data.accessToken);
       return true;
-    } catch (error: unknown) {
-      console.warn(
-        'Échec du rafraîchissement du jeton d’accès',
-        error instanceof Error ? error.message : error,
-      );
+    } catch (error) {
+      console.warn('Échec dans callback — poursuite en mode dégradé', error instanceof Error ? error.message : error);
       return false;
     } finally {
       refreshPromise = null;
@@ -127,20 +114,13 @@ async function refreshAccessToken(): Promise<boolean> {
   return refreshPromise;
 }
 
+/**
+ * Restaure une session après rechargement de la page : le jeton d'accès
+ * n'étant conservé qu'en mémoire, on tente un rafraîchissement silencieux
+ * via le cookie HttpOnly avant de considérer l'utilisateur déconnecté.
+ */
 export async function tryRestoreSession(): Promise<boolean> {
   if (hasAuthToken()) return true;
-
-  // Si l'utilisateur ne s'est jamais connecté sur ce navigateur, pas de refresh
-  try {
-    const hasSession = localStorage.getItem(HAS_SESSION_FLAG);
-    if (!hasSession) return false;
-  } catch (error: unknown) {
-    console.warn(
-      'Impossible de lire le flag de session depuis localStorage — tentative de refresh en mode dégradé',
-      error instanceof Error ? error.message : error,
-    );
-  }
-
   return refreshAccessToken();
 }
 
@@ -154,16 +134,12 @@ function handleUnauthorized(requestUrl: string): void {
     requestUrl.includes('/auth/verify') ||
     requestUrl.includes('/auth/me') ||
     requestUrl.includes('/auth/session') ||
-    requestUrl.includes('/auth/login') ||
-    requestUrl.includes('/auth/refresh');
+    requestUrl.includes('/auth/login');
   if (isAuthEndpoint) return;
   try {
     clearAuthToken();
-  } catch (error: unknown) {
-    console.warn(
-      'Échec du nettoyage du jeton lors de la déconnexion automatique',
-      error instanceof Error ? error.message : error,
-    );
+  } catch (error) {
+    console.warn('Nettoyage du jeton impossible', error);
   }
   onAuthFailure?.();
   if (typeof window !== 'undefined' && window.location.pathname !== '/login') {
@@ -303,11 +279,8 @@ async function parseJsonSafe(response: Response): Promise<unknown> {
   if (!text) return null;
   try {
     return JSON.parse(text) as unknown;
-  } catch (error: unknown) {
-    console.warn(
-      'Échec du parsing JSON — retour du texte brut en mode dégradé',
-      error instanceof Error ? error.message : error,
-    );
+  } catch (error) {
+    console.warn('Échec dans parseJsonSafe — poursuite en mode dégradé', error instanceof Error ? error.message : error);
     return text;
   }
 }
@@ -354,7 +327,6 @@ async function request<T>(
       headers,
       body,
       signal: controller.signal,
-      credentials: 'include', // FIX: envoie les cookies HttpOnly (refresh_token) même sur API cross-origin
     });
 
     if (!response.ok) {
@@ -440,7 +412,6 @@ export const apiClient = {
         method: 'GET',
         headers,
         signal: controller.signal,
-        credentials: 'include',
       });
       const blob = await response.blob();
       if (!response.ok) {

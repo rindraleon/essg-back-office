@@ -16,7 +16,7 @@ export const DetailSection: React.FC<DetailSectionProps> = ({
   children,
   className,
 }) => (
-  <section className={cn('rounded-2xl border border-ink-100 bg-white p-5 shadow-sm', className)}>
+  <section className={cn('rounded-2xl border border-ink-100 bg-card p-5 shadow-sm', className)}>
     <div className="mb-3 flex items-center gap-2">
       {icon && <span className="text-ink-400">{icon}</span>}
       <h3 className="text-sm font-semibold uppercase tracking-wide text-ink-700">{title}</h3>

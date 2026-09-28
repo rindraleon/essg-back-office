@@ -323,7 +323,7 @@ const ProjetForm: React.FC<ProjetFormProps> = ({ open, onClose, onSubmit, initia
               onClick={() => fileInputRef.current?.click()}
               disabled={uploadingImage}
               size="sm"
-              className="gap-1.5 bg-white text-xs h-8"
+              className="gap-1.5 bg-card text-xs h-8"
             >
               <Upload className="h-3.5 w-3.5" />
               {uploadingImage ? 'Upload...' : 'Choisir une image'}
@@ -411,7 +411,7 @@ const ProjetForm: React.FC<ProjetFormProps> = ({ open, onClose, onSubmit, initia
         className="
           sm:max-w-3xl
           w-[95vw]
-          bg-white
+          bg-card
           p-0
           gap-0
           overflow-hidden

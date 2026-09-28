@@ -154,7 +154,7 @@ const CvImportPanel: React.FC<CvImportPanelProps> = ({ onApply, disabled = false
           className={`flex w-full flex-col items-center gap-1.5 rounded-md border-2 border-dashed px-4 py-5 text-center transition-colors ${
             isDragging
               ? 'border-brand-500 bg-brand-50'
-              : 'border-ink-200 bg-white hover:border-brand-300 hover:bg-brand-50/50'
+              : 'border-ink-200 bg-card hover:border-brand-300 hover:bg-brand-50/50'
           } disabled:cursor-not-allowed disabled:opacity-60`}
         >
           <Upload className="size-5 text-brand-600" />
@@ -168,7 +168,7 @@ const CvImportPanel: React.FC<CvImportPanelProps> = ({ onApply, disabled = false
       )}
 
       {status === 'analyzing' && (
-        <div className="space-y-2 rounded-md border border-ink-100 bg-white p-3">
+        <div className="space-y-2 rounded-md border border-ink-100 bg-card p-3">
           <div className="flex items-center gap-2 text-sm text-ink-700">
             <Loader2 className="size-4 shrink-0 animate-spin text-brand-600" />
             <span className="min-w-0 flex-1 truncate">{progress.label || 'Analyse en cours…'}</span>
@@ -211,7 +211,7 @@ const CvImportPanel: React.FC<CvImportPanelProps> = ({ onApply, disabled = false
       )}
 
       {status === 'done' && result && (
-        <div className="space-y-2.5 rounded-md border border-ink-100 bg-white p-3">
+        <div className="space-y-2.5 rounded-md border border-ink-100 bg-card p-3">
           <div className="flex items-start justify-between gap-2">
             <p className="flex min-w-0 items-center gap-2 text-sm text-ink-800">
               <CheckCircle2 className="size-4 shrink-0 text-brand-600" />

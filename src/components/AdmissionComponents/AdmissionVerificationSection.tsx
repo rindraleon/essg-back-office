@@ -182,7 +182,7 @@ function getBadgeVariant(statut: string): 'default' | 'outline' | 'destructive' 
 }
 
 function getStepClasses(active: boolean, done: boolean): string {
-  if (active) return 'bg-white shadow-sm border border-brand-200 text-brand-700';
+  if (active) return 'bg-card shadow-sm border border-brand-200 text-brand-700';
   if (done) return 'bg-emerald-50 text-emerald-700 border border-emerald-100';
   return 'text-ink-400 bg-ink-50/50 border border-transparent';
 }
@@ -257,10 +257,10 @@ const FieldRow: React.FC<FieldRowProps> = ({ result, icon: CustomIcon }) => {
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
         aria-controls={`field-${result.champ}`}
-        className="flex w-full items-center gap-3 px-4 py-3 text-left transition hover:bg-white/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-0"
+        className="flex w-full items-center gap-3 px-4 py-3 text-left transition hover:bg-card/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-0"
       >
         <span
-          className={`grid h-8 w-8 shrink-0 place-items-center rounded-full bg-white shadow-sm ${meta.color}`}
+          className={`grid h-8 w-8 shrink-0 place-items-center rounded-full bg-card shadow-sm ${meta.color}`}
           aria-hidden="true"
         >
           <Icon className="size-4" />
@@ -293,7 +293,7 @@ const FieldRow: React.FC<FieldRowProps> = ({ result, icon: CustomIcon }) => {
       </button>
 
       {open && (
-        <div id={`field-${result.champ}`} className="border-t border-ink-100 bg-white px-4 py-3">
+        <div id={`field-${result.champ}`} className="border-t border-ink-100 bg-card px-4 py-3">
           {/* Format explicite Valeur saisie → Valeur détectée → Résultat */}
           <div className="grid grid-cols-1 gap-3 text-xs sm:grid-cols-3">
             <div className="rounded-lg bg-ink-50 px-3 py-2.5">
@@ -447,7 +447,7 @@ const ReleveDetails: React.FC<{ details: Record<string, unknown> }> = ({ details
         </div>
         <div className="max-h-64 overflow-auto">
           <table className="w-full text-left text-xs">
-            <thead className="sticky top-0 bg-white text-[0.65rem] uppercase tracking-wide text-ink-500">
+            <thead className="sticky top-0 bg-card text-[0.65rem] uppercase tracking-wide text-ink-500">
               <tr>
                 <th className="px-3 py-2 font-semibold">Matière</th>
                 <th className="px-2 py-2 font-semibold text-center">Note</th>
@@ -459,7 +459,7 @@ const ReleveDetails: React.FC<{ details: Record<string, unknown> }> = ({ details
               {matieres.map((m, idx) => (
                 <tr
                   key={`${m.matiere}-${idx}`}
-                  className={idx % 2 === 0 ? 'bg-white' : 'bg-ink-50/40'}
+                  className={idx % 2 === 0 ? 'bg-card' : 'bg-ink-50/40'}
                 >
                   <td className="px-3 py-2 font-medium text-ink-900">{m.matiere}</td>
                   <td className="px-2 py-2 text-center font-mono font-semibold text-ink-800">
@@ -503,7 +503,7 @@ const Block: React.FC<{
 }> = ({ title, icon: Icon, count, children, defaultOpen = true }) => {
   const [open, setOpen] = useState(defaultOpen);
   return (
-    <div className="overflow-hidden rounded-xl border border-ink-100 bg-white">
+    <div className="overflow-hidden rounded-xl border border-ink-100 bg-card">
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
@@ -614,7 +614,7 @@ export const AdmissionVerificationSection: React.FC<Props> = ({ admission, hideB
   }, [latest]);
 
   return (
-    <div className="rounded-2xl border border-brand-100 bg-white shadow-sm">
+    <div className="rounded-2xl border border-brand-100 bg-card shadow-sm">
       {!hideButton && (
         <div className="flex flex-col gap-3 border-b border-ink-100 bg-brand-50/40 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-3">
@@ -637,7 +637,7 @@ export const AdmissionVerificationSection: React.FC<Props> = ({ admission, hideB
           <Button
             onClick={() => void handleVerify()}
             disabled={isVerifying}
-            className="w-full gap-2 bg-brand-700 hover:bg-brand-800 sm:w-auto shrink-0"
+            className="w-full gap-2 bg-brand-700 hover:bg-brand-800 sm:w-auto shrink-0 dark:bg-brand-600 dark:hover:bg-brand-500"
           >
             {isVerifying ? (
               <LoaderCircle className="size-4 animate-spin" aria-hidden="true" />
@@ -739,26 +739,26 @@ export const AdmissionVerificationSection: React.FC<Props> = ({ admission, hideB
                 </p>
                 {summary && (
                   <p className="mt-1 flex flex-wrap gap-1.5 text-[0.7rem] font-medium">
-                    <span className="inline-flex items-center gap-1 rounded-full bg-white px-2 py-0.5 text-emerald-700">
+                    <span className="inline-flex items-center gap-1 rounded-full bg-card px-2 py-0.5 text-emerald-700">
                       <CheckCircle className="size-3" /> {summary.verifie} vérifié(s)
                     </span>
                     {summary.aVerifier > 0 && (
-                      <span className="inline-flex items-center gap-1 rounded-full bg-white px-2 py-0.5 text-amber-700">
+                      <span className="inline-flex items-center gap-1 rounded-full bg-card px-2 py-0.5 text-amber-700">
                         <AlertTriangle className="size-3" /> {summary.aVerifier} à vérifier
                       </span>
                     )}
                     {summary.incoherent > 0 && (
-                      <span className="inline-flex items-center gap-1 rounded-full bg-white px-2 py-0.5 text-red-700">
+                      <span className="inline-flex items-center gap-1 rounded-full bg-card px-2 py-0.5 text-red-700">
                         <XCircle className="size-3" /> {summary.incoherent} incohérent(s)
                       </span>
                     )}
                     {summary.nonTrouve > 0 && (
-                      <span className="inline-flex items-center gap-1 rounded-full bg-white px-2 py-0.5 text-slate-600">
+                      <span className="inline-flex items-center gap-1 rounded-full bg-card px-2 py-0.5 text-slate-600">
                         <CircleHelp className="size-3" /> {summary.nonTrouve} non trouvé(s)
                       </span>
                     )}
                     {summary.lectureImpossible > 0 && (
-                      <span className="inline-flex items-center gap-1 rounded-full bg-white px-2 py-0.5 text-slate-600">
+                      <span className="inline-flex items-center gap-1 rounded-full bg-card px-2 py-0.5 text-slate-600">
                         <ScanSearch className="size-3" /> {summary.lectureImpossible} lecture
                         impossible
                       </span>
@@ -772,7 +772,7 @@ export const AdmissionVerificationSection: React.FC<Props> = ({ admission, hideB
                   </p>
                 )}
                 {latest.erreurs && latest.erreurs.length > 0 && (
-                  <div className="mt-2 rounded-lg bg-white/80 px-3 py-2 text-xs text-amber-800">
+                  <div className="mt-2 rounded-lg bg-card/80 px-3 py-2 text-xs text-amber-800">
                     <p className="flex items-center gap-1 font-semibold">
                       <AlertTriangle className="size-3.5" /> Anomalies OCR / extraction :
                     </p>
@@ -801,7 +801,7 @@ export const AdmissionVerificationSection: React.FC<Props> = ({ admission, hideB
                 </p>
               </div>
               <div className="divide-y divide-ink-100">
-                <div className="hidden grid-cols-12 gap-2 bg-white px-4 py-2 text-[0.65rem] font-semibold uppercase tracking-wide text-ink-400 sm:grid">
+                <div className="hidden grid-cols-12 gap-2 bg-card px-4 py-2 text-[0.65rem] font-semibold uppercase tracking-wide text-ink-400 sm:grid">
                   <span className="col-span-3">Élément</span>
                   <span className="col-span-3">Saisie</span>
                   <span className="col-span-3">Détectée (OCR)</span>
@@ -942,7 +942,7 @@ export const AdmissionVerificationSection: React.FC<Props> = ({ admission, hideB
 
         {!latest && !latestQuery.isLoading && !isVerifying && (
           <div className="rounded-xl border border-dashed border-ink-200 bg-ink-50/40 px-4 py-8 text-center">
-            <ScanSearch className="mx-auto mb-2 size-8 text-ink-300" aria-hidden="true" />
+            <ScanSearch className="mx-auto mb-2 size-8 text-ink-300 dark:text-ink-500" aria-hidden="true" />
             <p className="text-sm font-semibold text-ink-700">Aucune vérification effectuée</p>
             <p className="mx-auto mt-1 max-w-md text-xs leading-snug text-ink-500">
               Cliquez sur <strong>« Vérifier les pièces »</strong> pour lancer l’analyse automatique
@@ -989,7 +989,7 @@ export const AdmissionVerificationSection: React.FC<Props> = ({ admission, hideB
                   return (
                     <div
                       key={v.id}
-                      className="flex items-center justify-between gap-3 rounded-xl border border-ink-100 bg-white px-4 py-3"
+                      className="flex items-center justify-between gap-3 rounded-xl border border-ink-100 bg-card px-4 py-3"
                     >
                       <div className="min-w-0 flex-1">
                         <p className="flex flex-wrap items-center gap-2 text-sm font-medium text-ink-900">

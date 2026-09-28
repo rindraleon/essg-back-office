@@ -139,7 +139,7 @@ const Partenaires: React.FC = () => {
       />
 
       {filtersOpen && (
-        <div className="bg-white rounded-xl border border-ink-100 p-4 shadow-card">
+        <div className="bg-card rounded-xl border border-ink-100 p-4 shadow-card">
           <PartenaireFilters
             filters={filters}
             onUpdateFilter={updateFilter}

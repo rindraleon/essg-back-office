@@ -53,7 +53,7 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({
           className
         )}
       >
-        <Images className="size-9 text-ink-300" />
+        <Images className="size-9 text-ink-300 dark:text-ink-500" />
         <p className="text-sm text-ink-500">Aucune image dans la galerie</p>
       </div>
     );

@@ -60,7 +60,7 @@ function DataTableInner<T>({
 
   return (
     <div className="min-w-0 space-y-3">
-      <div className="hidden max-w-full overflow-hidden rounded-xl border border-ink-100 bg-white shadow-card lg:block">
+      <div className="hidden max-w-full overflow-hidden rounded-xl border border-ink-100 bg-card shadow-card lg:block">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
@@ -103,14 +103,14 @@ function DataTableInner<T>({
 
       <div className="space-y-3 lg:hidden">
         {data.length === 0 ? (
-          <div className="rounded-xl border border-ink-100 bg-white shadow-card">
+          <div className="rounded-xl border border-ink-100 bg-card shadow-card">
             {renderEmpty()}
           </div>
         ) : (
           data.map((row, index) => (
             <article
               key={getRowKey(row, index)}
-              className="overflow-hidden rounded-xl border border-ink-100 bg-white shadow-card transition-all duration-200 hover:border-brand-200 hover:shadow-card-hover"
+              className="overflow-hidden rounded-xl border border-ink-100 bg-card shadow-card transition-all duration-200 hover:border-brand-200 hover:shadow-card-hover"
             >
               <div className="flex items-start gap-3 px-4 pt-4">
                 {headerColumns.map((column) => (
@@ -146,7 +146,7 @@ function DataTableInner<T>({
       </div>
 
       {totalCount > 0 && (
-        <div className="flex flex-col gap-3 rounded-xl border border-ink-100 bg-white px-4 py-3 shadow-card sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-3 rounded-xl border border-ink-100 bg-card px-4 py-3 shadow-card sm:flex-row sm:items-center sm:justify-between">
           <div className="flex flex-wrap items-center gap-3">
             <span className="text-sm text-ink-500">
               {page * rowsPerPage + 1}–{Math.min((page + 1) * rowsPerPage, totalCount)} sur{' '}
@@ -158,7 +158,7 @@ function DataTableInner<T>({
               <select
                 value={rowsPerPage}
                 onChange={(e) => onRowsPerPageChange(Number(e.target.value))}
-                className="h-8 rounded-lg border border-ink-200 bg-white px-2 text-xs font-medium text-ink-700 outline-none transition-colors focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20"
+                className="h-8 rounded-lg border border-ink-200 bg-card px-2 text-xs font-medium text-ink-700 outline-none transition-colors focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20"
               >
                 {ROWS_PER_PAGE_OPTIONS.map((option) => (
                   <option key={option} value={option}>

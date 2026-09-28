@@ -248,7 +248,7 @@ const PdfPreviewDialog = ({
                       const value = Number.parseInt(e.target.value, 10);
                       if (value >= 1 && value <= pageCount) setCurrentPage(value);
                     }}
-                    className="h-8 w-12 rounded-md border border-ink-200 bg-white px-1 text-center text-xs outline-none focus:border-brand-600"
+                    className="h-8 w-12 rounded-md border border-ink-200 bg-card px-1 text-center text-xs outline-none focus:border-brand-600"
                     aria-label="Numéro de page"
                   />
                   / {pageCount}

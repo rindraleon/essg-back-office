@@ -61,11 +61,11 @@ const RessourceHumaineViewDialog: React.FC<RessourceHumaineViewDialogProps> = ({
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
       <DialogContent
         showCloseButton={false}
-        className="!h-[90vh] !max-h-[90vh] !w-[96vw] !max-w-[calc(100%-1rem)] gap-0 overflow-hidden rounded-3xl border-2 border-ink-100 bg-white p-0 shadow-[0_24px_80px_rgba(15,23,42,0.35)] sm:!max-w-6xl"
+        className="!h-[90vh] !max-h-[90vh] !w-[96vw] !max-w-[calc(100%-1rem)] gap-0 overflow-hidden rounded-3xl border-2 border-ink-100 bg-card p-0 shadow-[0_24px_80px_rgba(15,23,42,0.35)] sm:!max-w-6xl"
       >
         <div className="grid h-full min-h-0 lg:grid-cols-[340px_minmax(0,1fr)]">
           <aside className="hidden min-h-0 flex-col overflow-y-auto border-r border-ink-100 bg-ink-950 p-5 text-white lg:flex">
-            <div className="overflow-hidden rounded-2xl border border-white/10 bg-ink-800 shadow-[0_12px_30px_rgba(0,0,0,0.35)]">
+            <div className="overflow-hidden rounded-2xl border border-white/10 bg-ink-800 dark:bg-night-800 shadow-[0_12px_30px_rgba(0,0,0,0.35)]">
               <div className="aspect-square w-full">
                 {ressource.photo ? (
                   <img
@@ -142,7 +142,7 @@ const RessourceHumaineViewDialog: React.FC<RessourceHumaineViewDialogProps> = ({
           </aside>
 
           <section className="flex min-h-0 flex-col">
-            <DialogHeader className="shrink-0 border-b border-ink-100 bg-white px-5 py-4 lg:px-6">
+            <DialogHeader className="shrink-0 border-b border-ink-100 bg-card px-5 py-4 lg:px-6">
               <div className="flex items-start justify-between gap-4">
                 <div className="min-w-0">
                   <DialogTitle className="text-xl font-bold text-ink-900">
@@ -166,7 +166,7 @@ const RessourceHumaineViewDialog: React.FC<RessourceHumaineViewDialogProps> = ({
 
             <div className="min-h-0 flex-1 space-y-5 overflow-y-auto px-5 py-5 lg:px-6">
               <div className="lg:hidden">
-                <div className="rounded-2xl border border-ink-100 bg-white p-4 shadow-sm">
+                <div className="rounded-2xl border border-ink-100 bg-card p-4 shadow-sm">
                   <div className="mb-4 flex items-start gap-4">
                     <Avatar className="size-16 shrink-0">
                       {ressource.photo ? (
@@ -337,7 +337,7 @@ const RessourceHumaineViewDialog: React.FC<RessourceHumaineViewDialogProps> = ({
               </DetailSection>
             </div>
 
-            <div className="flex shrink-0 items-center justify-end border-t border-ink-100 bg-white px-5 py-4 lg:px-6">
+            <div className="flex shrink-0 items-center justify-end border-t border-ink-100 bg-card px-5 py-4 lg:px-6">
               <Button type="button" onClick={onClose} variant="outline">
                 Fermer
               </Button>
