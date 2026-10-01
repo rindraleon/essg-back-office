@@ -55,6 +55,7 @@ export {
   validateName,
   validateOptionalAddress,
   validateOptionalBacNumber,
+  validateOptionalBordereau,
   validateOptionalDiplomaYear,
   validateOptionalEmail,
   validateOptionalEmailOrPhone,

@@ -369,8 +369,19 @@ const BordereauDetails: React.FC<{ details: Record<string, unknown> }> = ({ deta
   const montants = (details.montants as string[] | undefined) ?? [];
   const candidates = (details.candidates as string[] | undefined) ?? [];
   const isDuplicate = (details.isDuplicate as boolean | undefined) ?? false;
+  const referenceField = (details.referenceField as string | undefined) ?? null;
+  const detectedModel = (details.detectedModel as string | undefined) ?? null;
 
-  if (numbers.length === 0 && alphanumerics.length === 0) return null;
+  const modelLabels: Record<string, { label: string; color: string }> = {
+    boa: { label: 'Bank of Africa (BOA)', color: 'text-blue-700 bg-blue-50 border-blue-200' },
+    faby: { label: 'FABY / BNI', color: 'text-emerald-700 bg-emerald-50 border-emerald-200' },
+    bni: { label: 'BNI Madagascar', color: 'text-emerald-700 bg-emerald-50 border-emerald-200' },
+    generic: { label: 'Format générique', color: 'text-ink-700 bg-ink-50 border-ink-200' },
+    unknown: { label: 'Modèle non identifié', color: 'text-slate-600 bg-slate-50 border-slate-200' },
+  };
+  const modelMeta = detectedModel ? modelLabels[detectedModel] ?? modelLabels.unknown : null;
+
+  if (numbers.length === 0 && alphanumerics.length === 0 && !referenceField) return null;
   return (
     <div className="mt-3 rounded-lg border border-amber-100 bg-amber-50/50 p-3">
       <h6 className="mb-2 flex items-center gap-1.5 text-xs font-bold text-amber-900">
@@ -380,6 +391,21 @@ const BordereauDetails: React.FC<{ details: Record<string, unknown> }> = ({ deta
       {isDuplicate && (
         <p className="mb-2 rounded bg-red-100 px-2 py-1 text-xs font-semibold text-red-700">
           ⚠️ Unicité violée : bordereau déjà utilisé par une autre candidature
+        </p>
+      )}
+      {/* Champ Référence (prioritaire) */}
+      {referenceField && (
+        <div className="mb-2 rounded border border-blue-100 bg-blue-50 px-2.5 py-1.5">
+          <p className="text-[0.65rem] font-semibold uppercase tracking-wide text-blue-700">
+            Champ « Référence » détecté
+          </p>
+          <p className="mt-0.5 font-mono text-sm font-bold text-blue-900">{referenceField}</p>
+        </div>
+      )}
+      {/* Modèle détecté */}
+      {modelMeta && (
+        <p className="mb-2 inline-flex items-center gap-1 rounded border px-2 py-0.5 text-[0.65rem] font-semibold ${modelMeta.color}">
+          <Receipt className="size-3" /> Modèle : {modelMeta.label}
         </p>
       )}
       <div className="grid grid-cols-1 gap-2 text-[0.7rem] sm:grid-cols-2">
@@ -903,8 +929,10 @@ export const AdmissionVerificationSection: React.FC<Props> = ({ admission, hideB
                   <p className="flex items-start gap-1.5 rounded-lg bg-slate-50 px-3 py-2 text-[0.7rem] leading-snug text-slate-600">
                     <Info className="mt-0.5 size-3 shrink-0" aria-hidden="true" />
                     Unicité stricte : un même numéro de bordereau ne peut servir qu’à une seule
-                    candidature. Le système extrait tous les chiffres/alphanumériques, dates et
-                    montants du document pour fiabiliser la détection.
+                    candidature. Le système accepte les deux modèles (Bank of Africa / FABY-BNI) et
+                    se base sur le champ « Référence » pour identifier le numéro. L’extraction
+                    analyse chiffres, alphanumériques, dates et montants pour fiabiliser la
+                    détection.
                   </p>
                 </Block>
               )}
@@ -952,7 +980,7 @@ export const AdmissionVerificationSection: React.FC<Props> = ({ admission, hideB
             <ul className="mx-auto mt-3 max-w-md list-disc list-inside text-left text-xs text-ink-500">
               <li>Infos personnelles (date/lieu avec formats multiples)</li>
               <li>BAC (numéro, année 4 chiffres, centre)</li>
-              <li>Bordereau complet (chiffres, refs, dates, montants — unicité)</li>
+              <li>Bordereau complet — accepte les 2 modèles (Bank of Africa / FABY-BNI), référence prioritaire, unicité</li>
               <li>Relevé détaillé (toutes matières, coeffs, moyenne fiable)</li>
             </ul>
           </div>
