@@ -88,7 +88,9 @@ const FormationViewDialog: React.FC<FormationViewDialogProps> = ({ open, onClose
                     variant="outline"
                     className="rounded-full border-white/20 bg-white/5 text-white"
                   >
-                    {formation.domaine}
+                    {formation.parcours?.mention?.nom ??
+                      formation.mention ??
+                      formation.domaine.join(', ')}
                   </Badge>
                 </div>
               </div>
@@ -193,7 +195,9 @@ const FormationViewDialog: React.FC<FormationViewDialogProps> = ({ open, onClose
                       </Badge>
 
                       <Badge variant="outline" className="rounded-full">
-                        {formation.domaine}
+                        {formation.parcours?.mention?.nom ??
+                          formation.mention ??
+                          formation.domaine.join(', ')}
                       </Badge>
 
                       {formation.enVedette && (

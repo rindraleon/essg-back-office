@@ -4,6 +4,18 @@ export const queryKeys = {
     list: () => [...queryKeys.formations.all, 'list'] as const,
     detail: (id: number) => [...queryKeys.formations.all, 'detail', id] as const,
   },
+  mentions: {
+    all: ['mentions'] as const,
+    list: (search: string, filters: object) =>
+      [...queryKeys.mentions.all, 'list', search, filters] as const,
+    detail: (id: number) => [...queryKeys.mentions.all, 'detail', id] as const,
+    options: () => [...queryKeys.mentions.all, 'options'] as const,
+    domaines: () => [...queryKeys.mentions.all, 'domaines'] as const,
+  },
+  parcours: {
+    all: ['parcours'] as const,
+    byMention: (mentionId: number) => [...queryKeys.parcours.all, 'mention', mentionId] as const,
+  },
   actualites: {
     all: ['actualites'] as const,
     list: () => [...queryKeys.actualites.all, 'list'] as const,

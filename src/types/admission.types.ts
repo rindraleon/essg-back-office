@@ -92,7 +92,11 @@ export const REQUIRED_ADMISSION_FILE_TYPES: readonly AdmissionFileType[] = [
 export const ADMISSION_SOURCE_LABELS: Record<string, string> = {
   soifee: 'SOIFEE',
   'evenement-universite': 'Évènement université',
+  'porte-ouverte': 'Journée Porte Ouverte',
+  facebook: 'Page Facebook ESSG',
   radio: 'Radio',
+  'radio-ambalavao': 'Hai Radio Ambalavao',
+  'radio-rofia': 'Radio Rofia',
   'salon-tana': 'Salon Tana',
   recommandation: 'Recommandation',
 };

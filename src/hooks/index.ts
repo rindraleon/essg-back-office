@@ -18,7 +18,19 @@ export {
   useLatestAdmissionVerification,
 } from './queries/useAdmissionsQuery';
 export { useDashboardStatsQuery, useRecentActivitiesQuery } from './queries/useDashboardQuery';
-export { useFormationMentionsQuery } from './queries/useFormationMentionsQuery';
+export {
+  useMentionsQuery,
+  useMentionDetailQuery,
+  useMentionOptionsQuery,
+  useMentionDomainesQuery,
+  useParcoursByMentionQuery,
+  useCreateMention,
+  useUpdateMention,
+  useDeleteMention,
+  useCreateParcours,
+  useUpdateParcours,
+  useDeleteParcours,
+} from './queries/useMentionsQuery';
 export {
   useFormationsQuery,
   useCreateFormation,
@@ -59,7 +71,8 @@ export {
 } from './queries/useUsersQuery';
 export { default as useDebounce } from './useDebounce';
 export { useFilter } from './useFilter';
-export { default as useFormationFilter } from './useFormationFilter';
+export { default as useFormationFilter, formationMentionNom } from './useFormationFilter';
+export { default as useMentionFilter } from './useMentionFilter';
 export { useFormValidation } from './useFormValidation';
 export type {
   ValidationRule,

@@ -270,6 +270,22 @@ const Header: React.FC = () => {
                 </DropdownMenuContent>
               </DropdownMenu>
 
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button
+                      type="button"
+                      onClick={() => navigate(routesStatic.aide)}
+                      aria-label="Aide"
+                      className="ml-1 inline-flex size-9 items-center justify-center rounded-full text-ink-500 transition-colors hover:bg-ink-50 hover:text-ink-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
+                    >
+                      <CircleHelp className="size-4" aria-hidden="true" />
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent>Aide</TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+
               <DropdownMenu>
                 <TooltipProvider>
                   <Tooltip>
@@ -497,7 +513,11 @@ const Header: React.FC = () => {
 
                   <button
                     type="button"
-                    onClick={() => setOpen(false)}
+                    aria-label="Aide"
+                    onClick={() => {
+                      void navigate(routesStatic.aide);
+                      setOpen(false);
+                    }}
                     className="flex items-center gap-3 py-2.5 px-3 rounded-md text-sm font-medium text-ink-700 hover:bg-ink-50"
                   >
                     <CircleHelp className="size-4" />
@@ -507,7 +527,7 @@ const Header: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => {
-                      navigate(routesStatic.profil);
+                      void navigate(routesStatic.profil);
                       setOpen(false);
                     }}
                     className="flex items-center gap-3 py-2.5 px-3 rounded-md text-sm font-medium text-ink-700 hover:bg-ink-50"
@@ -520,7 +540,7 @@ const Header: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => {
-                        navigate(routesStatic.parametres);
+                        void navigate(routesStatic.parametres);
                         setOpen(false);
                       }}
                       className="flex items-center gap-3 py-2.5 px-3 rounded-md text-sm font-medium text-ink-700 hover:bg-ink-50"

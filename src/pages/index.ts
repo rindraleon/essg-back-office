@@ -4,6 +4,8 @@ export { default as Admissions } from './AdmissionsPage/Admissions';
 export { default as Contacts } from './ContactsPage/Contacts';
 export { default as Dashboard } from './DashboardPage/Dashboard';
 export { default as Formations } from './FormationsPage/Formations';
+export { default as MentionsParcours } from './MentionsParcoursPage/MentionsParcours';
+export { default as Aide } from './AidePage/Aide';
 export { default as Login } from './LoginPage/Login';
 export { default as Parametres } from './ParametresPage/Parametres';
 export { default as Partenaires } from './PartenairesPage/Partenaires';

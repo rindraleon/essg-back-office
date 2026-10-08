@@ -37,7 +37,11 @@ const FormationTable: React.FC<FormationTableProps> = ({
       render: (row) => (
         <div className="max-w-md">
           <span className="font-semibold text-ink-900 line-clamp-1">{row.titre}</span>
-          <p className="text-xs text-ink-500 line-clamp-1 mt-0.5">{row.domaine.join(', ')}</p>
+          {/* « Formation = Parcours » : seul le rattachement mention est
+              affiché ici, le parcours porterait deux fois le même libellé. */}
+          <p className="text-xs text-ink-500 line-clamp-1 mt-0.5">
+            {row.parcours?.mention?.nom ?? row.domaine.join(', ')}
+          </p>
         </div>
       ),
     },
@@ -85,10 +89,22 @@ const FormationTable: React.FC<FormationTableProps> = ({
       align: 'right',
       render: (row) => (
         <div className="flex justify-end gap-1">
-          <Button size="icon" variant="ghost" onClick={() => onView(row)} className="h-8 w-8">
+          <Button
+            size="icon"
+            variant="ghost"
+            onClick={() => onView(row)}
+            className="h-8 w-8"
+            aria-label={`Consulter la formation ${row.titre}`}
+          >
             <Eye className="size-4 h-4 w-4" />
           </Button>
-          <Button size="icon" variant="ghost" onClick={() => onEdit(row)} className="h-8 w-8">
+          <Button
+            size="icon"
+            variant="ghost"
+            onClick={() => onEdit(row)}
+            className="h-8 w-8"
+            aria-label={`Modifier la formation ${row.titre}`}
+          >
             <Pencil className="size-4 h-4 w-4" />
           </Button>
           <Button
@@ -96,6 +112,7 @@ const FormationTable: React.FC<FormationTableProps> = ({
             variant="ghost"
             onClick={() => onDelete(row)}
             className="h-8 w-8 text-red-600 hover:text-red-700"
+            aria-label={`Supprimer la formation ${row.titre}`}
           >
             <Trash2 className="size-4 h-4 w-4" />
           </Button>

@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 
 interface FormationFiltersProps {
   filters: FormationFilterOptions;
+  mentionOptions: string[];
   onUpdateFilter: (key: keyof FormationFilterOptions, value: string) => void;
   onResetFilters: () => void;
   activeFilterCount: number;
@@ -20,23 +21,9 @@ const niveaux = [
   { value: 'Doctorat', label: 'Doctorat' },
 ];
 
-const domaines = [
-  'Géomatique et agriculture durable',
-  'Géomatique et santé',
-  'Géomatique, ressources naturelles et assainissement',
-  'Cartographie numérique et développement',
-  'Géomatique et économie',
-  'Géomatique et bonne gouvernance',
-  'Géomatique, communication et marketing',
-  'Géo-entreprenariat',
-  "Système d'Information Géomatique et Décision",
-  "Ingénierie Géospatiale et Technologie d1'Informations",
-  'Géomatique et Intelligence Artificielle',
-  'Télédétection et SIG',
-];
-
 const FormationFilters: React.FC<FormationFiltersProps> = ({
   filters,
+  mentionOptions,
   onUpdateFilter,
   onResetFilters,
   activeFilterCount,
@@ -74,18 +61,18 @@ const FormationFilters: React.FC<FormationFiltersProps> = ({
           </div>
 
           <div className="space-y-2 w-full">
-            <Label>Domaine</Label>
+            <Label>Mention</Label>
             <Select
-              value={filters.domaine}
-              onValueChange={(value) => onUpdateFilter('domaine', value || '')}
+              value={filters.mention}
+              onValueChange={(value) => onUpdateFilter('mention', value || '')}
             >
               <SelectTrigger>
-                <SelectValue placeholder="Tous" />
+                <SelectValue placeholder="Toutes" />
               </SelectTrigger>
               <SelectContent>
-                {domaines.map((dom) => (
-                  <SelectItem key={dom} value={dom}>
-                    {dom}
+                {mentionOptions.map((mention) => (
+                  <SelectItem key={mention} value={mention}>
+                    {mention}
                   </SelectItem>
                 ))}
               </SelectContent>

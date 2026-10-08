@@ -14,7 +14,7 @@ export const BAC_TYPE_LABELS: Record<string, string> = {
 
 export const BAC_SERIES: Record<string, readonly string[]> = {
   general: ['a1', 'a2', 'c', 'd', 'l', 's', 'ose'],
-  technologique: ['tgc', 'tgi', 'tter'],
+  technologique: ['tgc', 'tgi', 'taef', 'tter'],
 };
 
 export const BAC_SERIE_LABELS: Record<string, string> = {
@@ -27,6 +27,7 @@ export const BAC_SERIE_LABELS: Record<string, string> = {
   ose: 'Série OSE',
   tgc: 'TGC — Génie Civil',
   tgi: 'TGI — Industriel',
+  taef: 'TAEF — Agricole, Élevage et Forêts',
   tter: 'TTER — Tertiaire',
 };
 

@@ -12,15 +12,17 @@ import { toast } from 'sonner';
 import { getImageUrl, formatFullName } from '@/utils';
 import { uploadImage } from '@/services';
 import type { Formation, FormationFormData, FormationFormProps } from '@/types';
-import { useFormValidation, useFormationMentionsQuery, useRessourcesHumainesQuery } from '@/hooks';
+import {
+  useFormValidation,
+  useMentionOptionsQuery,
+  useParcoursByMentionQuery,
+  useRessourcesHumainesQuery,
+} from '@/hooks';
 import {
   validateOptionalEmail,
   CONDITION_ACCES_OPTIONS,
   DUREE_OPTIONS,
   NIVEAU_OPTIONS,
-  findMentionByTitre,
-  getTitreOptions,
-  isTitreInMention,
 } from '@/constants';
 import { Button } from '../ui/button';
 import { Label } from '../ui/label';
@@ -40,16 +42,49 @@ const STEPS = [
 ];
 
 type ArrayField = 'objectifs' | 'debouches' | 'programme' | 'competences';
+interface FormationFormState extends FormationFormData {
+  mentionId: number | null;
+}
 
-type FormationField = keyof FormationFormData;
+type FormationField = keyof FormationFormState;
 
-function toFormDataSource(formation: Formation): FormationFormData {
+function toFormStateSource(formation: Formation): Partial<FormationFormState> {
   const source: Record<string, unknown> = { ...formation };
   delete source.id;
   delete source.slug;
   delete source.creeLe;
   delete source.misAJourLe;
-  return source as FormationFormData;
+  delete source.domaine;
+  delete source.parcours;
+  delete source.mention;
+  return source as Partial<FormationFormState>;
+}
+
+function mentionPlaceholder(loading: boolean, optionCount: number): string {
+  if (loading) return 'Chargement des mentions…';
+  if (optionCount === 0) return 'Aucune mention disponible';
+  return ' ';
+}
+
+function formationPlaceholder(hasMention: boolean, loading: boolean, optionCount: number): string {
+  if (!hasMention) return "Choisissez d'abord une mention";
+  if (loading) return 'Chargement des formations…';
+  if (optionCount === 0) return 'Aucune formation dans cette mention';
+  return ' ';
+}
+
+function formationHint(
+  hasError: boolean,
+  hasMention: boolean,
+  loading: boolean,
+  optionCount: number
+): string {
+  if (hasError) return 'Impossible de charger les formations — fermez et rouvrez le formulaire.';
+  if (!hasMention) return "Choisissez d'abord une mention pour activer ce champ.";
+  if (loading) return 'Chargement des formations…';
+  if (optionCount === 0)
+    return "Ajoutez d'abord un parcours à cette mention dans « Mentions / Parcours ».";
+  return 'Le titre de la formation correspond au nom du parcours sélectionné.';
 }
 
 /** Classes du bouton d'étape du stepper selon son état. */
@@ -60,15 +95,14 @@ function getStepButtonClass(isActive: boolean, isCompleted: boolean): string {
 }
 
 const STEP_FIELDS_MAP: Record<number, FormationField[]> = {
-  0: ['mention', 'titre', 'niveau', 'duree', 'credits', 'description'],
+  0: ['parcoursId', 'niveau', 'duree', 'credits', 'description'],
   1: ['objectifs', 'debouches'],
   2: ['email'],
 };
 
-const defaultFormData: FormationFormData = {
-  mention: '',
-  domaine: [],
-  titre: '',
+const defaultFormData: FormationFormState = {
+  parcoursId: 0,
+  mentionId: null,
   niveau: 'Licence',
   duree: '',
   description: '',
@@ -97,7 +131,9 @@ const FormationForm: React.FC<FormationFormProps> = ({
   const [uploadingImage, setUploadingImage] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
-  const { data: mentions = [] } = useFormationMentionsQuery();
+  const { data: mentions = [], isLoading: loadingMentions } = useMentionOptionsQuery({
+    enabled: open,
+  });
 
   const {
     data: ressources = [],
@@ -129,21 +165,12 @@ const FormationForm: React.FC<FormationFormProps> = ({
     validateAllSteps,
     setFormData,
     resetForm,
-  } = useFormValidation<FormationFormData>({
+  } = useFormValidation<FormationFormState>({
     defaultValues: defaultFormData,
     validators: {
-      mention: { required: true },
-      titre: {
-        required: true,
-        custom: (value, data) => {
-          const titre = value as string;
-          const mention = (data as FormationFormData).mention;
-          if (!titre) return 'Le titre est requis';
-          if (mention && !isTitreInMention(mention, titre, mentions)) {
-            return "Ce titre n'appartient pas à la mention sélectionnée";
-          }
-          return undefined;
-        },
+      parcoursId: {
+        custom: (value) =>
+          Number(value) > 0 ? undefined : 'Sélectionnez la formation (parcours de la mention).',
       },
       niveau: { required: true },
       duree: { required: true },
@@ -176,17 +203,19 @@ const FormationForm: React.FC<FormationFormProps> = ({
     stepFields: STEP_FIELDS_MAP,
   });
 
+  const {
+    data: parcours = [],
+    isLoading: loadingParcours,
+    isError: parcoursError,
+  } = useParcoursByMentionQuery(open ? formData.mentionId : null);
+
   const initialId = initialData?.id ?? '';
 
   useEffect(() => {
     if (!open) return;
 
     if (mode === 'edit' && initialData) {
-      const rest = toFormDataSource(initialData);
-
-      const mention =
-        rest.mention || rest.domaine?.[0] || findMentionByTitre(rest.titre, mentions)?.label || '';
-
+      const rest = toFormStateSource(initialData);
       const legacyCondition = (initialData.conditionsAcces ?? '').trim();
       const conditions = [...(rest.conditions ?? [])];
       if (legacyCondition && !conditions.some((item) => item.trim() === legacyCondition)) {
@@ -196,7 +225,8 @@ const FormationForm: React.FC<FormationFormProps> = ({
       setFormData({
         ...defaultFormData,
         ...rest,
-        mention,
+        mentionId: initialData.parcours?.mentionId ?? null,
+        parcoursId: initialData.parcoursId ?? 0,
         conditions: conditions.map((item) => item.trim()).filter(Boolean),
         competences: rest.competences?.length ? rest.competences : [''],
         programme: rest.programme?.length ? rest.programme : [''],
@@ -213,23 +243,44 @@ const FormationForm: React.FC<FormationFormProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, mode, initialId]);
 
-  const titreOptions = useMemo(
-    () => getTitreOptions(formData.mention, mentions),
-    [formData.mention, mentions]
-  );
-
   const mentionOptions = useMemo(
-    () => mentions.map((mention) => ({ value: mention.label, label: mention.label })),
+    () =>
+      mentions.map((mention) => ({
+        value: String(mention.id),
+        label: mention.domaine ? `${mention.nom} — ${mention.domaine}` : mention.nom,
+      })),
     [mentions]
   );
 
-  const handleMentionChange = (mention: string) => {
-    const keepTitre = isTitreInMention(mention, formData.titre, mentions);
+  const parcoursOptions = useMemo(() => {
+    const options = parcours
+      .filter((item) => item.isActive)
+      .map((item) => ({ value: String(item.id), label: item.nom }));
+    if (
+      formData.parcoursId > 0 &&
+      initialData?.parcours &&
+      !options.some((option) => option.value === String(formData.parcoursId))
+    ) {
+      options.push({ value: String(formData.parcoursId), label: initialData.parcours.nom });
+    }
+    return options;
+  }, [parcours, formData.parcoursId, initialData]);
+
+  const handleMentionChange = (mentionId: string) => {
+    const nextId = Number(mentionId);
+    if (nextId === formData.mentionId) return;
+    const keepParcours =
+      formData.parcoursId > 0 &&
+      initialData?.parcoursId === formData.parcoursId &&
+      initialData.parcours?.mentionId === nextId;
     handleChanges({
-      mention,
-      domaine: [mention],
-      titre: keepTitre ? formData.titre : '',
+      mentionId: nextId,
+      parcoursId: keepParcours ? formData.parcoursId : 0,
     });
+  };
+
+  const handleParcoursChange = (parcoursId: string) => {
+    handleChange('parcoursId', Number(parcoursId) || 0);
   };
 
   const handleResponsableChange = (value: string | null, option: SearchSelectOption | null) => {
@@ -267,7 +318,10 @@ const FormationForm: React.FC<FormationFormProps> = ({
       setImagePreview(getImageUrl(url));
       toast.success('Image téléversée avec succès');
     } catch (err) {
-      console.warn('Échec dans handleImageUpload — poursuite en mode dégradé', err instanceof Error ? err.message : err);
+      console.warn(
+        'Échec dans handleImageUpload — poursuite en mode dégradé',
+        err instanceof Error ? err.message : err
+      );
       toast.error(err instanceof Error ? err.message : "Échec du téléversement de l'image.");
     } finally {
       setUploadingImage(false);
@@ -300,9 +354,12 @@ const FormationForm: React.FC<FormationFormProps> = ({
     setSubmitting(true);
     try {
       const clean = (items?: string[]) => (items ?? []).map((i) => i.trim()).filter(Boolean);
+      const serverFields: Record<string, unknown> = { ...formData };
+      delete serverFields.mentionId;
+      delete serverFields.titre;
       await onSubmit({
-        ...formData,
-        domaine: formData.mention ? [formData.mention] : [],
+        ...(serverFields as unknown as FormationFormData),
+        parcoursId: formData.parcoursId,
         objectifs: clean(formData.objectifs),
         debouches: clean(formData.debouches),
         conditions: clean(formData.conditions),
@@ -318,27 +375,36 @@ const FormationForm: React.FC<FormationFormProps> = ({
 
   const renderStep0 = () => (
     <div className="space-y-1">
-      <FloatingSelect
-        label="Mention / Domaine *"
-        value={formData.mention ?? ''}
-        onValueChange={(v) => v && handleMentionChange(v)}
-        options={mentionOptions}
-        error={errors.mention}
-        hint="Sélectionnez d'abord la mention pour accéder aux titres associés"
-      />
+      <div className="grid grid-cols-1 items-start gap-x-3 sm:grid-cols-2">
+        <FloatingSelect
+          label="Mention *"
+          value={formData.mentionId ? String(formData.mentionId) : ''}
+          onValueChange={(v) => v && handleMentionChange(v)}
+          options={mentionOptions}
+          error={errors.parcoursId && !formData.mentionId ? errors.parcoursId : undefined}
+          placeholder={mentionPlaceholder(loadingMentions, mentionOptions.length)}
+          hint="Sélectionnez la mention, puis la formation (parcours) associée."
+        />
 
-      <FloatingSelect
-        label="Titre de la formation *"
-        value={formData.titre}
-        onValueChange={(v) => v && handleChange('titre', v)}
-        options={titreOptions}
-        error={errors.titre}
-        hint={
-          formData.mention
-            ? `${titreOptions.length} titre(s) disponible(s) pour cette mention`
-            : 'Choisissez une mention pour activer ce champ'
-        }
-      />
+        <FloatingSelect
+          label="Titre de la formation (parcours) *"
+          value={formData.parcoursId ? String(formData.parcoursId) : ''}
+          onValueChange={(v) => v && handleParcoursChange(v)}
+          options={parcoursOptions}
+          error={errors.parcoursId}
+          placeholder={formationPlaceholder(
+            Boolean(formData.mentionId),
+            loadingParcours,
+            parcoursOptions.length
+          )}
+          hint={formationHint(
+            parcoursError,
+            Boolean(formData.mentionId),
+            loadingParcours,
+            parcoursOptions.length
+          )}
+        />
+      </div>
 
       <div className="grid grid-cols-1 items-start gap-x-3 sm:grid-cols-2">
         <FloatingSelect

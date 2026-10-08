@@ -8,6 +8,8 @@ const routesStatic = {
   ressourcesHumaines: '/ressources-humaines',
   utilisateurs: '/utilisateurs',
   formations: '/formations',
+  mentionsParcours: '/mentions-parcours',
+  aide: '/aide',
   projets: '/projets',
   partenaires: '/partenaires',
   contacts: '/contacts',

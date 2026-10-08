@@ -15,6 +15,15 @@ export interface FloatingSelectProps {
   id?: string;
 }
 
+/**
+ * Select flottant — mêmes règles que FloatingInput :
+ * - l'identifiant technique n'est jamais affiché : la zone de saisie montre
+ *   toujours le libellé complet résolu depuis les options (avant comme après
+ *   la sélection ; si les options ne sont pas encore chargées, le placeholder
+ *   reprend la main plutôt que de laisser voir un id brut) ;
+ * - le libellé « flotte » dès qu'un texte (sélection ou placeholder
+ *   informatif) occupe la zone, ce qui exclut toute superposition des deux.
+ */
 const FloatingSelect: React.FC<FloatingSelectProps> = ({
   label,
   value,
@@ -30,6 +39,13 @@ const FloatingSelect: React.FC<FloatingSelectProps> = ({
   const selectId = id ?? `floating-select-${autoId.replace(/[^a-zA-Z0-9-]/g, '')}`;
   const errorId = `${selectId}-error`;
   const hasValue = Boolean(value);
+  const placeholderText = typeof placeholder === 'string' ? placeholder.trim() : '';
+  const selectedLabel = hasValue
+    ? (options.find((opt) => opt.value === value)?.label ?? null)
+    : null;
+  // Le libellé monte si une valeur est choisie ou si un placeholder doit être
+  // lu dans la zone : les deux textes ne peuvent alors jamais se chevaucher.
+  const floated = hasValue || placeholderText !== '';
 
   return (
     <div className="relative w-full pt-2">
@@ -38,6 +54,7 @@ const FloatingSelect: React.FC<FloatingSelectProps> = ({
           id={selectId}
           aria-invalid={error ? true : undefined}
           aria-describedby={error ? errorId : undefined}
+          title={selectedLabel ?? undefined}
           className={cn(
             'h-12 min-h-12 w-full bg-card px-3 pt-5 pb-2 text-sm',
             'focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20',
@@ -45,11 +62,19 @@ const FloatingSelect: React.FC<FloatingSelectProps> = ({
             className
           )}
         >
-          <SelectValue placeholder={placeholder} />
+          {/* Rendu maîtrisé du texte : libellé complet, jamais la valeur brute. */}
+          <SelectValue placeholder={placeholder}>
+            {() => selectedLabel ?? (placeholderText !== '' ? placeholder : ' ')}
+          </SelectValue>
         </SelectTrigger>
         <SelectContent className="bg-card">
           {options.map((opt) => (
-            <SelectItem key={opt.value} value={opt.value} className="hover:bg-ink-100">
+            <SelectItem
+              key={opt.value}
+              value={opt.value}
+              className="hover:bg-ink-100"
+              title={opt.label}
+            >
               {opt.label}
             </SelectItem>
           ))}
@@ -58,7 +83,7 @@ const FloatingSelect: React.FC<FloatingSelectProps> = ({
       <span
         className={cn(
           'pointer-events-none absolute left-3 origin-[0] transition-all duration-200',
-          hasValue
+          floated
             ? 'top-0 bg-card px-1 text-xs font-bold text-brand-700'
             : 'top-[1.35rem] text-sm text-ink-400',
           error && 'text-red-500'

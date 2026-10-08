@@ -16,6 +16,8 @@ const Actualites = lazy(() => import('@/pages/ActualitesPage/Actualites'));
 const RessourcesHumaines = lazy(() => import('@/pages/RessourcesHumainesPage/RessourcesHumaines'));
 const Utilisateurs = lazy(() => import('@/pages/UtilisateursPage/Utilisateurs'));
 const Formations = lazy(() => import('@/pages/FormationsPage/Formations'));
+const MentionsParcours = lazy(() => import('@/pages/MentionsParcoursPage/MentionsParcours'));
+const Aide = lazy(() => import('@/pages/AidePage/Aide'));
 const Projets = lazy(() => import('@/pages/ProjetsPage/Projets'));
 const Partenaires = lazy(() => import('@/pages/PartenairesPage/Partenaires'));
 const Contacts = lazy(() => import('@/pages/ContactsPage/Contacts'));
@@ -168,6 +170,28 @@ const AppRoutes = () => {
             <Layout showSidebar>
               <ProtectedRoute>
                 <Formations />
+              </ProtectedRoute>
+            </Layout>
+          }
+        />
+
+        <Route
+          path={routesStatic.mentionsParcours}
+          element={
+            <Layout showSidebar>
+              <ProtectedRoute>
+                <MentionsParcours />
+              </ProtectedRoute>
+            </Layout>
+          }
+        />
+
+        <Route
+          path={routesStatic.aide}
+          element={
+            <Layout showSidebar>
+              <ProtectedRoute>
+                <Aide />
               </ProtectedRoute>
             </Layout>
           }

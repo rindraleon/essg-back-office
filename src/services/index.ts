@@ -28,6 +28,19 @@ export type {
   VerificationGlobalStatus,
 } from './admissions.service';
 export { login, verifyToken } from './auth.service';
+export {
+  getMentions,
+  getMentionById,
+  getMentionOptions,
+  getMentionDomaines,
+  getParcoursByMention,
+  createMention,
+  updateMention,
+  deleteMention,
+  createParcours,
+  updateParcours,
+  deleteParcours,
+} from './mentions.service';
 export { getDashboardStats, getRecentActivities } from './dashboard.service';
 export {
   getAllFormations,

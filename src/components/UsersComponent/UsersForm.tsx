@@ -30,7 +30,7 @@ interface UsersFormProps {
 const ROLE_OPTIONS = [
   { label: 'Administrateur', value: 'admin' },
   { label: 'Éditeur', value: 'editeur' },
-  { label: 'Lecteur', value: 'lecteur' },
+  // { label: 'Lecteur', value: 'lecteur' },
 ];
 
 const defaultFormData: UserFormData = {
@@ -174,8 +174,11 @@ const UsersForm: React.FC<UsersFormProps> = ({ open, onClose, onSubmit, initialD
       ...(avatarFile && { avatarFile }),
     };
 
-    onSubmit(formDataToSubmit);
-    setUploading(false);
+    try {
+      await onSubmit(formDataToSubmit);
+    } finally {
+      setUploading(false);
+    }
   };
 
   const dialogTitle = mode === 'create' ? 'Nouvel utilisateur' : "Modifier l'utilisateur";

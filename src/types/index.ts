@@ -26,8 +26,28 @@ export type {
   FormationFormData,
   FormationFilterOptions,
   FormationFormProps,
+  FormationMentionRef,
+  FormationParcoursRef,
   FormErrors,
 } from './formation.types';
+export type {
+  Mention,
+  MentionFormData,
+  MentionFormationSummary,
+  MentionTableProps,
+  MentionViewDialogProps,
+  MentionFilterOptions,
+  MentionFormProps,
+  MentionOption,
+  MentionParcoursDetail,
+  MentionParcoursInput,
+  MentionParcoursSummary,
+  MentionQueryFilters,
+  Parcours,
+  ParcoursEditTarget,
+  ParcoursFormData,
+  ParcoursFormDialogProps,
+} from './mention.types';
 export type { LayoutProps } from './layout.types';
 export type { Actualite, NewsResponse } from './news.types';
 export type {

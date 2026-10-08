@@ -2,7 +2,7 @@ export { exportAdmissionsByParcours } from './admission-export.utils';
 export { getFileExtension, formatFileSize } from './admission.utils';
 export { parseCvText } from './cv-parser.utils';
 export type { ParsedExperience, ParsedCv } from './cv-parser.utils';
-export { formatDate, formatRelativeTime } from './date.utils';
+export { formatDate, formatDateCourt, formatRelativeTime } from './date.utils';
 export {
   ACCEPTED_IMAGE_MIME_TYPES,
   MAX_IMAGE_UPLOAD_SIZE,
@@ -11,6 +11,7 @@ export {
   getImageUrl,
 } from './image.utils';
 export { formatFullName, getPersonInitials } from './name.utils';
+export { normalizeMentionNom } from './mention.utils';
 export { filterBySearchTerm as filterPartnersBySearchTerm } from './partenaire.utils';
 export {
   getTypeColor,

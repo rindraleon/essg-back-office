@@ -155,3 +155,9 @@ export {
 } from '../constants/presence.constants';
 export { default as SessionRealtimeProvider } from './common/SessionRealtimeProvider';
 export { default as UserSessionsDialog } from './UsersComponent/UserSessionsDialog';
+
+// MentionsParcoursComponents
+export { default as MentionForm } from './MentionsParcoursComponents/MentionForm';
+export { default as MentionTable } from './MentionsParcoursComponents/MentionTable';
+export { default as MentionViewDialog } from './MentionsParcoursComponents/MentionViewDialog';
+export { default as ParcoursFormDialog } from './MentionsParcoursComponents/ParcoursFormDialog';

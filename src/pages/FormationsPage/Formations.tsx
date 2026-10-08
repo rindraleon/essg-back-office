@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useMemo, useState, useCallback } from 'react';
 import { toast } from 'sonner';
 import {
   FormationFilters,
@@ -11,6 +11,7 @@ import {
 import {
   usePagination,
   useFormationFilter,
+  formationMentionNom,
   useScrollToTop,
   useCreateFormation,
   useDeleteFormation,
@@ -42,6 +43,14 @@ const Formations: React.FC = () => {
       data,
       searchTerm,
     });
+
+  const mentionOptions = useMemo(
+    () =>
+      [...new Set(data.map(formationMentionNom).filter(Boolean))].sort((a, b) =>
+        a.localeCompare(b, 'fr')
+      ),
+    [data]
+  );
 
   const {
     currentPage,
@@ -86,12 +95,18 @@ const Formations: React.FC = () => {
     if (formationToDelete) {
       try {
         await deleteMutation.mutateAsync(formationToDelete.id);
-        toast.success(`"${formationToDelete.titre}" a été supprimée avec succès`);
+        toast.success(`« ${formationToDelete.titre} » supprimée avec succès.`);
         setDeleteDialogOpen(false);
         setFormationToDelete(null);
       } catch (error) {
-        toast.error('Erreur lors de la suppression');
+        // Les messages du backend sont déjà rédigés pour l'utilisateur ;
+        // les détails techniques restent dans la console.
         console.error('Error deleting formation:', error);
+        toast.error(
+          error instanceof Error && error.message
+            ? error.message
+            : 'Impossible de supprimer la formation. Veuillez réessayer.'
+        );
       }
     }
   }, [formationToDelete, deleteMutation]);
@@ -101,15 +116,19 @@ const Formations: React.FC = () => {
       try {
         if (formMode === 'create') {
           await createMutation.mutateAsync(formData);
-          toast.success('Formation créée avec succès');
+          toast.success('Formation créée avec succès.');
         } else if (selectedFormation) {
           await updateMutation.mutateAsync({ id: selectedFormation.id, data: formData });
-          toast.success('Formation modifiée avec succès');
+          toast.success('Formation modifiée avec succès.');
         }
         setFormOpen(false);
       } catch (error) {
-        toast.error("Erreur lors de l'enregistrement");
         console.error('Error saving formation:', error);
+        toast.error(
+          error instanceof Error && error.message
+            ? error.message
+            : "Impossible d'enregistrer la formation. Vérifiez les informations puis réessayez."
+        );
       }
     },
     [formMode, selectedFormation, createMutation, updateMutation]
@@ -131,7 +150,7 @@ const Formations: React.FC = () => {
         totalCount={filteredData.length}
         searchValue={searchTerm}
         onSearchChange={handleSearchChange}
-        searchPlaceholder="Rechercher par titre, domaine..."
+        searchPlaceholder="Rechercher par titre, mention, parcours..."
         onToggleFilters={handleToggleFilters}
         filtersOpen={filtersOpen}
         activeFilterCount={activeFilterCount}
@@ -143,6 +162,7 @@ const Formations: React.FC = () => {
         <div className="rounded-xl border border-ink-100 bg-card p-4 shadow-card">
           <FormationFilters
             filters={filters}
+            mentionOptions={mentionOptions}
             onUpdateFilter={(key, value) => {
               updateFilter(key, value);
               resetPage();

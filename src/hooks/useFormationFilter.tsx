@@ -3,9 +3,14 @@ import type { Formation, FormationFilterOptions } from '@/types';
 
 const initialFilters: FormationFilterOptions = {
   niveau: '',
-  domaine: '',
+  mention: '',
   enVedette: '',
 };
+
+/** Nom de la mention rattachée à une formation (source : parcours). */
+export function formationMentionNom(item: Formation): string {
+  return item.parcours?.mention?.nom ?? item.mention ?? item.domaine?.[0] ?? '';
+}
 
 interface UseFormationFilterProps {
   data: Formation[];
@@ -44,20 +49,23 @@ const useFormationFilter = ({
 
     if (searchTerm) {
       const term = searchTerm.toLowerCase();
-      result = result.filter(
-        (item) =>
+      result = result.filter((item) => {
+        const parcoursNom = item.parcours?.nom ?? '';
+        return (
           item.titre.toLowerCase().includes(term) ||
-          item.domaine.some((d) => d.toLowerCase().includes(term)) ||
+          formationMentionNom(item).toLowerCase().includes(term) ||
+          parcoursNom.toLowerCase().includes(term) ||
           item.description.toLowerCase().includes(term)
-      );
+        );
+      });
     }
 
     if (filters.niveau) {
       result = result.filter((item) => item.niveau === filters.niveau);
     }
 
-    if (filters.domaine) {
-      result = result.filter((item) => item.domaine.includes(filters.domaine));
+    if (filters.mention) {
+      result = result.filter((item) => formationMentionNom(item) === filters.mention);
     }
 
     if (filters.enVedette !== '') {
