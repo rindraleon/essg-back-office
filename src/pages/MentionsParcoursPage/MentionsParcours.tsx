@@ -21,7 +21,8 @@ import {
   useTitle,
   useUpdateMention,
   useUpdateParcours,
- useMentionFilter } from '@/hooks';
+  useMentionFilter,
+} from '@/hooks';
 import type { Mention, MentionFormData, ParcoursEditTarget, ParcoursFormData } from '@/types';
 import { Label } from '@/components/ui/label';
 import {
@@ -32,6 +33,8 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
+import { useAuth } from '@/contexts';
+import { PERMISSIONS } from '@/constants';
 
 const MentionFiltersPanel: React.FC<{
   value: { isActive: string; domaine: string };
@@ -77,6 +80,10 @@ const MentionFiltersPanel: React.FC<{
 const MentionsParcours: React.FC = () => {
   useScrollToTop();
   useTitle('Mentions / Parcours');
+  const { hasPermission } = useAuth();
+  const canCreate = hasPermission(PERMISSIONS.CONTENT_CREATE);
+  const canUpdate = hasPermission(PERMISSIONS.CONTENT_UPDATE);
+  const canDelete = hasPermission(PERMISSIONS.CONTENT_DELETE);
 
   const { data: mentions = [], isLoading, isError, refetch } = useMentionsQuery();
   const { data: domaines = [] } = useMentionDomainesQuery();
@@ -177,6 +184,7 @@ const MentionsParcours: React.FC = () => {
             ? 'Impossible de créer la mention.'
             : 'Impossible de mettre à jour la mention.';
         toast.error(error instanceof Error ? error.message : fallback);
+        throw error;
       }
     },
     [formMode, selectedMention, createMention, updateMention]
@@ -220,6 +228,7 @@ const MentionsParcours: React.FC = () => {
         toast.error(
           error instanceof Error ? error.message : 'Impossible d’enregistrer le parcours.'
         );
+        throw error;
       }
     },
     [parcoursMode, selectedParcours, createParcours, updateParcours, viewOpen, selectedMention]
@@ -228,6 +237,7 @@ const MentionsParcours: React.FC = () => {
   return (
     <div className="mx-auto min-w-0 max-w-7xl space-y-2 py-4">
       <ListPageHeader
+        loading={isLoading}
         title="Mentions / Parcours"
 
         totalCount={filteredData.length}
@@ -241,8 +251,8 @@ const MentionsParcours: React.FC = () => {
         onToggleFilters={() => setFiltersOpen((prev) => !prev)}
         filtersOpen={filtersOpen}
         activeFilterCount={activeFilterCount}
-        actionLabel="Nouvelle mention"
-        onAction={handleOpenCreate}
+        actionLabel={canCreate ? 'Nouvelle mention' : undefined}
+        onAction={canCreate ? handleOpenCreate : undefined}
         actionIcon={<Network className="h-4 w-4" />}
       />
 
@@ -293,18 +303,17 @@ const MentionsParcours: React.FC = () => {
           onPageChange={handleChangePage}
           onRowsPerPageChange={handleChangeRowsPerPage}
           onView={handleView}
-          onEdit={handleOpenEdit}
-          onDelete={handleDeleteRequest}
+          onEdit={canUpdate ? handleOpenEdit : undefined}
+          onDelete={canDelete ? handleDeleteRequest : undefined}
         />
       )}
 
       <MentionForm
         open={formOpen}
-        onClose={() => !createMention.isPending && !updateMention.isPending && setFormOpen(false)}
+        onClose={() => setFormOpen(false)}
         onSubmit={handleMentionSubmit}
         initialData={selectedMention}
         mode={formMode}
-        submitting={createMention.isPending || updateMention.isPending}
       />
 
       <MentionViewDialog
@@ -321,15 +330,12 @@ const MentionsParcours: React.FC = () => {
 
       <ParcoursFormDialog
         open={parcoursFormOpen}
-        onClose={() =>
-          !createParcours.isPending && !updateParcours.isPending && setParcoursFormOpen(false)
-        }
+        onClose={() => setParcoursFormOpen(false)}
         onSubmit={handleParcoursSubmit}
         initialData={selectedParcours}
         lockedMentionId={lockedMention?.id ?? null}
         lockedMentionName={lockedMention?.nom ?? null}
         mode={parcoursMode}
-        submitting={createParcours.isPending || updateParcours.isPending}
       />
 
       <ConfirmDialog

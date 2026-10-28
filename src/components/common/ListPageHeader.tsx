@@ -1,6 +1,7 @@
 import { Filter, Plus } from 'lucide-react';
 import React from 'react';
 import { Button } from '../ui/button';
+import { Skeleton } from '../ui/skeleton';
 import SearchInput from './SearchInput';
 import { cn } from '@/lib';
 
@@ -8,6 +9,7 @@ interface ListPageHeaderProps {
   title: string;
   description?: string;
   totalCount: number;
+  loading?: boolean;
   countLabel?: string;
   searchValue: string;
   onSearchChange: (value: string) => void;
@@ -26,6 +28,7 @@ const ListPageHeader: React.FC<ListPageHeaderProps> = ({
   title,
   description,
   totalCount,
+  loading = false,
   countLabel = 'résultat',
   searchValue,
   onSearchChange,
@@ -52,13 +55,17 @@ const ListPageHeader: React.FC<ListPageHeaderProps> = ({
       <div className="flex min-w-0 shrink-0 flex-col gap-0.5">
         <div className="flex min-w-0 items-baseline gap-2">
           <h2 className="truncate text-base font-semibold text-ink-900">{title}</h2>
-          <span
-            data-numeric
-            className="shrink-0 whitespace-nowrap text-sm font-normal text-ink-500"
-          >
-            ({totalCount} {countLabel}
-            {plural})
-          </span>
+          {loading ? (
+            <Skeleton className="h-4 w-20" />
+          ) : (
+            <span
+              data-numeric
+              className="shrink-0 whitespace-nowrap text-sm font-normal text-ink-500"
+            >
+              ({totalCount} {countLabel}
+              {plural})
+            </span>
+          )}
         </div>
         {description && (
           <p className="hidden max-w-prose truncate text-xs text-ink-500 sm:block">{description}</p>

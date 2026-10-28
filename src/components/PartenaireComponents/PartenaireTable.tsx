@@ -19,8 +19,11 @@ interface PartenaireTableProps {
   onPageChange: (page: number) => void;
   onRowsPerPageChange: (rows: number) => void;
   onView: (partenaire: Partenaire) => void;
-  onEdit: (partenaire: Partenaire) => void;
-  onDelete: (partenaire: Partenaire) => void;
+  onEdit?: (partenaire: Partenaire) => void;
+  onDelete?: (partenaire: Partenaire) => void;
+  loading?: boolean;
+  error?: boolean;
+  onRetry?: () => void;
 }
 
 const PartenaireTable: React.FC<PartenaireTableProps> = ({
@@ -33,6 +36,9 @@ const PartenaireTable: React.FC<PartenaireTableProps> = ({
   onView,
   onEdit,
   onDelete,
+  loading = false,
+  error = false,
+  onRetry,
 }) => {
   const columns = useMemo<Column<Partenaire>[]>(
     () => [
@@ -117,27 +123,31 @@ const PartenaireTable: React.FC<PartenaireTableProps> = ({
               </Tooltip>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    onClick={() => onEdit(row)}
-                    className="h-8 w-8"
-                  >
-                    <Pencil className="h-4 w-4" />
-                  </Button>
+                  {onEdit && (
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      onClick={() => onEdit(row)}
+                      className="h-8 w-8"
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                  )}
                 </TooltipTrigger>
                 <TooltipContent>Modifier</TooltipContent>
               </Tooltip>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    onClick={() => onDelete(row)}
-                    className="h-8 w-8 text-red-600 hover:text-red-700"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
+                  {onDelete && (
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      onClick={() => onDelete(row)}
+                      className="h-8 w-8 text-red-600 hover:text-red-700"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  )}
                 </TooltipTrigger>
                 <TooltipContent>Supprimer</TooltipContent>
               </Tooltip>
@@ -151,6 +161,9 @@ const PartenaireTable: React.FC<PartenaireTableProps> = ({
 
   return (
     <DataTable
+      loading={loading}
+      error={error}
+      onRetry={onRetry}
       columns={columns}
       data={data}
       totalCount={totalCount}

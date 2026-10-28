@@ -21,11 +21,17 @@ import {
   useUpdateProjet,
 } from '@/hooks';
 import type { ProjetFormData, Projet } from '@/types';
+import { useAuth } from '@/contexts';
+import { PERMISSIONS } from '@/constants';
 
 const Projets: React.FC = () => {
   useScrollToTop();
   useTitle('Projets');
-  const { data = [] } = useProjetsQuery();
+  const { hasPermission } = useAuth();
+  const canCreate = hasPermission(PERMISSIONS.CONTENT_CREATE);
+  const canUpdate = hasPermission(PERMISSIONS.CONTENT_UPDATE);
+  const canDelete = hasPermission(PERMISSIONS.CONTENT_DELETE);
+  const { data = [], isLoading, isError, refetch } = useProjetsQuery();
   const createMutation = useCreateProjet();
   const updateMutation = useUpdateProjet();
   const deleteMutation = useDeleteProjet();
@@ -111,6 +117,7 @@ const Projets: React.FC = () => {
       } catch (error) {
         toast.error("Erreur lors de l'enregistrement");
         console.error('Error saving projet:', error);
+        throw error;
       }
     },
     [formMode, selectedProjet, createMutation, updateMutation]
@@ -128,6 +135,7 @@ const Projets: React.FC = () => {
   return (
     <div className="mx-auto max-w-7xl py-4 space-y-2 mx-auto min-w-0">
       <ListPageHeader
+        loading={isLoading}
         title="Liste des projets"
         totalCount={filteredData.length}
         searchValue={searchTerm}
@@ -136,8 +144,8 @@ const Projets: React.FC = () => {
         onToggleFilters={handleToggleFilters}
         filtersOpen={filtersOpen}
         activeFilterCount={activeFilterCount}
-        actionLabel="Nouveau projet"
-        onAction={handleOpenCreate}
+        actionLabel={canCreate ? 'Nouveau projet' : undefined}
+        onAction={canCreate ? handleOpenCreate : undefined}
       />
 
       {filtersOpen && (
@@ -156,6 +164,11 @@ const Projets: React.FC = () => {
       )}
 
       <ProjetTable
+        loading={isLoading}
+
+        error={isError}
+
+        onRetry={() => void refetch()}
         data={paginatedData}
         totalCount={filteredData.length}
         page={currentPage}
@@ -163,8 +176,8 @@ const Projets: React.FC = () => {
         onPageChange={handleChangePage}
         onRowsPerPageChange={handleChangeRowsPerPage}
         onView={handleView}
-        onEdit={handleOpenEdit}
-        onDelete={handleDeleteRequest}
+        onEdit={canUpdate ? handleOpenEdit : undefined}
+        onDelete={canDelete ? handleDeleteRequest : undefined}
       />
 
       <ProjetForm

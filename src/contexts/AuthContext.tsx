@@ -4,6 +4,7 @@ import { login as loginService, verifyToken } from '@/services';
 import { logoutCurrentSession } from '@/services/session.service';
 import { setAuthToken, clearAuthToken, hasAuthToken, tryRestoreSession } from '@/api';
 import type { User } from '@/types';
+import type { Permission } from '@/constants/permissions.constants';
 
 export interface AuthContextType {
   isAuthenticated: boolean;
@@ -11,6 +12,7 @@ export interface AuthContextType {
   user: User | null;
   username: string;
   isAdmin: boolean;
+  hasPermission: (permission: Permission) => boolean;
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   updateUser: (patch: Partial<User>) => void;
@@ -99,6 +101,11 @@ function useAuthController(): AuthContextType {
     if (fresh) applyUser(fresh);
   }, [applyUser]);
 
+  const hasPermission = useCallback(
+    (permission: Permission) => user?.permissions?.includes(permission) ?? false,
+    [user]
+  );
+
   return useMemo(
     () => ({
       isAuthenticated,
@@ -106,12 +113,13 @@ function useAuthController(): AuthContextType {
       user,
       username: user?.email ?? '',
       isAdmin: user?.role === 'admin',
+      hasPermission,
       login,
       logout,
       updateUser,
       refreshUser,
     }),
-    [isAuthenticated, isLoading, user, login, logout, updateUser, refreshUser]
+    [isAuthenticated, isLoading, user, hasPermission, login, logout, updateUser, refreshUser]
   );
 }
 

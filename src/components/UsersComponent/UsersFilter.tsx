@@ -66,6 +66,7 @@ const UsersFilter: React.FC<UsersFilterProps> = ({
               <SelectContent>
                 <SelectItem value="admin">Administrateur</SelectItem>
                 <SelectItem value="editeur">Éditeur</SelectItem>
+                <SelectItem value="scolarite">Scolarité</SelectItem>
                 <SelectItem value="lecteur">Lecteur</SelectItem>
               </SelectContent>
             </Select>

@@ -6,8 +6,14 @@ import { getImageUrl, isValidSourceUrl } from '@/utils';
 import type { Projet, ProjetFormData, ProjectSource } from '@/types';
 import SourcesField from './SourcesField';
 import { PROJET_TYPES, PROJET_STATUTS, DEFAULT_FORM_DATA } from '@/constants';
-import { useFormValidation, usePartenairesQuery, type FieldValidators } from '@/hooks';
+import {
+  useFormValidation,
+  usePartenairesQuery,
+  useSaveStatus,
+  type FieldValidators,
+} from '@/hooks';
 import { Button } from '../ui/button';
+import { SaveButton } from '../ui/save-button';
 import { Label } from '../ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../ui/dialog';
 import { FloatingInput } from '../ui/floating-input';
@@ -28,12 +34,12 @@ interface ProjetFormProps {
 const STEPS = [
   {
     id: 0,
-    label: 'Informations',
+    label: 'Informations générales',
     icon: <Info className="h-4 w-4" />,
   },
   {
     id: 1,
-    label: 'Détails',
+    label: 'Détails du projet',
     icon: <Briefcase className="h-4 w-4" />,
   },
   {
@@ -150,8 +156,6 @@ const ProjetForm: React.FC<ProjetFormProps> = ({ open, onClose, onSubmit, initia
       resetForm();
       setImagePreview('');
     }
-    // Hydratation volontairement limitée à l'ouverture / au changement d'enregistrement.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, mode, initialId]);
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -164,7 +168,10 @@ const ProjetForm: React.FC<ProjetFormProps> = ({ open, onClose, onSubmit, initia
       setImagePreview(url);
       toast.success('Image téléversée avec succès');
     } catch (err) {
-      console.warn('Échec dans handleImageUpload — poursuite en mode dégradé', err instanceof Error ? err.message : err);
+      console.warn(
+        'Échec dans handleImageUpload — poursuite en mode dégradé',
+        err instanceof Error ? err.message : err
+      );
       const message = err instanceof Error ? err.message : "Échec du téléversement de l'image.";
       toast.error(message);
     } finally {
@@ -194,27 +201,22 @@ const ProjetForm: React.FC<ProjetFormProps> = ({ open, onClose, onSubmit, initia
     }
   };
 
-  const [submitting, setSubmitting] = useState(false);
+  const { status, run } = useSaveStatus();
+  const submitting = status === 'loading';
 
-  const handleSubmit = async () => {
+  const handleSubmit = () => {
     if (submitting || !validateAllSteps()) return;
-    setSubmitting(true);
-    try {
-      await onSubmit(formData);
-    } finally {
-      setSubmitting(false);
-    }
+    void run(() => onSubmit(formData));
   };
 
   const dialogTitle = mode === 'create' ? 'Nouveau projet' : 'Modifier le projet';
-  let submitLabel = mode === 'create' ? 'Créer' : 'Enregistrer';
-  if (submitting) submitLabel = 'Enregistrement...';
+  const submitLabel = mode === 'create' ? 'Créer' : 'Enregistrer';
 
   const renderStep0 = () => (
     <div className="space-y-1">
       <FloatingInput
         id="titre"
-        label="Titre *"
+        label="Titre du projet *"
         autoComplete="off"
         value={formData.titre}
         onChange={(e) => handleChange('titre', e.target.value)}
@@ -224,14 +226,14 @@ const ProjetForm: React.FC<ProjetFormProps> = ({ open, onClose, onSubmit, initia
 
       <div className="grid grid-cols-1 items-start gap-x-3 sm:grid-cols-2">
         <FloatingSelect
-          label="Type *"
+          label="Type du projet *"
           value={formData.type}
           onValueChange={(v) => v && handleChange('type', v)}
           options={[...PROJET_TYPES]}
           error={errors.type}
         />
         <FloatingSelect
-          label="Statut *"
+          label="Statut du projet *"
           value={formData.statut}
           onValueChange={(v) => v && handleChange('statut', v)}
           options={[...PROJET_STATUTS]}
@@ -242,7 +244,7 @@ const ProjetForm: React.FC<ProjetFormProps> = ({ open, onClose, onSubmit, initia
       <div className="grid grid-cols-1 items-start gap-x-3 sm:grid-cols-2">
         <FloatingInput
           id="date"
-          label="Date *"
+          label="Date du projet *"
           type="date"
           value={formData.date}
           onChange={(e) => handleChange('date', e.target.value)}
@@ -257,7 +259,7 @@ const ProjetForm: React.FC<ProjetFormProps> = ({ open, onClose, onSubmit, initia
     <div className="space-y-4">
       <FloatingTextarea
         id="description"
-        label="Description *"
+        label="Description du projet *"
         value={formData.description}
         onChange={(e) => handleChange('description', e.target.value)}
         onBlur={() => handleBlur('description')}
@@ -366,7 +368,7 @@ const ProjetForm: React.FC<ProjetFormProps> = ({ open, onClose, onSubmit, initia
 
         <FloatingInput
           id="adresse"
-          label="Adresse"
+          label="Adresse complète"
           value={formData.adresse || ''}
           onChange={(e) => handleChange('adresse', e.target.value)}
         />
@@ -463,12 +465,12 @@ const ProjetForm: React.FC<ProjetFormProps> = ({ open, onClose, onSubmit, initia
         <div className="px-5 py-4 overflow-y-auto max-h-[58vh]">{stepRenderers[activeStep]()}</div>
 
         <DialogFooter className="px-5 py-3 mb-4 mx-4 border-t bg-ink-50/80">
-          <div className="flex items-center justify-between w-full">
+          <div className="flex flex-wrap items-center justify-between gap-2 w-full">
             <span className="text-xs text-ink-400">
               {activeStep + 1}/{STEPS.length}
             </span>
 
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center justify-end gap-2 ml-auto">
               <Button
                 type="button"
                 variant="ghost"
@@ -506,16 +508,14 @@ const ProjetForm: React.FC<ProjetFormProps> = ({ open, onClose, onSubmit, initia
                   <ArrowRight className="h-3.5 w-3.5" />
                 </Button>
               ) : (
-                <Button
-                  type="button"
+                <SaveButton
                   size="sm"
+                  status={status}
+                  celebrate={mode === 'create'}
                   onClick={handleSubmit}
-                  disabled={submitting}
-                  className="gap-1 h-8 bg-brand-600 hover:bg-brand-700"
                 >
-                  <CircleCheck className="h-3.5 w-3.5" />
                   {submitLabel}
-                </Button>
+                </SaveButton>
               )}
             </div>
           </div>

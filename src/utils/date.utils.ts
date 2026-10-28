@@ -1,4 +1,3 @@
-
 const TIMEZONE = 'Indian/Antananarivo';
 const LOCALE = 'fr-FR';
 
@@ -21,9 +20,9 @@ export type DateInput = string | Date | number | null | undefined;
 
 function parseDate(input: DateInput): Date | null {
   if (!input) return null;
-  if (input instanceof Date) return isNaN(input.getTime()) ? null : input;
+  if (input instanceof Date) return Number.isNaN(input.getTime()) ? null : input;
   const d = new Date(input);
-  return isNaN(d.getTime()) ? null : d;
+  return Number.isNaN(d.getTime()) ? null : d;
 }
 
 /** Court : 09/09/2026 */
@@ -43,7 +42,7 @@ export function formatDateLong(input: DateInput): string {
   const d = parseDate(input);
   if (!d) return '—';
   const day = new Intl.DateTimeFormat(LOCALE, { timeZone: TIMEZONE, day: 'numeric' }).format(d);
-  const monthIndex = parseInt(
+  const monthIndex = Number.parseInt(
     new Intl.DateTimeFormat('en-US', { timeZone: TIMEZONE, month: 'numeric' }).format(d),
     10
   );

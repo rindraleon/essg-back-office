@@ -17,8 +17,11 @@ interface RessourceHumaineTableProps {
   onPageChange: (page: number) => void;
   onRowsPerPageChange: (rows: number) => void;
   onView: (ressource: RessourceHumaineItem) => void;
-  onEdit: (ressource: RessourceHumaineItem) => void;
-  onDelete: (ressource: RessourceHumaineItem) => void;
+  onEdit?: (ressource: RessourceHumaineItem) => void;
+  onDelete?: (ressource: RessourceHumaineItem) => void;
+  loading?: boolean;
+  error?: boolean;
+  onRetry?: () => void;
 }
 
 const RessourceHumaineTable: React.FC<RessourceHumaineTableProps> = ({
@@ -31,6 +34,9 @@ const RessourceHumaineTable: React.FC<RessourceHumaineTableProps> = ({
   onView,
   onEdit,
   onDelete,
+  loading = false,
+  error = false,
+  onRetry,
 }) => {
   const columns: Column<RessourceHumaineItem>[] = [
     {
@@ -95,22 +101,31 @@ const RessourceHumaineTable: React.FC<RessourceHumaineTableProps> = ({
             </Tooltip>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button size="icon" variant="ghost" onClick={() => onEdit(row)} className="h-8 w-8">
-                  <Pencil className="h-4 w-4" />
-                </Button>
+                {onEdit && (
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    onClick={() => onEdit(row)}
+                    className="h-8 w-8"
+                  >
+                    <Pencil className="h-4 w-4" />
+                  </Button>
+                )}
               </TooltipTrigger>
               <TooltipContent>Modifier</TooltipContent>
             </Tooltip>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button
-                  size="icon"
-                  variant="ghost"
-                  onClick={() => onDelete(row)}
-                  className="h-8 w-8 text-red-600 hover:text-red-700"
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
+                {onDelete && (
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    onClick={() => onDelete(row)}
+                    className="h-8 w-8 text-red-600 hover:text-red-700"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                )}
               </TooltipTrigger>
               <TooltipContent>Supprimer</TooltipContent>
             </Tooltip>
@@ -122,6 +137,9 @@ const RessourceHumaineTable: React.FC<RessourceHumaineTableProps> = ({
 
   return (
     <DataTable
+      loading={loading}
+      error={error}
+      onRetry={onRetry}
       columns={columns}
       data={data}
       totalCount={totalCount}

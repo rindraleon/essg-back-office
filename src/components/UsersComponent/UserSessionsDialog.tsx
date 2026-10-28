@@ -138,7 +138,10 @@ const UserSessionsDialog: React.FC<UserSessionsDialogProps> = ({ open, onClose, 
       toast.success('Session déconnectée. Les autres sessions restent actives.');
       setSessionToRevoke(null);
     } catch (error) {
-      console.warn('Échec dans handleRevokeOne — poursuite en mode dégradé', error instanceof Error ? error.message : error);
+      console.warn(
+        'Échec dans handleRevokeOne — poursuite en mode dégradé',
+        error instanceof Error ? error.message : error
+      );
       toast.error('Impossible de révoquer cette session');
     }
   };
@@ -149,7 +152,10 @@ const UserSessionsDialog: React.FC<UserSessionsDialogProps> = ({ open, onClose, 
       toast.success(`Toutes les sessions de ${formatFullName(user)} ont été déconnectées`);
       setConfirmRevokeAll(false);
     } catch (error) {
-      console.warn('Échec dans handleRevokeAll — poursuite en mode dégradé', error instanceof Error ? error.message : error);
+      console.warn(
+        'Échec dans handleRevokeAll — poursuite en mode dégradé',
+        error instanceof Error ? error.message : error
+      );
       toast.error('Impossible de révoquer toutes les sessions');
     }
   };

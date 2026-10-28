@@ -1,16 +1,17 @@
-import { GraduationCap, Loader2 } from 'lucide-react';
+import { GraduationCap } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { useSaveStatus } from '@/hooks';
 import { Button } from '../ui/button';
 import { Dialog, DialogBody, DialogContent, DialogFooter, DialogHeader } from '../ui/dialog';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
+import { SaveButton } from '../ui/save-button';
 import type { Admission, AdmissionStatus } from '@/types';
 import { formatFullName } from '@/utils';
 
 interface AdmissionDecisionDialogProps {
   admission: Admission;
   open: boolean;
-  submitting: boolean;
   onClose: () => void;
   onSubmit: (payload: {
     statut: AdmissionStatus;
@@ -26,10 +27,11 @@ interface AdmissionDecisionDialogProps {
 const AdmissionDecisionDialog = ({
   admission,
   open,
-  submitting,
   onClose,
   onSubmit,
 }: AdmissionDecisionDialogProps) => {
+  const { status, run } = useSaveStatus();
+  const submitting = status === 'loading';
   const [statut, setStatut] = useState<AdmissionStatus>(admission.statut);
   const [reponseDate, setReponseDate] = useState(admission.reponseDate ?? '');
   const [reponseHeure, setReponseHeure] = useState(admission.reponseHeure ?? '');
@@ -53,16 +55,18 @@ const AdmissionDecisionDialog = ({
 
   const accepted = statut === 'accepte';
 
-  const handleSubmit = async () => {
-    await onSubmit({
-      statut,
-      commentaire: reponseMessage || undefined,
-      reponseDate: accepted ? reponseDate || undefined : undefined,
-      reponseHeure: accepted ? reponseHeure || undefined : undefined,
-      reponseLieu: accepted ? reponseLieu || undefined : undefined,
-      reponseInstructions: accepted ? reponseInstructions || undefined : undefined,
-      reponseMessage: reponseMessage || undefined,
-    });
+  const handleSubmit = () => {
+    void run(() =>
+      onSubmit({
+        statut,
+        commentaire: reponseMessage || undefined,
+        reponseDate: accepted ? reponseDate || undefined : undefined,
+        reponseHeure: accepted ? reponseHeure || undefined : undefined,
+        reponseLieu: accepted ? reponseLieu || undefined : undefined,
+        reponseInstructions: accepted ? reponseInstructions || undefined : undefined,
+        reponseMessage: reponseMessage || undefined,
+      })
+    );
   };
 
   return (
@@ -163,18 +167,13 @@ const AdmissionDecisionDialog = ({
           <Button type="button" variant="outline" onClick={onClose} disabled={submitting}>
             Annuler
           </Button>
-          <Button
-            type="button"
-            onClick={() => void handleSubmit()}
-            disabled={submitting}
-            aria-busy={submitting}
+          <SaveButton
+            status={status}
+            loadingLabel="Envoi en cours…"
+            onClick={handleSubmit}
           >
-            {submitting && <Loader2 className="size-4 animate-spin" aria-hidden="true" />}
-            {(() => {
-              if (submitting) return 'Envoi en cours…';
-              return accepted ? 'Valider et envoyer' : 'Enregistrer et notifier';
-            })()}
-          </Button>
+            {accepted ? 'Valider et envoyer' : 'Enregistrer et notifier'}
+          </SaveButton>
         </DialogFooter>
       </DialogContent>
     </Dialog>

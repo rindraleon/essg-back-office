@@ -2,6 +2,7 @@ import { getAllAdmissions, type AdmissionQuery } from '@/services';
 import { formatBacSerie } from '@/constants';
 import type { Admission } from '@/types';
 import { ADMISSION_GENRE_LABELS, ADMISSION_SOURCE_LABELS } from '@/types';
+import { saveBlobAsFile } from './download.utils';
 
 const STATUS_LABELS: Record<Admission['statut'], string> = {
   en_attente: 'En attente',
@@ -25,7 +26,7 @@ async function loadAllAdmissions(query: AdmissionQuery): Promise<Admission[]> {
       page,
       limit: 100,
       sortBy: 'nom',
-      sortOrder: 'ASC',
+      sortOrder: 'DESC',
     });
     admissions.push(...result.data);
   }
@@ -130,11 +131,9 @@ export async function exportAdmissionsByParcours(
   const blob = new Blob([new Uint8Array(buffer)], {
     type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
   });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = `admissions-${safeFileName(parcours)}-${new Date().toISOString().slice(0, 10)}.xlsx`;
-  link.click();
-  URL.revokeObjectURL(url);
+  saveBlobAsFile(
+    blob,
+    `admissions-${safeFileName(parcours)}-${new Date().toISOString().slice(0, 10)}.xlsx`
+  );
   return admissions.length;
 }

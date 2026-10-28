@@ -66,24 +66,28 @@ const MentionTable: React.FC<MentionTableProps> = ({
           >
             <Eye className="size-4" />
           </Button>
-          <Button
-            size="icon"
-            variant="ghost"
-            onClick={() => onEdit(row)}
-            className="h-8 w-8"
-            aria-label={`Modifier la mention ${row.nom}`}
-          >
-            <Pencil className="size-4" />
-          </Button>
-          <Button
-            size="icon"
-            variant="ghost"
-            onClick={() => onDelete(row)}
-            className="h-8 w-8 text-red-600 hover:text-red-700"
-            aria-label={`Supprimer la mention ${row.nom}`}
-          >
-            <Trash2 className="size-4" />
-          </Button>
+          {onEdit && (
+            <Button
+              size="icon"
+              variant="ghost"
+              onClick={() => onEdit(row)}
+              className="h-8 w-8"
+              aria-label={`Modifier la mention ${row.nom}`}
+            >
+              <Pencil className="size-4" />
+            </Button>
+          )}
+          {onDelete && (
+            <Button
+              size="icon"
+              variant="ghost"
+              onClick={() => onDelete(row)}
+              className="h-8 w-8 text-red-600 hover:text-red-700"
+              aria-label={`Supprimer la mention ${row.nom}`}
+            >
+              <Trash2 className="size-4" />
+            </Button>
+          )}
         </div>
       ),
     },

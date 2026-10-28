@@ -9,6 +9,7 @@ import {
 
 const DEFAULT_API_URL = 'http://localhost:3000';
 const REQUEST_TIMEOUT = 15_000;
+const BLOB_REQUEST_TIMEOUT = 30_000;
 
 let accessToken: string | undefined;
 
@@ -19,6 +20,8 @@ const LEGACY_REFRESH_COOKIE = 'refresh_token';
 export type DocumentBlob = Blob & {
   inlineViewable: boolean;
   mimetype: string;
+  filename: string | null;
+  headers: Headers;
 };
 
 export interface RequestOptions {
@@ -38,6 +41,20 @@ function resolveBaseUrl(): string {
 }
 
 export const API_BASE_URL = resolveBaseUrl();
+
+export function parseContentDispositionFilename(value: string | null): string | null {
+  if (!value) return null;
+  const encoded = /filename\*=UTF-8''([^;]+)/i.exec(value)?.[1];
+  if (encoded) {
+    try {
+      return decodeURIComponent(encoded.trim());
+    } catch {
+      return null;
+    }
+  }
+  const quoted = /filename="([^"]+)"/i.exec(value)?.[1];
+  return quoted?.trim() || null;
+}
 
 /** Efface un cookie JavaScript accessible en le faisant expirer. */
 function expireLegacyCookie(name: string): void {
@@ -79,12 +96,6 @@ export function hasAuthToken(): boolean {
 
 let refreshPromise: Promise<boolean> | null = null;
 
-/**
- * Renouvelle le jeton d'accès via le cookie HttpOnly de refresh token :
- * aucune valeur sensible n'est lue ni écrite par JavaScript. Le cookie est
- * envoyé automatiquement (`credentials: 'include'`), le serveur applique la
- * rotation et réémet le cookie.
- */
 async function refreshAccessToken(): Promise<boolean> {
   refreshPromise ??= (async () => {
     try {
@@ -104,7 +115,10 @@ async function refreshAccessToken(): Promise<boolean> {
       setAuthToken(data.accessToken);
       return true;
     } catch (error) {
-      console.warn('Échec dans callback — poursuite en mode dégradé', error instanceof Error ? error.message : error);
+      console.warn(
+        'Échec dans callback — poursuite en mode dégradé',
+        error instanceof Error ? error.message : error
+      );
       return false;
     } finally {
       refreshPromise = null;
@@ -114,11 +128,6 @@ async function refreshAccessToken(): Promise<boolean> {
   return refreshPromise;
 }
 
-/**
- * Restaure une session après rechargement de la page : le jeton d'accès
- * n'étant conservé qu'en mémoire, on tente un rafraîchissement silencieux
- * via le cookie HttpOnly avant de considérer l'utilisateur déconnecté.
- */
 export async function tryRestoreSession(): Promise<boolean> {
   if (hasAuthToken()) return true;
   return refreshAccessToken();
@@ -280,7 +289,10 @@ async function parseJsonSafe(response: Response): Promise<unknown> {
   try {
     return JSON.parse(text) as unknown;
   } catch (error) {
-    console.warn('Échec dans parseJsonSafe — poursuite en mode dégradé', error instanceof Error ? error.message : error);
+    console.warn(
+      'Échec dans parseJsonSafe — poursuite en mode dégradé',
+      error instanceof Error ? error.message : error
+    );
     return text;
   }
 }
@@ -396,12 +408,12 @@ export const apiClient = {
     await request<null>(url, { method: 'DELETE' });
   },
 
-  async getBlob(url: string): Promise<DocumentBlob> {
+  async getBlob(url: string, options: { timeout?: number } = {}): Promise<DocumentBlob> {
     const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 30_000);
+    const timer = setTimeout(() => controller.abort(), options.timeout ?? BLOB_REQUEST_TIMEOUT);
     const headers: Record<string, string> = {
       Accept:
-        'application/pdf,image/*,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/octet-stream,application/json',
+        'application/pdf,image/*,application/zip,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/octet-stream,application/json',
       'X-Requested-With': 'XMLHttpRequest',
     };
     const token = getToken();
@@ -433,6 +445,8 @@ export const apiClient = {
       return Object.assign(blob, {
         inlineViewable,
         mimetype: blob.type || 'application/octet-stream',
+        filename: parseContentDispositionFilename(response.headers.get('Content-Disposition')),
+        headers: response.headers,
       });
     } catch (error) {
       throw toApiError(error);

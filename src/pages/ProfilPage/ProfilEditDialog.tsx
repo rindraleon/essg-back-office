@@ -16,7 +16,9 @@ import {
   DialogFooter,
   DialogHeader,
   FloatingInput,
+  SaveButton,
 } from '@/components';
+import { useSaveStatus } from '@/hooks';
 import { VALIDATION_MESSAGES, validateEmail, validateFirstName, validateName } from '@/constants';
 import {
   ACCEPTED_IMAGE_MIME_TYPES,
@@ -53,7 +55,8 @@ const ProfilEditDialog: React.FC<ProfilEditDialogProps> = ({ open, onClose, user
     confirmation: '',
   });
   const [errors, setErrors] = useState<Partial<Record<keyof FormState, string>>>({});
-  const [saving, setSaving] = useState(false);
+  const { status, run } = useSaveStatus();
+  const saving = status === 'loading';
   const [avatarState, setAvatarState] = useState<AvatarState>('idle');
   const [avatarError, setAvatarError] = useState<string>('');
   const [avatarPath, setAvatarPath] = useState<string>('');
@@ -128,7 +131,10 @@ const ProfilEditDialog: React.FC<ProfilEditDialogProps> = ({ open, onClose, user
       setAvatarState('success');
       toast.success('Photo de profil mise à jour');
     } catch (error) {
-      console.warn('Échec dans handleAvatarChange — poursuite en mode dégradé', error instanceof Error ? error.message : error);
+      console.warn(
+        'Échec dans handleAvatarChange — poursuite en mode dégradé',
+        error instanceof Error ? error.message : error
+      );
       setAvatarState('error');
       const message =
         error instanceof Error ? error.message : 'Échec du téléversement de la photo.';
@@ -137,33 +143,36 @@ const ProfilEditDialog: React.FC<ProfilEditDialogProps> = ({ open, onClose, user
     }
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = () => {
     if (saving || avatarState === 'uploading' || !validate()) return;
-    setSaving(true);
-    try {
-      const updated = await updateUserRequest(user.id, {
-        prenom: form.prenom.trim(),
-        nom: form.nom.trim(),
-        email: form.email.trim(),
-        ...(form.motDePasse ? { motDePasse: form.motDePasse } : {}),
-      });
+    void run(async () => {
+      try {
+        const updated = await updateUserRequest(user.id, {
+          prenom: form.prenom.trim(),
+          nom: form.nom.trim(),
+          email: form.email.trim(),
+          ...(form.motDePasse ? { motDePasse: form.motDePasse } : {}),
+        });
 
-      updateUser({
-        prenom: updated.prenom ?? form.prenom.trim(),
-        nom: updated.nom ?? form.nom.trim(),
-        email: updated.email ?? form.email.trim(),
-      });
+        updateUser({
+          prenom: updated.prenom ?? form.prenom.trim(),
+          nom: updated.nom ?? form.nom.trim(),
+          email: updated.email ?? form.email.trim(),
+        });
 
-      toast.success('Profil mis à jour avec succès');
-      onClose();
-    } catch (error) {
-      console.warn('Échec dans handleSubmit — poursuite en mode dégradé', error instanceof Error ? error.message : error);
-      toast.error(
-        error instanceof Error ? error.message : "Erreur lors de l'enregistrement du profil."
-      );
-    } finally {
-      setSaving(false);
-    }
+        toast.success('Profil mis à jour avec succès');
+        onClose();
+      } catch (error) {
+        console.warn(
+          'Échec dans handleSubmit — poursuite en mode dégradé',
+          error instanceof Error ? error.message : error
+        );
+        toast.error(
+          error instanceof Error ? error.message : "Erreur lors de l'enregistrement du profil."
+        );
+        throw error;
+      }
+    });
   };
 
   const initials = getPersonInitials(user);
@@ -320,14 +329,9 @@ const ProfilEditDialog: React.FC<ProfilEditDialogProps> = ({ open, onClose, user
           <Button type="button" variant="outline" onClick={onClose} disabled={busy}>
             Annuler
           </Button>
-          <Button type="button" onClick={handleSubmit} disabled={busy} aria-busy={saving}>
-            {saving ? (
-              <Loader2 className="size-4 animate-spin" aria-hidden="true" />
-            ) : (
-              <CircleCheck className="size-4" aria-hidden="true" />
-            )}
-            {saving ? 'Enregistrement…' : 'Enregistrer'}
-          </Button>
+          <SaveButton status={status} onClick={handleSubmit} disabled={busy}>
+            Enregistrer
+          </SaveButton>
         </DialogFooter>
       </DialogContent>
     </Dialog>

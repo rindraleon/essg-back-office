@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { routesStatic } from '@/routes';
 import { useAuth } from '@/contexts';
+import { PERMISSIONS, getUserRoleLabel, getVisibleNavItems } from '@/constants';
 import { getImageUrl, formatFullName } from '@/utils';
 import { Button } from '../ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
@@ -29,11 +30,22 @@ const navLinkClassName = ({ isActive }: { isActive: boolean }): string =>
 const Header: React.FC = () => {
   const [open, setOpen] = useState(false);
   const [logoutDialogOpen, setLogoutDialogOpen] = useState(false);
+  const [loggingOut, setLoggingOut] = useState(false);
   const navigate = useNavigate();
-  const { isAuthenticated, user, username, isAdmin, logout } = useAuth();
+  const { isAuthenticated, user, username, isAdmin, hasPermission, logout } = useAuth();
   const { resolvedTheme, toggleTheme } = useTheme();
-  const { data: recentAdmissions = [] } = useRecentAdmissionsQuery(4, isAuthenticated);
-  const { data: recentMessagesResponse } = useRecentMessagesQuery(4, isAuthenticated);
+  const canViewAdmissions = hasPermission(PERMISSIONS.ADMISSION_VIEW);
+  const canViewContacts = hasPermission(PERMISSIONS.CONTACT_VIEW);
+  const canManageSettings = hasPermission(PERMISSIONS.SETTINGS_ADMISSION);
+  const navItems = getVisibleNavItems({ isAdmin, hasPermission });
+  const { data: recentAdmissions = [] } = useRecentAdmissionsQuery(
+    4,
+    isAuthenticated && canViewAdmissions
+  );
+  const { data: recentMessagesResponse } = useRecentMessagesQuery(
+    4,
+    isAuthenticated && canViewContacts
+  );
   const recentMessages = recentMessagesResponse?.data ?? [];
 
   const handleLogoutClick = () => {
@@ -41,8 +53,10 @@ const Header: React.FC = () => {
   };
 
   const handleLogoutConfirm = async () => {
-    setLogoutDialogOpen(false);
+    setLoggingOut(true);
     await logout();
+    setLoggingOut(false);
+    setLogoutDialogOpen(false);
     setOpen(false);
   };
 
@@ -58,19 +72,6 @@ const Header: React.FC = () => {
       .join('')
       .toUpperCase()
       .slice(0, 2);
-  };
-
-  const getRoleLabel = (role?: string) => {
-    switch (role) {
-      case 'admin':
-        return 'Administrateur';
-      case 'editeur':
-        return 'Éditeur';
-      case 'lecteur':
-        return 'Lecteur';
-      default:
-        return 'Utilisateur';
-    }
   };
 
   const displayName = formatFullName(user) || username || 'Utilisateur';
@@ -123,152 +124,156 @@ const Header: React.FC = () => {
           {isAuthenticated && (
             <div className="hidden md:flex items-center gap-1 lg:gap-2">
               <ThemeToggle />
-              <DropdownMenu>
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <DropdownMenuTrigger>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="text-ink-700 hover:text-brand-600 relative"
-                          aria-label="messages"
-                        >
-                          <Badge
-                            variant="danger"
-                            className="absolute -top-1 -right-1 px-1.5 py-0.5 text-xs"
+              {canViewContacts && (
+                <DropdownMenu>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <DropdownMenuTrigger>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="text-ink-700 hover:text-brand-600 relative"
+                            aria-label="messages"
                           >
-                            {unreadMessagesCount}
-                          </Badge>
-                          <Mail className="h-5 w-5" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                    </TooltipTrigger>
-                    <TooltipContent>Messages</TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
+                            <Badge
+                              variant="danger"
+                              className="absolute -top-1 -right-1 px-1.5 py-0.5 text-xs"
+                            >
+                              {unreadMessagesCount}
+                            </Badge>
+                            <Mail className="h-5 w-5" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                      </TooltipTrigger>
+                      <TooltipContent>Messages</TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
 
-                <DropdownMenuContent
-                  align="end"
-                  className="w-80 shadow-none ring-0 bg-card border border-ink-100"
-                >
-                  <div className="px-3 py-2 border-b border-ink-100">
-                    <h3 className="text-sm font-semibold text-ink-900">Messages</h3>
-                  </div>
-                  <div className="max-h-96 overflow-y-auto">
-                    {recentMessages.length === 0 ? (
-                      <div className="px-3 py-4 text-sm text-ink-500 text-center">
-                        Aucun message
-                      </div>
-                    ) : (
-                      recentMessages.map((message) => (
-                        <DropdownMenuItem
-                          key={message.id}
-                          className="flex flex-col items-start p-3 cursor-pointer"
-                          onClick={() => navigate(routesStatic.contacts)}
-                        >
-                          <div className="flex items-start justify-between w-full">
-                            <div className="flex-1">
-                              <p className="text-sm font-medium text-ink-900">
-                                {formatFullName(message)}
-                              </p>
-                              <p className="text-xs text-ink-500 mt-1">{message.email}</p>
-                              <p className="text-xs text-ink-600 mt-1 line-clamp-2">
-                                {message.message}
-                              </p>
-                              {!message.lu && (
-                                <span className="inline-block mt-2 px-2 py-1 text-xs font-medium rounded-full bg-brand-100 text-brand-800 border border-brand-300">
-                                  Non lu
+                  <DropdownMenuContent
+                    align="end"
+                    className="w-80 shadow-none ring-0 bg-card border border-ink-100"
+                  >
+                    <div className="px-3 py-2 border-b border-ink-100">
+                      <h3 className="text-sm font-semibold text-ink-900">Messages</h3>
+                    </div>
+                    <div className="max-h-96 overflow-y-auto">
+                      {recentMessages.length === 0 ? (
+                        <div className="px-3 py-4 text-sm text-ink-500 text-center">
+                          Aucun message
+                        </div>
+                      ) : (
+                        recentMessages.map((message) => (
+                          <DropdownMenuItem
+                            key={message.id}
+                            className="flex flex-col items-start p-3 cursor-pointer"
+                            onClick={() => navigate(routesStatic.contacts)}
+                          >
+                            <div className="flex items-start justify-between w-full">
+                              <div className="flex-1">
+                                <p className="text-sm font-medium text-ink-900">
+                                  {formatFullName(message)}
+                                </p>
+                                <p className="text-xs text-ink-500 mt-1">{message.email}</p>
+                                <p className="text-xs text-ink-600 mt-1 line-clamp-2">
+                                  {message.message}
+                                </p>
+                                {!message.lu && (
+                                  <span className="inline-block mt-2 px-2 py-1 text-xs font-medium rounded-full bg-brand-100 text-brand-800 border border-brand-300">
+                                    Non lu
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                          </DropdownMenuItem>
+                        ))
+                      )}
+                    </div>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                      onClick={() => navigate(routesStatic.contacts)}
+                      className="text-center text-sm font-medium text-brand-600 hover:text-brand-700"
+                    >
+                      Voir plus
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
+
+              {canViewAdmissions && (
+                <DropdownMenu>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <DropdownMenuTrigger>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="text-ink-700 hover:text-brand-600 relative"
+                            aria-label="notifications"
+                          >
+                            <Badge
+                              variant="danger"
+                              className="absolute -top-1 -right-1 px-1.5 py-0.5 text-xs"
+                            >
+                              {pendingAdmissionsCount}
+                            </Badge>
+                            <Bell className="h-5 w-5" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                      </TooltipTrigger>
+                      <TooltipContent>Notifications</TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+
+                  <DropdownMenuContent
+                    align="end"
+                    className="w-80 shadow-none ring-0 bg-card border border-ink-100"
+                  >
+                    <div className="px-3 py-2 border-b border-ink-100">
+                      <h3 className="text-sm font-semibold text-ink-900">Notifications</h3>
+                    </div>
+                    <div className="max-h-96 overflow-y-auto">
+                      {recentAdmissions.length === 0 ? (
+                        <div className="px-3 py-4 text-sm text-ink-500 text-center">
+                          Aucune notification
+                        </div>
+                      ) : (
+                        recentAdmissions.map((admission) => (
+                          <DropdownMenuItem
+                            key={admission.id}
+                            className="flex flex-col items-start p-3 cursor-pointer"
+                            onClick={() => navigate(routesStatic.admissions)}
+                          >
+                            <div className="flex items-start justify-between w-full">
+                              <div className="flex-1">
+                                <p className="text-sm font-medium text-ink-900">
+                                  {formatFullName(admission)}
+                                </p>
+                                <p className="text-xs text-ink-500 mt-1">
+                                  Formation: {admission.formation}
+                                </p>
+                                <span
+                                  className={`inline-block mt-2 px-2 py-1 text-xs font-medium rounded-full border ${getStatusColor(admission.statut)}`}
+                                >
+                                  {getStatusLabel(admission.statut)}
                                 </span>
-                              )}
+                              </div>
                             </div>
-                          </div>
-                        </DropdownMenuItem>
-                      ))
-                    )}
-                  </div>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    onClick={() => navigate(routesStatic.contacts)}
-                    className="text-center text-sm font-medium text-brand-600 hover:text-brand-700"
-                  >
-                    Voir plus
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-
-              <DropdownMenu>
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <DropdownMenuTrigger>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="text-ink-700 hover:text-brand-600 relative"
-                          aria-label="notifications"
-                        >
-                          <Badge
-                            variant="danger"
-                            className="absolute -top-1 -right-1 px-1.5 py-0.5 text-xs"
-                          >
-                            {pendingAdmissionsCount}
-                          </Badge>
-                          <Bell className="h-5 w-5" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                    </TooltipTrigger>
-                    <TooltipContent>Notifications</TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-
-                <DropdownMenuContent
-                  align="end"
-                  className="w-80 shadow-none ring-0 bg-card border border-ink-100"
-                >
-                  <div className="px-3 py-2 border-b border-ink-100">
-                    <h3 className="text-sm font-semibold text-ink-900">Notifications</h3>
-                  </div>
-                  <div className="max-h-96 overflow-y-auto">
-                    {recentAdmissions.length === 0 ? (
-                      <div className="px-3 py-4 text-sm text-ink-500 text-center">
-                        Aucune notification
-                      </div>
-                    ) : (
-                      recentAdmissions.map((admission) => (
-                        <DropdownMenuItem
-                          key={admission.id}
-                          className="flex flex-col items-start p-3 cursor-pointer"
-                          onClick={() => navigate(routesStatic.admissions)}
-                        >
-                          <div className="flex items-start justify-between w-full">
-                            <div className="flex-1">
-                              <p className="text-sm font-medium text-ink-900">
-                                {formatFullName(admission)}
-                              </p>
-                              <p className="text-xs text-ink-500 mt-1">
-                                Formation: {admission.formation}
-                              </p>
-                              <span
-                                className={`inline-block mt-2 px-2 py-1 text-xs font-medium rounded-full border ${getStatusColor(admission.statut)}`}
-                              >
-                                {getStatusLabel(admission.statut)}
-                              </span>
-                            </div>
-                          </div>
-                        </DropdownMenuItem>
-                      ))
-                    )}
-                  </div>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    onClick={() => navigate(routesStatic.admissions)}
-                    className="text-center text-sm font-medium text-brand-600 hover:text-brand-700"
-                  >
-                    Voir plus
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+                          </DropdownMenuItem>
+                        ))
+                      )}
+                    </div>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                      onClick={() => navigate(routesStatic.admissions)}
+                      className="text-center text-sm font-medium text-brand-600 hover:text-brand-700"
+                    >
+                      Voir plus
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
 
               <TooltipProvider>
                 <Tooltip>
@@ -328,7 +333,7 @@ const Header: React.FC = () => {
                     <User className="h-4 w-4 mr-2" />
                     Mon profil
                   </DropdownMenuItem>
-                  {isAdmin && (
+                  {canManageSettings && (
                     <DropdownMenuItem onClick={() => navigate(routesStatic.parametres)}>
                       <Settings className="h-4 w-4 mr-2" />
                       Paramètres
@@ -381,117 +386,56 @@ const Header: React.FC = () => {
                   </Avatar>
                   <div>
                     <p className="text-sm font-medium text-ink-900">{displayName}</p>
-                    <p className="text-xs text-ink-500">{getRoleLabel(user?.role)}</p>
+                    <p className="text-xs text-ink-500">{getUserRoleLabel(user?.role)}</p>
                   </div>
                 </div>
               </div>
             )}
 
             <nav className="flex flex-col gap-1">
-              <NavLink
-                to={routesStatic.dashboard}
-                onClick={() => setOpen(false)}
-                className={navLinkClassName}
-              >
-                Dashboard
-              </NavLink>
-              <NavLink
-                to={routesStatic.admissions}
-                onClick={() => setOpen(false)}
-                className={navLinkClassName}
-              >
-                Admissions
-              </NavLink>
-              <NavLink
-                to={routesStatic.actualites}
-                onClick={() => setOpen(false)}
-                className={navLinkClassName}
-              >
-                Actualités
-              </NavLink>
-              <NavLink
-                to={routesStatic.contacts}
-                onClick={() => setOpen(false)}
-                className={navLinkClassName}
-              >
-                Contacts
-              </NavLink>
-              <NavLink
-                to={routesStatic.projets}
-                onClick={() => setOpen(false)}
-                className={navLinkClassName}
-              >
-                Projets
-              </NavLink>
-              <NavLink
-                to={routesStatic.formations}
-                onClick={() => setOpen(false)}
-                className={navLinkClassName}
-              >
-                Formations
-              </NavLink>
-              <NavLink
-                to={routesStatic.partenaires}
-                onClick={() => setOpen(false)}
-                className={navLinkClassName}
-              >
-                Partenaires
-              </NavLink>
-              <NavLink
-                to={routesStatic.ressourcesHumaines}
-                onClick={() => setOpen(false)}
-                className={navLinkClassName}
-              >
-                Equipes pédagogiques
-              </NavLink>
-              {user?.role === 'admin' && (
+              {navItems.map((item) => (
                 <NavLink
-                  to={routesStatic.utilisateurs}
+                  key={item.href}
+                  to={item.href}
                   onClick={() => setOpen(false)}
                   className={navLinkClassName}
                 >
-                  Utilisateurs
+                  {item.name}
                 </NavLink>
-              )}
-
-              {user?.role === 'admin' && (
-                <NavLink
-                  to={routesStatic.activityLogs}
-                  onClick={() => setOpen(false)}
-                  className={navLinkClassName}
-                >
-                  Journal des actions
-                </NavLink>
-              )}
+              ))}
             </nav>
 
             {isAuthenticated && (
               <>
                 <hr className="border-ink-100" />
                 <div className="flex flex-col gap-1">
-                  <button
-                    type="button"
-                    onClick={() => setOpen(false)}
-                    className="flex items-center gap-3 py-2.5 px-3 rounded-md text-sm font-medium text-ink-700 hover:bg-ink-50"
-                  >
-                    <Bell className="size-4" />
-                    <span>Notifications</span>
-                    <Badge variant="destructive" className="ml-auto px-1.5 py-0.5 text-xs">
-                      {pendingAdmissionsCount}
-                    </Badge>
-                  </button>
+                  {canViewAdmissions && (
+                    <button
+                      type="button"
+                      onClick={() => setOpen(false)}
+                      className="flex items-center gap-3 py-2.5 px-3 rounded-md text-sm font-medium text-ink-700 hover:bg-ink-50"
+                    >
+                      <Bell className="size-4" />
+                      <span>Notifications</span>
+                      <Badge variant="destructive" className="ml-auto px-1.5 py-0.5 text-xs">
+                        {pendingAdmissionsCount}
+                      </Badge>
+                    </button>
+                  )}
 
-                  <button
-                    type="button"
-                    onClick={() => setOpen(false)}
-                    className="flex items-center gap-3 py-2.5 px-3 rounded-md text-sm font-medium text-ink-700 hover:bg-ink-50"
-                  >
-                    <Mail className="size-4" />
-                    <span>Messages</span>
-                    <Badge variant="default" className="ml-auto px-1.5 py-0.5 text-xs">
-                      {unreadMessagesCount}
-                    </Badge>
-                  </button>
+                  {canViewContacts && (
+                    <button
+                      type="button"
+                      onClick={() => setOpen(false)}
+                      className="flex items-center gap-3 py-2.5 px-3 rounded-md text-sm font-medium text-ink-700 hover:bg-ink-50"
+                    >
+                      <Mail className="size-4" />
+                      <span>Messages</span>
+                      <Badge variant="default" className="ml-auto px-1.5 py-0.5 text-xs">
+                        {unreadMessagesCount}
+                      </Badge>
+                    </button>
+                  )}
 
                   <button
                     type="button"
@@ -536,7 +480,7 @@ const Header: React.FC = () => {
                     <span>Mon profil</span>
                   </button>
 
-                  {isAdmin && (
+                  {canManageSettings && (
                     <button
                       type="button"
                       onClick={() => {
@@ -565,7 +509,12 @@ const Header: React.FC = () => {
         </div>
       )}
 
-      <Dialog open={logoutDialogOpen} onOpenChange={setLogoutDialogOpen}>
+      <Dialog
+        open={logoutDialogOpen}
+        onOpenChange={(isOpen) => {
+          if (!loggingOut) setLogoutDialogOpen(isOpen);
+        }}
+      >
         <DialogContent className="bg-card border-2 border-ink-100 shadow-2xl">
           <DialogHeader className="bg-gradient-to-r from-brand-500 to-purple-600 -mx-4 -mt-4 px-6 py-4 rounded-t-xl">
             <DialogTitle className="text-white text-xl font-bold">
@@ -582,6 +531,7 @@ const Header: React.FC = () => {
             <Button
               variant="outline"
               onClick={handleLogoutCancel}
+              disabled={loggingOut}
               className="border-2 border-ink-300 hover:bg-ink-50"
             >
               Annuler
@@ -589,10 +539,11 @@ const Header: React.FC = () => {
             <Button
               variant="destructive"
               onClick={handleLogoutConfirm}
+              loading={loggingOut}
               className="bg-red-600 hover:bg-red-700 text-white dark:hover:bg-red-500"
             >
               <LogOut className="h-4 w-4 mr-2" />
-              Se déconnecter
+              {loggingOut ? 'Déconnexion…' : 'Se déconnecter'}
             </Button>
           </DialogFooter>
         </DialogContent>

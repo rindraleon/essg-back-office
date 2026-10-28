@@ -15,8 +15,11 @@ interface ActualiteTableProps {
   onPageChange: (page: number) => void;
   onRowsPerPageChange: (rows: number) => void;
   onView: (actualite: ActualiteItem) => void;
-  onEdit: (actualite: ActualiteItem) => void;
-  onDelete: (actualite: ActualiteItem) => void;
+  onEdit?: (actualite: ActualiteItem) => void;
+  onDelete?: (actualite: ActualiteItem) => void;
+  loading?: boolean;
+  error?: boolean;
+  onRetry?: () => void;
 }
 
 const ActualiteTable: React.FC<ActualiteTableProps> = ({
@@ -29,6 +32,9 @@ const ActualiteTable: React.FC<ActualiteTableProps> = ({
   onView,
   onEdit,
   onDelete,
+  loading = false,
+  error = false,
+  onRetry,
 }) => {
   const columns: Column<ActualiteItem>[] = [
     {
@@ -84,17 +90,21 @@ const ActualiteTable: React.FC<ActualiteTableProps> = ({
           <Button size="icon" variant="ghost" onClick={() => onView(row)} className="h-8 w-8">
             <Eye className="size-4 h-4 w-4" />
           </Button>
-          <Button size="icon" variant="ghost" onClick={() => onEdit(row)} className="h-8 w-8">
-            <Pencil className="size-4 h-4 w-4" />
-          </Button>
-          <Button
-            size="icon"
-            variant="ghost"
-            onClick={() => onDelete(row)}
-            className="h-8 w-8 text-red-600 hover:text-red-700"
-          >
-            <Trash2 className="size-4 h-4 w-4" />
-          </Button>
+          {onEdit && (
+            <Button size="icon" variant="ghost" onClick={() => onEdit(row)} className="h-8 w-8">
+              <Pencil className="size-4 h-4 w-4" />
+            </Button>
+          )}
+          {onDelete && (
+            <Button
+              size="icon"
+              variant="ghost"
+              onClick={() => onDelete(row)}
+              className="h-8 w-8 text-red-600 hover:text-red-700"
+            >
+              <Trash2 className="size-4 h-4 w-4" />
+            </Button>
+          )}
         </div>
       ),
     },
@@ -102,6 +112,9 @@ const ActualiteTable: React.FC<ActualiteTableProps> = ({
 
   return (
     <DataTable<ActualiteItem>
+      loading={loading}
+      error={error}
+      onRetry={onRetry}
       columns={columns}
       data={data}
       totalCount={totalCount}

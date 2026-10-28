@@ -1,22 +1,20 @@
-import { Loader2, Plus, Trash2 } from 'lucide-react';
+import { Plus, Trash2 } from 'lucide-react';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { Mention, MentionFormProps, MentionParcoursInput } from '@/types';
 import { normalizeMentionNom } from '@/utils';
 import { Button } from '../ui/button';
+import { SaveButton } from '../ui/save-button';
 import { Checkbox } from '../ui/checkbox';
 import ConfirmDialog from '../common/ConfirmDialog';
 import { Label } from '../ui/label';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '../ui/dialog';
 import { FloatingInput } from '../ui/floating-input';
-import { useMentionDomainesQuery } from '@/hooks';
+import { useMentionDomainesQuery, useSaveStatus } from '@/hooks';
 
 interface ParcoursRow {
-  /** Clé React stable, indépendante du parcours backend. */
   key: number;
-  /** Identifiant backend si le parcours existe déjà (mode édition). */
   id?: number;
   nom: string;
-  /** Nombre de formations utilisant ce parcours (protection à la suppression). */
   formationCount: number;
 }
 
@@ -43,8 +41,9 @@ const MentionForm: React.FC<MentionFormProps> = ({
   onSubmit,
   initialData,
   mode,
-  submitting = false,
 }) => {
+  const { status, run } = useSaveStatus();
+  const submitting = status === 'loading';
   const nextKey = useRef(1);
   const [nom, setNom] = useState('');
   const [domaine, setDomaine] = useState('');
@@ -111,8 +110,6 @@ const MentionForm: React.FC<MentionFormProps> = ({
     (index: number) => {
       const row = rows[index];
       if (!row) return;
-      // Un parcours déjà utilisé par des formations mérite un avertissement
-      // explicite ; la suppression effective reste validée par le backend.
       if (row.id !== undefined && row.formationCount > 0) {
         setPendingRemoval(row);
         return;
@@ -132,7 +129,7 @@ const MentionForm: React.FC<MentionFormProps> = ({
     setRows((prev) => prev.map((row, i) => (i === index ? { ...row, nom: value } : row)));
   }, []);
 
-  const handleSubmit = async () => {
+  const handleSubmit = () => {
     setSubmitted(true);
     if (hasErrors || submitting) return;
 
@@ -140,12 +137,14 @@ const MentionForm: React.FC<MentionFormProps> = ({
       .map((row) => ({ id: row.id, nom: row.nom.trim() }))
       .filter((item) => item.nom.length > 0);
 
-    await onSubmit({
-      nom: nom.trim(),
-      domaine: domaine.trim() || undefined,
-      isActive,
-      parcours,
-    });
+    void run(() =>
+      onSubmit({
+        nom: nom.trim(),
+        domaine: domaine.trim() || undefined,
+        isActive,
+        parcours,
+      })
+    );
   };
 
   const dialogTitle = mode === 'create' ? 'Créer une mention' : 'Modifier la mention';
@@ -266,16 +265,14 @@ const MentionForm: React.FC<MentionFormProps> = ({
               >
                 Annuler
               </Button>
-              <Button
-                type="button"
+              <SaveButton
                 size="sm"
-                onClick={() => void handleSubmit()}
-                disabled={submitting}
-                className="min-w-36"
+                status={status}
+                celebrate={mode === 'create'}
+                onClick={handleSubmit}
               >
-                {submitting && <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />}
                 {mode === 'create' ? 'Créer la mention' : 'Enregistrer'}
-              </Button>
+              </SaveButton>
             </div>
           </DialogFooter>
         </DialogContent>

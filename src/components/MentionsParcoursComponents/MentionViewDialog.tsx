@@ -4,6 +4,8 @@ import { toast } from 'sonner';
 import type { MentionFormationSummary, MentionViewDialogProps, ParcoursEditTarget } from '@/types';
 import { formatDateLong } from '@/utils/date.utils';
 import { useDeleteParcours } from '@/hooks';
+import { useAuth } from '@/contexts';
+import { PERMISSIONS } from '@/constants';
 import ConfirmDialog from '../common/ConfirmDialog';
 import { DetailField, DetailSection } from '../common/DetailSection';
 import { Badge } from '../ui/badge';
@@ -34,6 +36,10 @@ const MentionViewDialog: React.FC<MentionViewDialogProps> = ({
 }) => {
   const deleteParcours = useDeleteParcours();
   const [parcoursToDelete, setParcoursToDelete] = useState<MentionParcoursRow | null>(null);
+  const { hasPermission } = useAuth();
+  const canCreate = hasPermission(PERMISSIONS.CONTENT_CREATE);
+  const canUpdate = hasPermission(PERMISSIONS.CONTENT_UPDATE);
+  const canDelete = hasPermission(PERMISSIONS.CONTENT_DELETE);
 
   const handleConfirmParcoursDelete = useCallback(async () => {
     if (!parcoursToDelete) return;
@@ -100,26 +106,30 @@ const MentionViewDialog: React.FC<MentionViewDialogProps> = ({
                           <Badge variant="secondary" className="text-xs">
                             {item.formationCount ?? 0}
                           </Badge>
-                          <Button
-                            size="icon"
-                            variant="ghost"
-                            className="h-7 w-7"
-                            aria-label={`Modifier le parcours ${item.nom}`}
-                            onClick={() =>
-                              onEditParcours(item, { id: mention.id, nom: mention.nom })
-                            }
-                          >
-                            <Pencil className="h-3.5 w-3.5" />
-                          </Button>
-                          <Button
-                            size="icon"
-                            variant="ghost"
-                            className="h-7 w-7 text-red-600 hover:text-red-700"
-                            aria-label={`Supprimer le parcours ${item.nom}`}
-                            onClick={() => setParcoursToDelete(item)}
-                          >
-                            <Trash2 className="h-3.5 w-3.5" />
-                          </Button>
+                          {canUpdate && (
+                            <Button
+                              size="icon"
+                              variant="ghost"
+                              className="h-7 w-7"
+                              aria-label={`Modifier le parcours ${item.nom}`}
+                              onClick={() =>
+                                onEditParcours(item, { id: mention.id, nom: mention.nom })
+                              }
+                            >
+                              <Pencil className="h-3.5 w-3.5" />
+                            </Button>
+                          )}
+                          {canDelete && (
+                            <Button
+                              size="icon"
+                              variant="ghost"
+                              className="h-7 w-7 text-red-600 hover:text-red-700"
+                              aria-label={`Supprimer le parcours ${item.nom}`}
+                              onClick={() => setParcoursToDelete(item)}
+                            >
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </Button>
+                          )}
                         </div>
                       </div>
                       {item.formations && item.formations.length > 0 && (
@@ -146,16 +156,18 @@ const MentionViewDialog: React.FC<MentionViewDialogProps> = ({
                 </ul>
               )}
 
-              <Button
-                type="button"
-                size="sm"
-                variant="outline"
-                className="mt-3 gap-1.5"
-                onClick={() => onAddParcours({ id: mention.id, nom: mention.nom })}
-              >
-                <Plus className="h-4 w-4" />
-                Ajouter un parcours
-              </Button>
+              {canCreate && (
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  className="mt-3 gap-1.5"
+                  onClick={() => onAddParcours({ id: mention.id, nom: mention.nom })}
+                >
+                  <Plus className="h-4 w-4" />
+                  Ajouter un parcours
+                </Button>
+              )}
             </DetailSection>
 
             <DetailSection title="Informations système" icon={<Layers className="h-4 w-4" />}>
@@ -177,10 +189,12 @@ const MentionViewDialog: React.FC<MentionViewDialogProps> = ({
               <Button type="button" variant="ghost" size="sm" onClick={onClose}>
                 Fermer
               </Button>
-              <Button type="button" size="sm" onClick={() => onEdit(mention)}>
-                <Pencil className="h-3.5 w-3.5" />
-                Modifier la mention
-              </Button>
+              {canUpdate && (
+                <Button type="button" size="sm" onClick={() => onEdit(mention)}>
+                  <Pencil className="h-3.5 w-3.5" />
+                  Modifier la mention
+                </Button>
+              )}
             </div>
           </DialogFooter>
         </DialogContent>

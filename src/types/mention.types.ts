@@ -97,7 +97,6 @@ export interface MentionFormProps {
   onSubmit: (data: MentionFormData) => void | Promise<void>;
   initialData?: Mention | null;
   mode: 'create' | 'edit';
-  submitting?: boolean;
 }
 
 export interface ParcoursFormDialogProps {
@@ -110,7 +109,6 @@ export interface ParcoursFormDialogProps {
   lockedMentionName?: string | null;
   initialData?: ParcoursEditTarget | null;
   mode: 'create' | 'edit';
-  submitting?: boolean;
 }
 
 export interface MentionTableProps {
@@ -121,8 +119,8 @@ export interface MentionTableProps {
   onPageChange: (page: number) => void;
   onRowsPerPageChange: (rows: number) => void;
   onView: (mention: Mention) => void;
-  onEdit: (mention: Mention) => void;
-  onDelete: (mention: Mention) => void;
+  onEdit?: (mention: Mention) => void;
+  onDelete?: (mention: Mention) => void;
 }
 
 export interface MentionViewDialogProps {

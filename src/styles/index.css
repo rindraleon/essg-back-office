@@ -1,20 +1,13 @@
 @import 'tailwindcss';
 
-/* Mode sombre piloté par la classe `.dark` sur <html> (et non par la seule
-   préférence système), afin de laisser l'utilisateur choisir via le bouton
-   dédié du back-office. Le script inline de index.html applique la classe
-   avant le montage de React pour éviter tout flash de thème incorrect. */
 @custom-variant dark (&:where(.dark, .dark *));
 
-/* Polices identiques au site public (frontend) : Manrope pour le texte,
-   Outfit pour les titres, Space Mono pour les accents techniques.
-   Fichiers auto-hébergés dans src/assets/fonts. */
 @import '../assets/fonts/fonts.css';
 
 @theme {
   --font-sans:
-    'Manrope Variable', 'Manrope', ui-sans-serif, system-ui, -apple-system, 'Segoe UI',
-    Roboto, 'Helvetica Neue', Arial, sans-serif;
+    'Manrope Variable', 'Manrope', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto,
+    'Helvetica Neue', Arial, sans-serif;
 
   /* Police d'affichage : titres de pages, chiffres clés, identité visuelle. */
   --font-display:
@@ -39,11 +32,6 @@
   --text-section--letter-spacing: 0.06em;
   --text-section--font-weight: 600;
 
-  /* ============================================================
-     PALETTE — strictement identique au site public.
-     Dérivée du logo ESSG : vert feuille #98c070, anthracite #586068,
-     rouge #e53935 en accent d'alerte uniquement.
-     ============================================================ */
   --color-brand-50: #f5faef;
   --color-brand-100: #e8f3db;
   --color-brand-200: #d3e8bd;
@@ -80,10 +68,6 @@
   --color-ink-900: #2b3034;
   --color-ink-950: #1b1f22;
 
-  /* Surfaces toujours sombres (pied de page, panneaux latéraux des
-     dialogues de consultation, champs de code…). Contrairement à l'échelle
-     « ink », ces valeurs ne sont PAS réinterprétées en mode sombre :
-     elles fournissent un ancrage sombre constant dans les deux thèmes. */
   --color-night-700: #333940;
   --color-night-800: #262b31;
   --color-night-900: #1b1f24;
@@ -164,30 +148,8 @@
       transform: scale(1);
     }
   }
-
 }
 
-/* ============================================================
-   MODE SOMBRE
-   Les utilitaires Tailwind v4 référencent les variables de thème
-   (`bg-ink-50` → `var(--color-ink-50)`) : il suffit donc de
-   redéfinir les variables sous `.dark` pour re-thémer toute
-   l'interface sans toucher aux composants.
-
-   Principe de transposition :
-   - les nuances claires de « ink » (50→300) deviennent des surfaces
-     et bordures sombres (fond de page, cartes, traits) ;
-   - les nuances foncées (400→900) deviennent des niveaux de texte
-     clairs, du placeholder au titre principal ;
-   - « ink-950 » et l'échelle « night » restent sombres : ce sont les
-     surfaces déjà sombres en thème clair (panneaux, overlays, code) ;
-   - les voiles pastel de la marque (brand-50→200) deviennent des
-     voiles vert foncé, les nuances « texte » de la marque (700/800)
-     s'éclaircissent ; 400→600 restent inchangés (identité) ;
-   - les pastels de statut (red/amber/emerald/slate/violet/yellow)
-     suivent la même logique : fonds en teintes sombres, textes
-     associés éclaircis.
-   ============================================================ */
 .dark {
   --color-ink-50: #131519;
   --color-ink-100: #1f2328;
@@ -408,4 +370,3 @@
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
-

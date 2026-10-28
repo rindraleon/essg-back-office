@@ -1,4 +1,5 @@
 export { exportAdmissionsByParcours } from './admission-export.utils';
+export { saveBlobAsFile } from './download.utils';
 export { getFileExtension, formatFileSize } from './admission.utils';
 export { parseCvText } from './cv-parser.utils';
 export type { ParsedExperience, ParsedCv } from './cv-parser.utils';

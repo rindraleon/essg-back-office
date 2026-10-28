@@ -1,29 +1,26 @@
-import { Loader2, Reply } from 'lucide-react';
+import { Reply } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { useSaveStatus } from '@/hooks';
 import { Button } from '../ui/button';
 import { Dialog, DialogBody, DialogContent, DialogFooter, DialogHeader } from '../ui/dialog';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
+import { SaveButton } from '../ui/save-button';
 import type { Message } from '@/services';
 import { formatFullName } from '@/utils';
 
 interface ContactReplyDialogProps {
   message: Message;
   open: boolean;
-  submitting: boolean;
   onClose: () => void;
   onSubmit: (payload: { sujet: string; message: string }) => Promise<void>;
 }
 
-const ContactReplyDialog = ({
-  message,
-  open,
-  submitting,
-  onClose,
-  onSubmit,
-}: ContactReplyDialogProps) => {
+const ContactReplyDialog = ({ message, open, onClose, onSubmit }: ContactReplyDialogProps) => {
   const [sujet, setSujet] = useState(`Re : ${message.sujet}`);
   const [body, setBody] = useState('');
+  const { status, run } = useSaveStatus();
+  const submitting = status === 'loading';
 
   useEffect(() => {
     if (!open) return;
@@ -72,15 +69,15 @@ const ContactReplyDialog = ({
           <Button type="button" variant="outline" onClick={onClose} disabled={submitting}>
             Annuler
           </Button>
-          <Button
-            type="button"
-            disabled={submitting || !body.trim()}
-            aria-busy={submitting}
-            onClick={() => void onSubmit({ sujet, message: body.trim() })}
+          <SaveButton
+            disabled={!body.trim()}
+            status={status}
+            loadingLabel="Envoi en cours…"
+            successLabel="Envoyé"
+            onClick={() => void run(() => onSubmit({ sujet, message: body.trim() }))}
           >
-            {submitting && <Loader2 className="size-4 animate-spin" aria-hidden="true" />}
-            {submitting ? 'Envoi en cours…' : 'Envoyer la réponse'}
-          </Button>
+            Envoyer la réponse
+          </SaveButton>
         </DialogFooter>
       </DialogContent>
     </Dialog>

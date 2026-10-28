@@ -6,7 +6,7 @@ export interface DashboardStats {
   totalPartnerships?: number;
   totalPartners?: number;
   totalResources: number;
-  totalAdmissions: number;
+  totalAdmissions?: number;
   totalContacts?: number;
   usersChange?: string;
   formationsChange?: string;

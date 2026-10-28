@@ -19,11 +19,17 @@ import {
   useTitle,
 } from '@/hooks';
 import type { PartenaireFormData, Partenaire } from '@/types';
+import { useAuth } from '@/contexts';
+import { PERMISSIONS } from '@/constants';
 
 const Partenaires: React.FC = () => {
   useScrollToTop();
   useTitle('Partenaires');
-  const { data = [] } = usePartenairesQuery();
+  const { hasPermission } = useAuth();
+  const canCreate = hasPermission(PERMISSIONS.CONTENT_CREATE);
+  const canUpdate = hasPermission(PERMISSIONS.CONTENT_UPDATE);
+  const canDelete = hasPermission(PERMISSIONS.CONTENT_DELETE);
+  const { data = [], isLoading, isError, refetch } = usePartenairesQuery();
   const createMutation = useCreatePartenaire();
   const updateMutation = useUpdatePartenaire();
   const deleteMutation = useDeletePartenaire();
@@ -109,6 +115,7 @@ const Partenaires: React.FC = () => {
       } catch (error) {
         toast.error("Erreur lors de l'enregistrement");
         console.error('Error saving partenaire:', error);
+        throw error;
       }
     },
     [formMode, selectedPartenaire, createMutation, updateMutation]
@@ -126,6 +133,7 @@ const Partenaires: React.FC = () => {
   return (
     <div className="mx-auto max-w-7xl py-4 space-y-2 mx-auto min-w-0">
       <ListPageHeader
+        loading={isLoading}
         title="Liste des partenaires"
         totalCount={filteredData.length}
         searchValue={searchTerm}
@@ -134,8 +142,8 @@ const Partenaires: React.FC = () => {
         onToggleFilters={handleToggleFilters}
         filtersOpen={filtersOpen}
         activeFilterCount={activeFilterCount}
-        actionLabel="Nouveau partenaire"
-        onAction={handleOpenCreate}
+        actionLabel={canCreate ? 'Nouveau partenaire' : undefined}
+        onAction={canCreate ? handleOpenCreate : undefined}
       />
 
       {filtersOpen && (
@@ -152,6 +160,11 @@ const Partenaires: React.FC = () => {
       )}
 
       <PartenaireTable
+        loading={isLoading}
+
+        error={isError}
+
+        onRetry={() => void refetch()}
         data={paginatedData}
         totalCount={filteredData.length}
         page={currentPage}
@@ -159,8 +172,8 @@ const Partenaires: React.FC = () => {
         onPageChange={handleChangePage}
         onRowsPerPageChange={handleChangeRowsPerPage}
         onView={handleView}
-        onEdit={handleOpenEdit}
-        onDelete={handleDeleteRequest}
+        onEdit={canUpdate ? handleOpenEdit : undefined}
+        onDelete={canDelete ? handleDeleteRequest : undefined}
       />
 
       <PartenaireForm

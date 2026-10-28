@@ -15,15 +15,6 @@ export interface FloatingSelectProps {
   id?: string;
 }
 
-/**
- * Select flottant — mêmes règles que FloatingInput :
- * - l'identifiant technique n'est jamais affiché : la zone de saisie montre
- *   toujours le libellé complet résolu depuis les options (avant comme après
- *   la sélection ; si les options ne sont pas encore chargées, le placeholder
- *   reprend la main plutôt que de laisser voir un id brut) ;
- * - le libellé « flotte » dès qu'un texte (sélection ou placeholder
- *   informatif) occupe la zone, ce qui exclut toute superposition des deux.
- */
 const FloatingSelect: React.FC<FloatingSelectProps> = ({
   label,
   value,

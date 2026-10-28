@@ -3,6 +3,7 @@ import {
   Banknote,
   Eye,
   FileText,
+  FolderArchive,
   GraduationCap,
   LoaderCircle,
   Mail,
@@ -12,10 +13,11 @@ import {
 } from 'lucide-react';
 import React, { useState } from 'react';
 import { toast } from 'sonner';
-import { formatBacSerie, formatBacType } from '@/constants';
+import { formatBacSerie, formatBacType , PERMISSIONS } from '@/constants';
 import AdmissionVerificationSection from './AdmissionVerificationSection';
-import { useVerifyAdmission } from '@/hooks';
+import { useDownloadAdmissionArchive, useVerifyAdmission } from '@/hooks';
 import { ApiError } from '@/api';
+import { useAuth } from '@/contexts';
 import type { Admission, AdmissionFile } from '@/types';
 import {
   ADMISSION_FILE_TYPE_LABELS,
@@ -26,7 +28,7 @@ import {
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
 import { Dialog, DialogBody, DialogContent, DialogFooter, DialogHeader } from '../ui/dialog';
-import { formatFullName, formatFileSize, getFileExtension } from '@/utils';
+import { formatFullName, formatFileSize, getFileExtension, saveBlobAsFile } from '@/utils';
 
 interface AdmissionDetailDialogProps {
   admission: Admission;
@@ -98,6 +100,17 @@ function getVerificationErrorMessage(error: unknown): string {
   return 'Erreur lors de la vérification';
 }
 
+const ARCHIVE_NETWORK_ERROR = 'Impossible de télécharger les pièces. Veuillez réessayer.';
+const ARCHIVE_TIMEOUT_ERROR =
+  'Le téléchargement a pris trop de temps. Réessayez, ou vérifiez votre connexion.';
+
+function getArchiveErrorMessage(error: unknown): string {
+  if (error instanceof ApiError) {
+    return error.kind === 'timeout' ? ARCHIVE_TIMEOUT_ERROR : error.message;
+  }
+  return ARCHIVE_NETWORK_ERROR;
+}
+
 const AdmissionDetailDialog: React.FC<AdmissionDetailDialogProps> = ({
   admission,
   open,
@@ -116,6 +129,35 @@ const AdmissionDetailDialog: React.FC<AdmissionDetailDialogProps> = ({
     </Badge>
   );
 
+  const { hasPermission } = useAuth();
+  const canDownload = hasPermission(PERMISSIONS.ADMISSION_DOWNLOAD);
+  const canManage = hasPermission(PERMISSIONS.ADMISSION_MANAGE);
+  const canDeleteFiles = hasPermission(PERMISSIONS.ADMISSION_DELETE);
+
+  const archiveMutation = useDownloadAdmissionArchive();
+  const handleDownloadArchive = async (): Promise<void> => {
+    try {
+      const archive = await archiveMutation.mutateAsync(admission.id);
+      saveBlobAsFile(archive.blob, archive.filename);
+      if (archive.missingCount > 0) {
+        toast.warning(
+          `Archive téléchargée sans ${archive.missingCount} pièce${archive.missingCount > 1 ? 's' : ''} introuvable${archive.missingCount > 1 ? 's' : ''} dans le stockage. Le fichier pieces-manquantes.txt la signale.`
+        );
+      } else {
+        toast.success(
+          `Archive téléchargée : ${archive.fileCount} pièce${archive.fileCount > 1 ? 's' : ''}.`
+        );
+      }
+    } catch (error: unknown) {
+      console.warn(
+        'Échec dans handleDownloadArchive — poursuite en mode dégradé',
+        error instanceof Error ? error.message : error
+      );
+      toast.error(getArchiveErrorMessage(error));
+    }
+  };
+  const isArchiving = archiveMutation.isPending;
+
   // Vérification directe — bouton visible directement dans ce fichier (demande utilisateur)
   const verifyMutation = useVerifyAdmission();
   const [directVerifying, setDirectVerifying] = useState(false);
@@ -125,7 +167,10 @@ const AdmissionDetailDialog: React.FC<AdmissionDetailDialogProps> = ({
       await verifyMutation.mutateAsync(admission.id);
       toast.success('Vérification des pièces lancée avec succès');
     } catch (error: unknown) {
-      console.warn('Échec dans handleDirectVerify — poursuite en mode dégradé', error instanceof Error ? error.message : error);
+      console.warn(
+        'Échec dans handleDirectVerify — poursuite en mode dégradé',
+        error instanceof Error ? error.message : error
+      );
       const msg = getVerificationErrorMessage(error);
       toast.error(msg);
     } finally {
@@ -181,16 +226,6 @@ const AdmissionDetailDialog: React.FC<AdmissionDetailDialogProps> = ({
               <Field label="Numéro d'inscription au Bac" value={admission.numeroBaccalaureat} />
               <Field label="Année d'obtention du Bac" value={admission.bacAnneeObtention} />
               <Field label="Centre d'examen du Bac" value={admission.bacCentreExamen} />
-              {/* <Field
-                label="Ancien établissement"
-                value={admission.ancienEtablissement || admission.licenceEtablissement}
-              />
-              <Field label="Numéro matricule" value={admission.numeroMatricule} />
-              <Field label="Mention de la Licence" value={admission.licenceMention} />
-              <Field
-                label="Année d'obtention de la Licence"
-                value={admission.licenceAnneeObtention}
-              /> */}
             </div>
           </Section>
 
@@ -227,8 +262,35 @@ const AdmissionDetailDialog: React.FC<AdmissionDetailDialogProps> = ({
                 .
               </p>
             )}
+            {canDownload && (
+              <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+                <p className="text-xs text-ink-500">
+                  {files.length} pièce{files.length > 1 ? 's' : ''} jointe
+                  {files.length > 1 ? 's' : ''}
+                </p>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="gap-2"
+                  onClick={() => void handleDownloadArchive()}
+                  disabled={files.length === 0}
+                  loading={isArchiving}
+                  title={
+                    files.length === 0
+                      ? 'Aucune pièce jointe disponible'
+                      : 'Télécharger toutes les pièces dans une archive ZIP'
+                  }
+                >
+                  <FolderArchive className="size-4" aria-hidden="true" />
+                  {isArchiving
+                    ? 'Préparation du téléchargement...'
+                    : 'Télécharger toutes les pièces'}
+                </Button>
+              </div>
+            )}
             {files.length === 0 ? (
-              <p className="text-sm text-ink-500">Aucun fichier joint à cette candidature.</p>
+              <p className="text-sm text-ink-500">Aucune pièce jointe disponible.</p>
             ) : (
               <ul className="divide-y divide-ink-100 rounded-xl border border-ink-100">
                 {files.map((file) => (
@@ -269,7 +331,7 @@ const AdmissionDetailDialog: React.FC<AdmissionDetailDialogProps> = ({
                         <Eye className="h-3.5 w-3.5" />
                         Aperçu
                       </Button>
-                      {onDeleteFile && (
+                      {onDeleteFile && canDeleteFiles && (
                         <Button
                           type="button"
                           size="icon"
@@ -294,47 +356,49 @@ const AdmissionDetailDialog: React.FC<AdmissionDetailDialogProps> = ({
 
           <Section icon={<ScanSearch className="size-4" />} title="Vérification des pièces">
             {/* Bouton directement dans AdmissionDetailDialog — visible dans ce fichier unique (exigence) */}
-            <div className="mb-4 rounded-xl border border-brand-200 bg-brand-50 p-4">
-              <div className="flex flex-wrap items-center justify-between gap-4">
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm font-semibold text-ink-900">
-                    Contrôle automatique des documents
-                  </p>
-                  <p className="text-xs leading-relaxed text-ink-500">
-                    Le système identifie les pièces (diplôme, relevé, bordereau...), extrait le
-                    texte (PDF natif → OCR si nécessaire) et compare avec les données saisies.
-                  </p>
+            {canManage && (
+              <div className="mb-4 rounded-xl border border-brand-200 bg-brand-50 p-4">
+                <div className="flex flex-wrap items-center justify-between gap-4">
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-semibold text-ink-900">
+                      Contrôle automatique des documents
+                    </p>
+                    <p className="text-xs leading-relaxed text-ink-500">
+                      Le système identifie les pièces (diplôme, relevé, bordereau...), extrait le
+                      texte (PDF natif → OCR si nécessaire) et compare avec les données saisies.
+                    </p>
+                  </div>
+                  <Button
+                    onClick={() => void handleDirectVerify()}
+                    disabled={isVerifying}
+                    className="shrink-0 gap-2 bg-brand-700 text-white hover:bg-brand-800 dark:bg-brand-600 dark:hover:bg-brand-500"
+                    size="default"
+                  >
+                    {isVerifying ? (
+                      <LoaderCircle className="size-4 animate-spin" />
+                    ) : (
+                      <ScanSearch className="size-4" />
+                    )}
+                    Vérifier les pièces
+                  </Button>
                 </div>
-                <Button
-                  onClick={() => void handleDirectVerify()}
-                  disabled={isVerifying}
-                  className="shrink-0 gap-2 bg-brand-700 text-white hover:bg-brand-800 dark:bg-brand-600 dark:hover:bg-brand-500"
-                  size="default"
-                >
-                  {isVerifying ? (
-                    <LoaderCircle className="size-4 animate-spin" />
-                  ) : (
-                    <ScanSearch className="size-4" />
-                  )}
-                  Vérifier les pièces
-                </Button>
+                {isVerifying && (
+                  <div className="mt-3 rounded-lg border border-brand-200 bg-card px-3 py-2">
+                    <p className="flex items-center gap-2 text-xs font-medium text-brand-700">
+                      <LoaderCircle className="size-3.5 animate-spin" />
+                      Analyse des documents...
+                    </p>
+                    <ol className="mt-2 grid grid-cols-1 gap-1 text-xs text-ink-500 sm:grid-cols-5">
+                      <li>1. Identification</li>
+                      <li>2. Extraction</li>
+                      <li>3. OCR</li>
+                      <li>4. Comparaison</li>
+                      <li>5. Résultat</li>
+                    </ol>
+                  </div>
+                )}
               </div>
-              {isVerifying && (
-                <div className="mt-3 rounded-lg border border-brand-200 bg-card px-3 py-2">
-                  <p className="flex items-center gap-2 text-xs font-medium text-brand-700">
-                    <LoaderCircle className="size-3.5 animate-spin" />
-                    Analyse des documents...
-                  </p>
-                  <ol className="mt-2 grid grid-cols-1 gap-1 text-xs text-ink-500 sm:grid-cols-5">
-                    <li>1. Identification</li>
-                    <li>2. Extraction</li>
-                    <li>3. OCR</li>
-                    <li>4. Comparaison</li>
-                    <li>5. Résultat</li>
-                  </ol>
-                </div>
-              )}
-            </div>
+            )}
 
             {/* Détails / résultats — logique conservée dans le service dédié */}
             <AdmissionVerificationSection admission={admission} hideButton />
@@ -345,10 +409,12 @@ const AdmissionDetailDialog: React.FC<AdmissionDetailDialogProps> = ({
           <Button onClick={onClose} variant="outline">
             Fermer
           </Button>
-          <Button onClick={onEditStatus}>
-            <BadgeCheck className="size-4" aria-hidden="true" />
-            Modifier le statut
-          </Button>
+          {canManage && (
+            <Button onClick={onEditStatus}>
+              <BadgeCheck className="size-4" aria-hidden="true" />
+              Modifier le statut
+            </Button>
+          )}
         </DialogFooter>
       </DialogContent>
     </Dialog>

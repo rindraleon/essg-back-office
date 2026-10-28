@@ -1,7 +1,10 @@
+import { Suspense } from 'react';
+import { useLocation } from 'react-router-dom';
 import Header from './Header';
 import Footer from './Footer';
 import Sidebar from './Sidebar';
 import Breadcrumb from './Breadcrumb';
+import { CoreSpinLoader } from '../ui/core-spin-loader';
 import type { LayoutProps } from '@/types';
 
 const Layout: React.FC<LayoutProps> = ({
@@ -10,6 +13,8 @@ const Layout: React.FC<LayoutProps> = ({
   showFooter = false,
   showSidebar = false,
 }) => {
+  const { pathname } = useLocation();
+
   return (
     <div className="min-h-screen flex bg-ink-50 text-ink-900">
       {showSidebar && <Sidebar />}
@@ -26,7 +31,17 @@ const Layout: React.FC<LayoutProps> = ({
             }
           >
             <Breadcrumb />
-            {children}
+            <Suspense
+              fallback={
+                <div className="flex min-h-[50vh] items-center justify-center">
+                  <CoreSpinLoader />
+                </div>
+              }
+            >
+              <div key={pathname} className="animate-fade-in">
+                {children}
+              </div>
+            </Suspense>
           </div>
         </main>
 

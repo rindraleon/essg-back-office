@@ -26,7 +26,10 @@ export function useCreateUser() {
         try {
           return await uploadAvatar(created.id, avatarFile);
         } catch (error) {
-          console.warn('Échec dans mutationFn — poursuite en mode dégradé', error instanceof Error ? error.message : error);
+          console.warn(
+            'Échec dans mutationFn — poursuite en mode dégradé',
+            error instanceof Error ? error.message : error
+          );
           return created;
         }
       }

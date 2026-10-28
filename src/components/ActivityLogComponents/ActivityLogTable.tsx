@@ -1,5 +1,5 @@
-import { Eye } from 'lucide-react';
-import { Button } from '../ui/button';
+// import { Eye } from 'lucide-react';
+// import { Button } from '../ui/button';
 import DataTable, { type Column } from '../common/DataTable';
 import type { ActivityLog } from '@/types';
 
@@ -12,6 +12,9 @@ interface ActivityLogTableProps {
   onRowsPerPageChange: (rows: number) => void;
   onView: (log: ActivityLog) => void;
   emptyMessage?: string;
+  loading?: boolean;
+  error?: boolean;
+  onRetry?: () => void;
 }
 
 const ACTION_LABELS: Record<string, string> = {
@@ -51,8 +54,10 @@ export default function ActivityLogTable({
   rowsPerPage,
   onPageChange,
   onRowsPerPageChange,
-  onView,
   emptyMessage = 'Aucune action trouvée',
+  loading = false,
+  error = false,
+  onRetry,
 }: Readonly<ActivityLogTableProps>) {
   const columns: Column<ActivityLog>[] = [
     {
@@ -93,25 +98,28 @@ export default function ActivityLogTable({
         <span className="text-sm text-ink-600">{MODULE_LABELS[row.module] ?? row.module}</span>
       ),
     },
-    {
-      id: 'actions',
-      label: 'Actions',
-      align: 'right',
-      render: (row) => (
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => onView(row)}
-          aria-label="Voir le détail de l'action"
-        >
-          <Eye className="size-4" />
-        </Button>
-      ),
-    },
+    // {
+    //   id: 'actions',
+    //   label: 'Actions',
+    //   align: 'right',
+    //   render: (row) => (
+    //     <Button
+    //       variant="ghost"
+    //       size="icon"
+    //       onClick={() => onView(row)}
+    //       aria-label="Voir le détail de l'action"
+    //     >
+    //       <Eye className="size-4" />
+    //     </Button>
+    //   ),
+    // },
   ];
 
   return (
     <DataTable
+      loading={loading}
+      error={error}
+      onRetry={onRetry}
       columns={columns}
       data={data}
       totalCount={totalCount}

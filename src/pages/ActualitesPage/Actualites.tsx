@@ -19,11 +19,17 @@ import {
   useTitle,
 } from '@/hooks';
 import type { ActualiteFormData, ActualiteItem } from '@/types';
+import { useAuth } from '@/contexts';
+import { PERMISSIONS } from '@/constants';
 
 const Actualites: React.FC = () => {
   useScrollToTop();
   useTitle('Actualités');
-  const { data = [] } = useActualitesQuery();
+  const { hasPermission } = useAuth();
+  const canCreate = hasPermission(PERMISSIONS.CONTENT_CREATE);
+  const canUpdate = hasPermission(PERMISSIONS.CONTENT_UPDATE);
+  const canDelete = hasPermission(PERMISSIONS.CONTENT_DELETE);
+  const { data = [], isLoading, isError, refetch } = useActualitesQuery();
   const createMutation = useCreateActualite();
   const updateMutation = useUpdateActualite();
   const deleteMutation = useDeleteActualite();
@@ -109,6 +115,7 @@ const Actualites: React.FC = () => {
       } catch (error) {
         toast.error("Erreur lors de l'enregistrement");
         console.error('Error saving actualite:', error);
+        throw error;
       }
     },
     [formMode, selectedActualite, createMutation, updateMutation]
@@ -126,6 +133,7 @@ const Actualites: React.FC = () => {
   return (
     <div className="mx-auto max-w-7xl py-4 space-y-2 mx-auto min-w-0">
       <ListPageHeader
+        loading={isLoading}
         title="Liste des actualités"
         totalCount={filteredData.length}
         searchValue={searchTerm}
@@ -134,8 +142,8 @@ const Actualites: React.FC = () => {
         onToggleFilters={handleToggleFilters}
         filtersOpen={filtersOpen}
         activeFilterCount={activeFilterCount}
-        actionLabel="Nouvelle actualité"
-        onAction={handleOpenCreate}
+        actionLabel={canCreate ? 'Nouvelle actualité' : undefined}
+        onAction={canCreate ? handleOpenCreate : undefined}
       />
 
       {filtersOpen && (
@@ -155,6 +163,11 @@ const Actualites: React.FC = () => {
       )}
 
       <ActualiteTable
+        loading={isLoading}
+
+        error={isError}
+
+        onRetry={() => void refetch()}
         data={paginatedData}
         totalCount={filteredData.length}
         page={currentPage}
@@ -162,8 +175,8 @@ const Actualites: React.FC = () => {
         onPageChange={handleChangePage}
         onRowsPerPageChange={handleChangeRowsPerPage}
         onView={handleView}
-        onEdit={handleOpenEdit}
-        onDelete={handleDeleteRequest}
+        onEdit={canUpdate ? handleOpenEdit : undefined}
+        onDelete={canDelete ? handleDeleteRequest : undefined}
       />
 
       <ActualiteForm

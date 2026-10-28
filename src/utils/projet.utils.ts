@@ -19,7 +19,10 @@ export const isValidSourceUrl = (url: string): boolean => {
     const parsed = new URL(normalizeSourceUrl(url));
     return ['http:', 'https:'].includes(parsed.protocol);
   } catch (error) {
-    console.warn('Échec dans isValidSourceUrl — poursuite en mode dégradé', error instanceof Error ? error.message : error);
+    console.warn(
+      'Échec dans isValidSourceUrl — poursuite en mode dégradé',
+      error instanceof Error ? error.message : error
+    );
     return false;
   }
 };

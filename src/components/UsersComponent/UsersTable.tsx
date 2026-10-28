@@ -3,6 +3,7 @@ import React from 'react';
 import { getImageUrl, formatFullName, getPersonInitials } from '@/utils';
 import type { User } from '@/types';
 import type { UserPresence } from '@/types/session.types';
+import { getUserRoleLabel } from '@/constants';
 import {
   PRESENCE_DOT_COLORS,
   PRESENCE_LABELS,
@@ -28,6 +29,9 @@ interface UsersTableProps {
   onDelete: (user: User) => void;
   onOpenSessions: (user: User) => void;
   isAdmin: boolean;
+  loading?: boolean;
+  error?: boolean;
+  onRetry?: () => void;
 }
 
 const UsersTable: React.FC<UsersTableProps> = ({
@@ -43,25 +47,16 @@ const UsersTable: React.FC<UsersTableProps> = ({
   onDelete,
   onOpenSessions,
   isAdmin,
+  loading = false,
+  error = false,
+  onRetry,
 }) => {
-  const getRoleLabel = (role: string) => {
-    switch (role) {
-      case 'admin':
-        return 'Administrateur';
-      case 'editeur':
-        return 'Éditeur';
-      case 'lecteur':
-        return 'Lecteur';
-      default:
-        return role;
-    }
-  };
-
   const getRoleVariant = (role: string) => {
     switch (role) {
       case 'admin':
         return 'default';
       case 'editeur':
+      case 'scolarite':
         return 'secondary';
       case 'lecteur':
         return 'outline';
@@ -116,7 +111,7 @@ const UsersTable: React.FC<UsersTableProps> = ({
       label: 'Rôle',
       minWidth: 140,
       render: (user) => (
-        <Badge variant={getRoleVariant(user.role)}>{getRoleLabel(user.role)}</Badge>
+        <Badge variant={getRoleVariant(user.role)}>{getUserRoleLabel(user.role)}</Badge>
       ),
     },
 
@@ -180,6 +175,9 @@ const UsersTable: React.FC<UsersTableProps> = ({
 
   return (
     <DataTable<User>
+      loading={loading}
+      error={error}
+      onRetry={onRetry}
       columns={columns}
       data={data}
       totalCount={totalCount}

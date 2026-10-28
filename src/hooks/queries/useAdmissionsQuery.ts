@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   deleteAdmission,
   deleteAdmissionFile,
+  downloadAdmissionArchive,
   getAdmissionById,
   getAdmissionVerifications,
   getAllAdmissions,
@@ -81,6 +82,12 @@ export function useDeleteAdmission() {
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: queryKeys.admissions.all });
     },
+  });
+}
+
+export function useDownloadAdmissionArchive() {
+  return useMutation({
+    mutationFn: (id: number) => downloadAdmissionArchive(id),
   });
 }
 

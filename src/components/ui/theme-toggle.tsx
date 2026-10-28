@@ -18,10 +18,6 @@ const OPTIONS: ReadonlyArray<{ value: ThemeMode; label: string; Icon: typeof Sun
 ];
 
 interface ThemeToggleProps {
-  /**
-   * « select » : bouton ouvrant le choix Clair / Sombre / Système (en-tête).
-   * « cycle »  : bascule directe clair ↔ sombre (menu mobile, page de connexion).
-   */
   variant?: 'select' | 'cycle';
   className?: string;
 }

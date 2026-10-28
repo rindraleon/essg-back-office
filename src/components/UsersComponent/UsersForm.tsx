@@ -9,9 +9,10 @@ import {
 } from '@/utils';
 import { uploadAvatar } from '@/services';
 import type { User, UserFormData } from '@/types';
-import { useFormValidation } from '@/hooks';
+import { useFormValidation, useSaveStatus } from '@/hooks';
 import { validateEmail, validateFirstName, validateName } from '@/constants';
 import { Button } from '../ui/button';
+import { SaveButton } from '../ui/save-button';
 import { Label } from '../ui/label';
 import { Checkbox } from '../ui/checkbox';
 import { Dialog, DialogBody, DialogContent, DialogFooter, DialogHeader } from '../ui/dialog';
@@ -30,6 +31,7 @@ interface UsersFormProps {
 const ROLE_OPTIONS = [
   { label: 'Administrateur', value: 'admin' },
   { label: 'Éditeur', value: 'editeur' },
+  { label: 'Scolarité', value: 'scolarite' },
   // { label: 'Lecteur', value: 'lecteur' },
 ];
 
@@ -47,7 +49,8 @@ const UsersForm: React.FC<UsersFormProps> = ({ open, onClose, onSubmit, initialD
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
-  const [uploading, setUploading] = useState(false);
+  const { status, run } = useSaveStatus();
+  const saving = status === 'loading';
   const [avatarError, setAvatarError] = useState<string>('');
 
   const { formData, errors, handleChange, handleBlur, validateAllSteps, setFormData, resetForm } =
@@ -138,60 +141,46 @@ const UsersForm: React.FC<UsersFormProps> = ({ open, onClose, onSubmit, initialD
     return '??';
   };
 
-  const handleSubmit = async () => {
-    const allTouched: Record<string, boolean> = {};
-    Object.keys(defaultFormData).forEach((k) => (allTouched[k] = true));
+  const handleSubmit = () => {
+    if (!validateAllSteps()) return;
 
-    const isValid = validateAllSteps();
-
-    if (!isValid) {
-      return;
-    }
-
-    if (avatarFile) {
-      try {
-        setUploading(true);
-
-        if (mode === 'edit' && initialData) {
-          const updatedUser = await uploadAvatar(initialData.id, avatarFile);
-          setFormData((prev) => ({ ...prev, avatar: updatedUser.avatar }));
-          setAvatarPreview(updatedUser.avatar ?? null);
-          setAvatarFile(null);
+    void run(async () => {
+      if (avatarFile) {
+        try {
+          if (mode === 'edit' && initialData) {
+            const updatedUser = await uploadAvatar(initialData.id, avatarFile);
+            setFormData((prev) => ({ ...prev, avatar: updatedUser.avatar }));
+            setAvatarPreview(updatedUser.avatar ?? null);
+            setAvatarFile(null);
+          }
+        } catch (error) {
+          console.warn(
+            'Échec dans handleSubmit — poursuite en mode dégradé',
+            error instanceof Error ? error.message : error
+          );
+          const message =
+            error instanceof Error ? error.message : "Erreur lors de l'upload de l'avatar";
+          setAvatarError(message);
+          toast.error(message);
+          throw error;
         }
-      } catch (error) {
-        console.warn('Échec dans handleSubmit — poursuite en mode dégradé', error instanceof Error ? error.message : error);
-        const message =
-          error instanceof Error ? error.message : "Erreur lors de l'upload de l'avatar";
-        setAvatarError(message);
-        toast.error(message);
-        setUploading(false);
-        return;
       }
-    }
 
-    const formDataToSubmit = {
-      ...formData,
-      ...(avatarFile && { avatarFile }),
-    };
-
-    try {
-      await onSubmit(formDataToSubmit);
-    } finally {
-      setUploading(false);
-    }
+      await onSubmit({
+        ...formData,
+        ...(avatarFile && { avatarFile }),
+      });
+    });
   };
 
   const dialogTitle = mode === 'create' ? 'Nouvel utilisateur' : "Modifier l'utilisateur";
 
-  const getButtonText = (): string => {
-    if (uploading) return 'Enregistrement…';
-    return mode === 'create' ? 'Créer' : 'Enregistrer';
-  };
+  const getButtonText = (): string => (mode === 'create' ? 'Créer' : 'Enregistrer');
   const buttonText = getButtonText();
 
   return (
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
-      <DialogContent size="xl" showCloseButton={!uploading}>
+      <DialogContent size="xl" showCloseButton={!saving}>
         <DialogHeader
           icon={<UserPlus aria-hidden="true" />}
           title={dialogTitle}
@@ -217,7 +206,7 @@ const UsersForm: React.FC<UsersFormProps> = ({ open, onClose, onSubmit, initialD
                       variant="destructive"
                       size="icon-sm"
                       onClick={handleDeleteAvatar}
-                      disabled={uploading}
+                      disabled={saving}
                       aria-label="Retirer la photo"
                       className="absolute -top-1 -right-1 size-7 rounded-full bg-card shadow-soft"
                     >
@@ -240,9 +229,9 @@ const UsersForm: React.FC<UsersFormProps> = ({ open, onClose, onSubmit, initialD
                     variant="outline"
                     size="sm"
                     onClick={() => fileInputRef.current?.click()}
-                    disabled={uploading}
+                    disabled={saving}
                   >
-                    {uploading ? (
+                    {saving ? (
                       <Loader2 className="size-3.5 animate-spin" aria-hidden="true" />
                     ) : (
                       <ImageUp className="size-3.5" aria-hidden="true" />
@@ -338,13 +327,12 @@ const UsersForm: React.FC<UsersFormProps> = ({ open, onClose, onSubmit, initialD
         </DialogBody>
 
         <DialogFooter>
-          <Button type="button" variant="outline" onClick={onClose} disabled={uploading}>
+          <Button type="button" variant="outline" onClick={onClose} disabled={saving}>
             Annuler
           </Button>
-          <Button type="button" onClick={handleSubmit} disabled={uploading} aria-busy={uploading}>
-            {uploading && <Loader2 className="size-4 animate-spin" aria-hidden="true" />}
+          <SaveButton status={status} onClick={handleSubmit}>
             {buttonText}
-          </Button>
+          </SaveButton>
         </DialogFooter>
       </DialogContent>
     </Dialog>

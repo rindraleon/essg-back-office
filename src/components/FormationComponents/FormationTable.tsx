@@ -14,8 +14,11 @@ interface FormationTableProps {
   onPageChange: (page: number) => void;
   onRowsPerPageChange: (rows: number) => void;
   onView: (formation: Formation) => void;
-  onEdit: (formation: Formation) => void;
-  onDelete: (formation: Formation) => void;
+  onEdit?: (formation: Formation) => void;
+  onDelete?: (formation: Formation) => void;
+  loading?: boolean;
+  error?: boolean;
+  onRetry?: () => void;
 }
 
 const FormationTable: React.FC<FormationTableProps> = ({
@@ -28,6 +31,9 @@ const FormationTable: React.FC<FormationTableProps> = ({
   onView,
   onEdit,
   onDelete,
+  loading = false,
+  error = false,
+  onRetry,
 }) => {
   const columns: Column<Formation>[] = [
     {
@@ -37,8 +43,6 @@ const FormationTable: React.FC<FormationTableProps> = ({
       render: (row) => (
         <div className="max-w-md">
           <span className="font-semibold text-ink-900 line-clamp-1">{row.titre}</span>
-          {/* « Formation = Parcours » : seul le rattachement mention est
-              affiché ici, le parcours porterait deux fois le même libellé. */}
           <p className="text-xs text-ink-500 line-clamp-1 mt-0.5">
             {row.parcours?.mention?.nom ?? row.domaine.join(', ')}
           </p>
@@ -98,24 +102,28 @@ const FormationTable: React.FC<FormationTableProps> = ({
           >
             <Eye className="size-4 h-4 w-4" />
           </Button>
-          <Button
-            size="icon"
-            variant="ghost"
-            onClick={() => onEdit(row)}
-            className="h-8 w-8"
-            aria-label={`Modifier la formation ${row.titre}`}
-          >
-            <Pencil className="size-4 h-4 w-4" />
-          </Button>
-          <Button
-            size="icon"
-            variant="ghost"
-            onClick={() => onDelete(row)}
-            className="h-8 w-8 text-red-600 hover:text-red-700"
-            aria-label={`Supprimer la formation ${row.titre}`}
-          >
-            <Trash2 className="size-4 h-4 w-4" />
-          </Button>
+          {onEdit && (
+            <Button
+              size="icon"
+              variant="ghost"
+              onClick={() => onEdit(row)}
+              className="h-8 w-8"
+              aria-label={`Modifier la formation ${row.titre}`}
+            >
+              <Pencil className="size-4 h-4 w-4" />
+            </Button>
+          )}
+          {onDelete && (
+            <Button
+              size="icon"
+              variant="ghost"
+              onClick={() => onDelete(row)}
+              className="h-8 w-8 text-red-600 hover:text-red-700"
+              aria-label={`Supprimer la formation ${row.titre}`}
+            >
+              <Trash2 className="size-4 h-4 w-4" />
+            </Button>
+          )}
         </div>
       ),
     },
@@ -123,6 +131,9 @@ const FormationTable: React.FC<FormationTableProps> = ({
 
   return (
     <DataTable<Formation>
+      loading={loading}
+      error={error}
+      onRetry={onRetry}
       columns={columns}
       data={data}
       totalCount={totalCount}

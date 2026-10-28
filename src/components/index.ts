@@ -80,6 +80,8 @@ export { default as RessourceHumaineViewDialog } from './RessourceHumaineCompone
 export { Avatar, AvatarImage, AvatarFallback } from './ui/avatar';
 export { Badge } from './ui/badge';
 export { Button } from './ui/button';
+export { SaveButton } from './ui/save-button';
+export type { SaveStatus } from './ui/save-button';
 export {
   Card,
   CardHeader,

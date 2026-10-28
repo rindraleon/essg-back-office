@@ -7,6 +7,8 @@ import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip';
 import { formatFullName, getPersonInitials } from '@/utils';
+import { useAuth } from '@/contexts';
+import { PERMISSIONS } from '@/constants';
 
 interface AdmissionTableProps {
   data: Admission[];
@@ -20,6 +22,8 @@ interface AdmissionTableProps {
   onDelete: (id: number) => void;
   loading?: boolean;
   emptyMessage?: string;
+  error?: boolean;
+  onRetry?: () => void;
 }
 
 const getStatusColor = (statut: string): 'default' | 'secondary' | 'destructive' | 'outline' => {
@@ -63,8 +67,13 @@ const AdmissionTable: React.FC<AdmissionTableProps> = ({
   onEdit,
   onDelete,
   loading = false,
+  error = false,
+  onRetry,
   emptyMessage = 'Aucune admission trouvée',
 }) => {
+  const { hasPermission } = useAuth();
+  const canManage = hasPermission(PERMISSIONS.ADMISSION_MANAGE);
+  const canDelete = hasPermission(PERMISSIONS.ADMISSION_DELETE);
   const columns = useMemo<Column<Admission>[]>(
     () => [
       {
@@ -154,7 +163,7 @@ const AdmissionTable: React.FC<AdmissionTableProps> = ({
         render: (row) => (
           <TooltipProvider>
             <div className="flex justify-end gap-1">
-              <Tooltip>
+              {/* <Tooltip>
                 <TooltipTrigger asChild>
                   <Button
                     size="icon"
@@ -166,54 +175,50 @@ const AdmissionTable: React.FC<AdmissionTableProps> = ({
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>Voir détails</TooltipContent>
-              </Tooltip>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    onClick={() => onEdit(row)}
-                    className="h-8 w-8"
-                  >
-                    <CircleCheck className="h-4 w-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Valider / répondre</TooltipContent>
-              </Tooltip>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    onClick={() => onDelete(row.id)}
-                    className="h-8 w-8 text-red-600 hover:text-red-700"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Supprimer</TooltipContent>
-              </Tooltip>
+              </Tooltip> */}
+              {canManage && (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      onClick={() => onEdit(row)}
+                      className="h-8 w-8"
+                    >
+                      <CircleCheck className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Valider / répondre</TooltipContent>
+                </Tooltip>
+              )}
+              {canDelete && (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      onClick={() => onDelete(row.id)}
+                      className="h-8 w-8 text-red-600 hover:text-red-700"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Supprimer</TooltipContent>
+                </Tooltip>
+              )}
             </div>
           </TooltipProvider>
         ),
       },
     ],
-    [onView, onEdit, onDelete]
+    [onView, onEdit, onDelete, canManage, canDelete]
   );
-
-  if (loading) {
-    return (
-      <div className="border border-ink-100 rounded-xl overflow-hidden bg-card p-8">
-        <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-ink-300 border-t-brand-600"></div>
-          <p className="mt-2 text-ink-600">Chargement des admissions...</p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <DataTable<Admission>
+      loading={loading}
+      error={error}
+      onRetry={onRetry}
       columns={columns}
       data={data}
       totalCount={totalCount}

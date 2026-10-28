@@ -10,8 +10,9 @@ import {
   validateOptionalEmailOrPhone,
   validateOptionalUrl,
 } from '@/constants';
-import { useFormValidation } from '@/hooks';
+import { useFormValidation, useSaveStatus } from '@/hooks';
 import { Button } from '../ui/button';
+import { SaveButton } from '../ui/save-button';
 import { Label } from '../ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../ui/dialog';
 import { FloatingInput } from '../ui/floating-input';
@@ -125,7 +126,6 @@ const PartenaireForm: React.FC<PartenaireFormProps> = ({
       resetForm();
       setLogoPreview('');
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, mode, initialId]);
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -138,7 +138,10 @@ const PartenaireForm: React.FC<PartenaireFormProps> = ({
       setLogoPreview(getImageUrl(url));
       toast.success('Logo téléversé avec succès');
     } catch (err) {
-      console.warn('Échec dans handleImageUpload — poursuite en mode dégradé', err instanceof Error ? err.message : err);
+      console.warn(
+        'Échec dans handleImageUpload — poursuite en mode dégradé',
+        err instanceof Error ? err.message : err
+      );
       const message = err instanceof Error ? err.message : 'Échec du téléversement du logo.';
       toast.error(message);
     } finally {
@@ -169,27 +172,22 @@ const PartenaireForm: React.FC<PartenaireFormProps> = ({
     }
   };
 
-  const [submitting, setSubmitting] = useState(false);
+  const { status, run } = useSaveStatus();
+  const submitting = status === 'loading';
 
-  const handleSubmit = async () => {
+  const handleSubmit = () => {
     if (submitting || !validateAllSteps()) return;
-    setSubmitting(true);
-    try {
-      await onSubmit(formData);
-    } finally {
-      setSubmitting(false);
-    }
+    void run(() => onSubmit(formData));
   };
 
   const dialogTitle = mode === 'create' ? 'Nouveau partenaire' : 'Modifier le partenaire';
-  let submitLabel = mode === 'create' ? 'Créer' : 'Enregistrer';
-  if (submitting) submitLabel = 'Enregistrement...';
+  const submitLabel = mode === 'create' ? 'Créer' : 'Enregistrer';
 
   const renderStep0 = () => (
     <div className="space-y-4">
       <FloatingInput
         id="nom"
-        label="Nom *"
+        label="Nom du partenaire *"
         value={formData.nom}
         onChange={(e) => handleChange('nom', toUpperName(e.target.value))}
         onBlur={() => handleBlur('nom')}
@@ -198,7 +196,7 @@ const PartenaireForm: React.FC<PartenaireFormProps> = ({
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <FloatingSelect
-          label="Type *"
+          label="Type du partenaire *"
           value={formData.type}
           onValueChange={(v) => v && handleChange('type', v)}
           options={[...PARTENAIRE_TYPES]}
@@ -206,7 +204,7 @@ const PartenaireForm: React.FC<PartenaireFormProps> = ({
         />
         <FloatingInput
           id="secteur"
-          label="Secteur *"
+          label="Secteur d'activité *"
           value={formData.secteur}
           onChange={(e) => handleChange('secteur', e.target.value)}
           onBlur={() => handleBlur('secteur')}
@@ -231,7 +229,7 @@ const PartenaireForm: React.FC<PartenaireFormProps> = ({
     <div className="space-y-4">
       <FloatingTextarea
         id="description"
-        label="Description *"
+        label="Description du partenaire *"
         value={formData.description}
         onChange={(e) => handleChange('description', e.target.value)}
         onBlur={() => handleBlur('description')}
@@ -282,7 +280,7 @@ const PartenaireForm: React.FC<PartenaireFormProps> = ({
     <div className="space-y-1">
       <FloatingInput
         id="siteWeb"
-        label="Site web"
+        label="Site web du partenaire"
         type="url"
         autoComplete="url"
         value={formData.siteWeb}
@@ -294,7 +292,7 @@ const PartenaireForm: React.FC<PartenaireFormProps> = ({
 
       <FloatingInput
         id="contact"
-        label="Contact"
+        label="Contact du partenaire"
         autoComplete="email"
         value={formData.contact}
         onChange={(e) => handleChange('contact', e.target.value)}
@@ -361,12 +359,12 @@ const PartenaireForm: React.FC<PartenaireFormProps> = ({
         <div className="px-5 py-4 overflow-y-auto max-h-[58vh]">{stepRenderers[activeStep]()}</div>
 
         <DialogFooter className="px-5 py-3 mb-4 mx-4 border-t bg-ink-50/80">
-          <div className="flex items-center justify-between w-full">
+          <div className="flex flex-wrap items-center justify-between gap-2 w-full">
             <span className="text-xs text-ink-400">
               {activeStep + 1}/{STEPS.length}
             </span>
 
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center justify-end gap-2 ml-auto">
               <Button
                 type="button"
                 variant="ghost"
@@ -396,10 +394,14 @@ const PartenaireForm: React.FC<PartenaireFormProps> = ({
                   <ArrowRight className="h-3.5 w-3.5" />
                 </Button>
               ) : (
-                <Button type="button" size="sm" onClick={handleSubmit} disabled={submitting}>
-                  <CircleCheck className="h-3.5 w-3.5" />
+                <SaveButton
+                  size="sm"
+                  status={status}
+                  celebrate={mode === 'create'}
+                  onClick={handleSubmit}
+                >
                   {submitLabel}
-                </Button>
+                </SaveButton>
               )}
             </div>
           </div>

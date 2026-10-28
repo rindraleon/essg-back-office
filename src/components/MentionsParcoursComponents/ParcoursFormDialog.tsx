@@ -1,16 +1,12 @@
-import { Loader2 } from 'lucide-react';
 import React, { useEffect, useMemo, useState } from 'react';
 import type { ParcoursFormDialogProps } from '@/types';
-import { useMentionOptionsQuery } from '@/hooks';
+import { useMentionOptionsQuery, useSaveStatus } from '@/hooks';
 import { Button } from '../ui/button';
+import { SaveButton } from '../ui/save-button';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '../ui/dialog';
 import { FloatingInput } from '../ui/floating-input';
 import { FloatingSelect } from '../ui/floating-select';
 
-/**
- * Formulaire « parcours seul » : sélection obligatoire de la mention puis
- * nom du parcours. Le backend garantit l'unicité du nom dans la mention.
- */
 const ParcoursFormDialog: React.FC<ParcoursFormDialogProps> = ({
   open,
   onClose,
@@ -19,8 +15,9 @@ const ParcoursFormDialog: React.FC<ParcoursFormDialogProps> = ({
   lockedMentionId,
   lockedMentionName,
   mode,
-  submitting = false,
 }) => {
+  const { status, run } = useSaveStatus();
+  const submitting = status === 'loading';
   const [mentionId, setMentionId] = useState<string>('');
   const [nom, setNom] = useState('');
   const [submitted, setSubmitted] = useState(false);
@@ -59,14 +56,16 @@ const ParcoursFormDialog: React.FC<ParcoursFormDialogProps> = ({
     );
   }, [lockedMentionId, lockedMentionName, mentionOptions, initialData]);
 
-  const handleSubmit = async () => {
+  const handleSubmit = () => {
     setSubmitted(true);
     if (nomError || mentionError || submitting) return;
-    await onSubmit({
-      mentionId: Number(mentionId),
-      nom: normalizedNom,
-      ...(mode === 'edit' ? { isActive: initialData?.isActive } : {}),
-    });
+    void run(() =>
+      onSubmit({
+        mentionId: Number(mentionId),
+        nom: normalizedNom,
+        ...(mode === 'edit' ? { isActive: initialData?.isActive } : {}),
+      })
+    );
   };
 
   return (
@@ -115,15 +114,14 @@ const ParcoursFormDialog: React.FC<ParcoursFormDialogProps> = ({
             <Button type="button" variant="ghost" size="sm" onClick={onClose} disabled={submitting}>
               Annuler
             </Button>
-            <Button
-              type="button"
+            <SaveButton
               size="sm"
-              onClick={() => void handleSubmit()}
-              disabled={submitting}
+              status={status}
+              celebrate={mode === 'create'}
+              onClick={handleSubmit}
             >
-              {submitting && <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />}
               {mode === 'create' ? 'Créer le parcours' : 'Enregistrer'}
-            </Button>
+            </SaveButton>
           </div>
         </DialogFooter>
       </DialogContent>

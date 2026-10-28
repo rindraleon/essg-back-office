@@ -4,6 +4,7 @@ import { Mail, Shield, UserRound, X } from 'lucide-react';
 
 import { getImageUrl, formatFullName, getPersonInitials } from '@/utils';
 import type { User } from '@/types';
+import { getUserRoleLabel } from '@/constants';
 
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { Badge } from '../ui/badge';
@@ -22,17 +23,10 @@ interface InfoItemProps {
   icon?: ReactNode;
 }
 
-const ROLE_LABELS: Record<string, string> = {
-  admin: 'Administrateur',
-  editeur: 'Éditeur',
-  lecteur: 'Lecteur',
-};
-
-const getRoleLabel = (role: string): string => ROLE_LABELS[role] ?? role;
-
 const ROLE_VARIANTS: Record<User['role'], 'default' | 'secondary' | 'outline'> = {
   admin: 'default',
   editeur: 'secondary',
+  scolarite: 'secondary',
   lecteur: 'outline',
 };
 
@@ -85,7 +79,7 @@ function UsersViewDialog({ open, onClose, user }: Readonly<UsersViewDialogProps>
 
   const fullName = formatFullName(user);
   const initials = getPersonInitials(user);
-  const roleLabel = getRoleLabel(user.role);
+  const roleLabel = getUserRoleLabel(user.role);
 
   const roleVariant = ROLE_VARIANTS[user.role] ?? 'outline';
 

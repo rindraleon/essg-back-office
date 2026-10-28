@@ -7,13 +7,13 @@ export {
   formatBacSerie,
   formatBacType,
 } from './admission.constants';
-export {
-  NIVEAU_OPTIONS,
-  DUREE_OPTIONS,
-  CONDITION_ACCES_OPTIONS,
-} from './formation.constants';
+export { NIVEAU_OPTIONS, DUREE_OPTIONS, CONDITION_ACCES_OPTIONS } from './formation.constants';
 export { PRESENCE_LABELS, PRESENCE_DOT_COLORS, PRESENCE_TEXT_COLORS } from './presence.constants';
-export { isNavActive, isAdminRole, getVisibleNavItems } from './navigation';
+export { isNavActive, isAdminRole, canAccessMenu, getVisibleNavItems } from './navigation';
+export type { AccessContext, MenuAccess } from './navigation';
+export { PERMISSIONS } from './permissions.constants';
+export type { Permission } from './permissions.constants';
+export { USER_ROLE_LABELS, getUserRoleLabel } from './user-role.constants';
 export {
   PARTENAIRE_TYPES,
   PARTENAIRE_TYPE_COLORS,

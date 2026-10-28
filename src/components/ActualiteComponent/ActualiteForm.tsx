@@ -5,8 +5,9 @@ import { uploadImage } from '@/services';
 import { getImageUrl } from '@/utils';
 import type { ActualiteItem, ActualiteFormData } from '@/types';
 import { ACTUALITE_CATEGORIES as categories, ACTUALITE_STATUTS as statuts } from '@/constants';
-import { useFormValidation } from '@/hooks';
+import { useFormValidation, useSaveStatus } from '@/hooks';
 import { Button } from '../ui/button';
+import { SaveButton } from '../ui/save-button';
 import { Label } from '../ui/label';
 import { Checkbox } from '../ui/checkbox';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../ui/dialog';
@@ -140,7 +141,10 @@ const ActualiteForm: React.FC<ActualiteFormProps> = ({
       setImagePreview(getImageUrl(url));
       toast.success('Image téléversée avec succès');
     } catch (err) {
-      console.warn('Échec dans handleImageUpload — poursuite en mode dégradé', err instanceof Error ? err.message : err);
+      console.warn(
+        'Échec dans handleImageUpload — poursuite en mode dégradé',
+        err instanceof Error ? err.message : err
+      );
       const message = err instanceof Error ? err.message : "Échec du téléversement de l'image.";
       toast.error(message);
     } finally {
@@ -170,21 +174,16 @@ const ActualiteForm: React.FC<ActualiteFormProps> = ({
     }
   };
 
-  const [submitting, setSubmitting] = useState(false);
+  const { status, run } = useSaveStatus();
+  const submitting = status === 'loading';
 
-  const handleSubmit = async () => {
+  const handleSubmit = () => {
     if (submitting || !validateAllSteps()) return;
-    setSubmitting(true);
-    try {
-      await onSubmit(formData);
-    } finally {
-      setSubmitting(false);
-    }
+    void run(() => onSubmit(formData));
   };
 
   const dialogTitle = mode === 'create' ? 'Nouvelle actualité' : "Modifier l'actualité";
-  let submitLabel = mode === 'create' ? 'Créer' : 'Enregistrer';
-  if (submitting) submitLabel = 'Enregistrement...';
+  const submitLabel = mode === 'create' ? 'Créer' : 'Enregistrer';
 
   const renderStep0 = () => (
     <div className="space-y-1">
@@ -282,12 +281,12 @@ const ActualiteForm: React.FC<ActualiteFormProps> = ({
               type="button"
               variant="outline"
               onClick={() => fileInputRef.current?.click()}
-              disabled={uploadingImage}
+              loading={uploadingImage}
               size="sm"
               className="gap-1.5 bg-card text-xs h-8"
             >
               <Upload className="h-3.5 w-3.5" />
-              {uploadingImage ? 'Upload...' : 'Choisir une image'}
+              {uploadingImage ? 'Téléversement…' : 'Choisir une image'}
             </Button>
             <span className="text-[10px] text-ink-400">JPG, PNG, GIF, WebP — max 5 Mo</span>
           </div>
@@ -382,12 +381,12 @@ const ActualiteForm: React.FC<ActualiteFormProps> = ({
         <div className="px-5 py-4 overflow-y-auto max-h-[58vh]">{stepRenderers[activeStep]()}</div>
 
         <DialogFooter className="px-5 py-3 mb-4 mx-4 border-t bg-ink-50/80">
-          <div className="flex items-center justify-between w-full">
+          <div className="flex flex-wrap items-center justify-between gap-2 w-full">
             <span className="text-xs text-ink-400">
               {activeStep + 1}/{STEPS.length}
             </span>
 
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center justify-end gap-2 ml-auto">
               <Button
                 type="button"
                 variant="ghost"
@@ -425,16 +424,14 @@ const ActualiteForm: React.FC<ActualiteFormProps> = ({
                   <ArrowRight className="h-3.5 w-3.5" />
                 </Button>
               ) : (
-                <Button
-                  type="button"
+                <SaveButton
                   size="sm"
+                  status={status}
+                  celebrate={mode === 'create'}
                   onClick={handleSubmit}
-                  disabled={submitting}
-                  className="gap-1 h-8 bg-brand-600 hover:bg-brand-700"
                 >
-                  <CircleCheck className="h-3.5 w-3.5" />
                   {submitLabel}
-                </Button>
+                </SaveButton>
               )}
             </div>
           </div>

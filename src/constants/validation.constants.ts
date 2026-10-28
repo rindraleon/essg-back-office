@@ -146,7 +146,5 @@ export const validateOptionalBordereau = (value: string): string | undefined => 
   if (isEmpty(value)) return undefined;
   const trimmed = String(value).trim();
   if (trimmed.length > 30) return VALIDATION_MESSAGES.bordereauInvalid;
-  return BORDEREAU_PATTERN.test(trimmed)
-    ? undefined
-    : VALIDATION_MESSAGES.bordereauInvalid;
+  return BORDEREAU_PATTERN.test(trimmed) ? undefined : VALIDATION_MESSAGES.bordereauInvalid;
 };

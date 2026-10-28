@@ -1,3 +1,7 @@
+import type { Permission } from '@/constants/permissions.constants';
+
+export type UserRole = 'admin' | 'editeur' | 'scolarite' | 'lecteur';
+
 export interface LoginRequest {
   email: string;
   password: string;
@@ -17,7 +21,8 @@ export interface User {
   email: string;
   prenom: string;
   nom: string;
-  role: 'admin' | 'editeur' | 'lecteur';
+  role: UserRole;
+  permissions: Permission[];
   estActif: boolean;
   creeLe: string;
   misAJourLe: string;
@@ -29,7 +34,7 @@ export interface UserFormData {
   motDePasse?: string;
   prenom: string;
   nom: string;
-  role?: 'admin' | 'editeur' | 'lecteur';
+  role?: UserRole;
   estActif?: boolean;
   avatar?: string;
   avatarFile?: File;

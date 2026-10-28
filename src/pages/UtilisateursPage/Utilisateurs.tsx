@@ -29,7 +29,7 @@ const Utilisateurs: React.FC = () => {
   useScrollToTop();
   useTitle('Utilisateurs');
 
-  const { data = [] } = useUsersQuery();
+  const { data = [], isLoading, isError, refetch } = useUsersQuery();
 
   const { data: presenceData } = useUsersPresence();
   const createMutation = useCreateUser();
@@ -171,13 +171,12 @@ const Utilisateurs: React.FC = () => {
 
   const handleFormSubmit = useCallback(
     async (formData: UserFormData) => {
+      if (formMode === 'create' && !formData.motDePasse) {
+        toast.error('Le mot de passe est requis');
+        throw new Error('Le mot de passe est requis');
+      }
       try {
         if (formMode === 'create') {
-          if (!formData.motDePasse) {
-            toast.error('Le mot de passe est requis');
-            return;
-          }
-
           const { avatarFile, ...userDataWithoutAvatar } = formData;
           await createMutation.mutateAsync({
             userData: {
@@ -203,6 +202,7 @@ const Utilisateurs: React.FC = () => {
           error instanceof ApiError ? error.message : "Erreur lors de l'enregistrement";
         toast.error(message);
         console.error('Error saving user:', error);
+        throw error;
       }
     },
     [formMode, selectedUser, createMutation, updateMutation]
@@ -211,6 +211,7 @@ const Utilisateurs: React.FC = () => {
   return (
     <div className="mx-auto max-w-7xl py-4 space-y-2 mx-auto min-w-0">
       <ListPageHeader
+        loading={isLoading}
         title="Gestion des utilisateurs"
         totalCount={filteredData.length}
         searchValue={filters.search}
@@ -233,6 +234,11 @@ const Utilisateurs: React.FC = () => {
       />
 
       <UsersTable
+        loading={isLoading}
+
+        error={isError}
+
+        onRetry={() => void refetch()}
         data={paginatedData}
         presenceByUser={presenceByUser}
         totalCount={filteredData.length}

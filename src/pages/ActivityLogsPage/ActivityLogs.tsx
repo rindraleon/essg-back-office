@@ -1,5 +1,4 @@
 import { useCallback, useMemo, useState } from 'react';
-import { toast } from 'sonner';
 import { RotateCcw, X } from 'lucide-react';
 import {
   Button,
@@ -59,7 +58,7 @@ const ActivityLogs = () => {
     [page, rowsPerPage, debouncedSearch, moduleFilter, methodFilter, successFilter]
   );
 
-  const { data, isLoading, isError, error, refetch } = useActivityLogsQuery(query);
+  const { data, isLoading, isError, refetch } = useActivityLogsQuery(query);
   const logs = data?.data ?? [];
   const totalItems = data?.total ?? 0;
   const activeFilterCount = [
@@ -84,6 +83,7 @@ const ActivityLogs = () => {
   return (
     <div className="mx-auto max-w-7xl py-4 space-y-2 mx-auto min-w-0">
       <ListPageHeader
+        loading={isLoading}
         title="Journal des actions"
         totalCount={totalItems}
         searchValue={searchTerm}
@@ -196,32 +196,11 @@ const ActivityLogs = () => {
         </div>
       )}
 
-      {isError && (
-        <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-          {error instanceof Error ? error.message : 'Erreur lors du chargement du journal'}
-          <Button
-            variant="outline"
-            size="sm"
-            className="ml-3"
-            onClick={() => {
-              void refetch();
-              toast.message('Nouvelle tentative...');
-            }}
-          >
-            Réessayer
-          </Button>
-        </div>
-      )}
-
       {(() => {
         const hasActiveFiltersOrSearch = searchTerm || activeFilterCount > 0;
-        let emptyMessage = 'Aucune action enregistrée';
-
-        if (isLoading) {
-          emptyMessage = 'Chargement...';
-        } else if (hasActiveFiltersOrSearch) {
-          emptyMessage = 'Aucun résultat trouvé';
-        }
+        const emptyMessage = hasActiveFiltersOrSearch
+          ? 'Aucun résultat trouvé'
+          : 'Aucune action enregistrée';
 
         return (
           <ActivityLogTable
@@ -236,6 +215,9 @@ const ActivityLogs = () => {
             }}
             onView={setSelectedLog}
             emptyMessage={emptyMessage}
+            loading={isLoading}
+            error={isError}
+            onRetry={() => void refetch()}
           />
         );
       })()}

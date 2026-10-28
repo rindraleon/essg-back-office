@@ -17,6 +17,7 @@ import {
   useMentionOptionsQuery,
   useParcoursByMentionQuery,
   useRessourcesHumainesQuery,
+  useSaveStatus,
 } from '@/hooks';
 import {
   validateOptionalEmail,
@@ -25,6 +26,7 @@ import {
   NIVEAU_OPTIONS,
 } from '@/constants';
 import { Button } from '../ui/button';
+import { SaveButton } from '../ui/save-button';
 import { Label } from '../ui/label';
 import { Checkbox } from '../ui/checkbox';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../ui/dialog';
@@ -87,6 +89,9 @@ function formationHint(
   return 'Le titre de la formation correspond au nom du parcours sélectionné.';
 }
 
+const cleanList = (items?: string[]): string[] =>
+  (items ?? []).map((i) => i.trim()).filter(Boolean);
+
 /** Classes du bouton d'étape du stepper selon son état. */
 function getStepButtonClass(isActive: boolean, isCompleted: boolean): string {
   if (isActive) return 'bg-brand-600 text-white';
@@ -112,7 +117,7 @@ const defaultFormData: FormationFormState = {
   competences: [''],
   programme: [''],
   image: '',
-  enVedette: false,
+  enVedette: true,
   credits: 180,
   responsable: '',
   responsableId: null,
@@ -129,7 +134,8 @@ const FormationForm: React.FC<FormationFormProps> = ({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [imagePreview, setImagePreview] = useState<string>('');
   const [uploadingImage, setUploadingImage] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
+  const { status, run } = useSaveStatus();
+  const submitting = status === 'loading';
 
   const { data: mentions = [], isLoading: loadingMentions } = useMentionOptionsQuery({
     enabled: open,
@@ -240,7 +246,6 @@ const FormationForm: React.FC<FormationFormProps> = ({
       resetForm();
       setImagePreview('');
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, mode, initialId]);
 
   const mentionOptions = useMemo(
@@ -349,26 +354,22 @@ const FormationForm: React.FC<FormationFormProps> = ({
     setActiveStep(step);
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = () => {
     if (submitting || !validateAllSteps()) return;
-    setSubmitting(true);
-    try {
-      const clean = (items?: string[]) => (items ?? []).map((i) => i.trim()).filter(Boolean);
+    void run(() => {
       const serverFields: Record<string, unknown> = { ...formData };
       delete serverFields.mentionId;
       delete serverFields.titre;
-      await onSubmit({
+      return onSubmit({
         ...(serverFields as unknown as FormationFormData),
         parcoursId: formData.parcoursId,
-        objectifs: clean(formData.objectifs),
-        debouches: clean(formData.debouches),
-        conditions: clean(formData.conditions),
-        competences: clean(formData.competences),
-        programme: clean(formData.programme),
+        objectifs: cleanList(formData.objectifs),
+        debouches: cleanList(formData.debouches),
+        conditions: cleanList(formData.conditions),
+        competences: cleanList(formData.competences),
+        programme: cleanList(formData.programme),
       });
-    } finally {
-      setSubmitting(false);
-    }
+    });
   };
 
   const dialogTitle = mode === 'create' ? 'Nouvelle formation' : 'Modifier la formation';
@@ -377,7 +378,7 @@ const FormationForm: React.FC<FormationFormProps> = ({
     <div className="space-y-1">
       <div className="grid grid-cols-1 items-start gap-x-3 sm:grid-cols-2">
         <FloatingSelect
-          label="Mention *"
+          label="Mention de la formation *"
           value={formData.mentionId ? String(formData.mentionId) : ''}
           onValueChange={(v) => v && handleMentionChange(v)}
           options={mentionOptions}
@@ -408,14 +409,14 @@ const FormationForm: React.FC<FormationFormProps> = ({
 
       <div className="grid grid-cols-1 items-start gap-x-3 sm:grid-cols-2">
         <FloatingSelect
-          label="Niveau *"
+          label="Niveau de la formation *"
           value={formData.niveau}
           onValueChange={(v) => v && handleChange('niveau', v)}
           options={NIVEAU_OPTIONS}
           error={errors.niveau}
         />
         <FloatingSelect
-          label="Durée *"
+          label="Durée de la formation *"
           value={formData.duree}
           onValueChange={(v) => v && handleChange('duree', v)}
           options={DUREE_OPTIONS}
@@ -436,7 +437,7 @@ const FormationForm: React.FC<FormationFormProps> = ({
 
       <FloatingTextarea
         id="description"
-        label="Description *"
+        label="Description de la formation *"
         value={formData.description}
         onChange={(e) => handleChange('description', e.target.value)}
         onBlur={() => handleBlur('description')}
@@ -451,7 +452,7 @@ const FormationForm: React.FC<FormationFormProps> = ({
     <div className="space-y-4">
       <div className="grid grid-cols-1 items-start gap-4 sm:grid-cols-2">
         <DynamicListField
-          label="Objectifs *"
+          label="Objectifs de la formation *"
           items={formData.objectifs}
           error={errors.objectifs}
           onAdd={() => addArrayItem('objectifs')}
@@ -459,7 +460,7 @@ const FormationForm: React.FC<FormationFormProps> = ({
           onChange={(i, v) => handleArrayChange('objectifs', i, v)}
         />
         <DynamicListField
-          label="Débouchés *"
+          label="Débouchés de la formation *"
           items={formData.debouches}
           error={errors.debouches}
           onAdd={() => addArrayItem('debouches')}
@@ -470,14 +471,14 @@ const FormationForm: React.FC<FormationFormProps> = ({
 
       <div className="grid grid-cols-1 items-start gap-4 sm:grid-cols-2">
         <DynamicListField
-          label="Programme (modules)"
+          label="Programme de la formation (modules)"
           items={formData.programme ?? []}
           onAdd={() => addArrayItem('programme')}
           onRemove={(i) => removeArrayItem('programme', i)}
           onChange={(i, v) => handleArrayChange('programme', i, v)}
         />
         <DynamicListField
-          label="Compétences visées"
+          label="Compétences visées par la formation"
           items={formData.competences ?? []}
           onAdd={() => addArrayItem('competences')}
           onRemove={(i) => removeArrayItem('competences', i)}
@@ -500,7 +501,7 @@ const FormationForm: React.FC<FormationFormProps> = ({
   const renderStep2 = () => (
     <div className="space-y-4">
       <SearchSelect
-        label="Responsable de formation"
+        label="Responsable de la formation"
         value={formData.responsableId ? String(formData.responsableId) : null}
         onChange={handleResponsableChange}
         options={responsableOptions}
@@ -549,7 +550,7 @@ const FormationForm: React.FC<FormationFormProps> = ({
               variant="outline"
               size="sm"
               onClick={() => fileInputRef.current?.click()}
-              disabled={uploadingImage}
+              loading={uploadingImage}
             >
               <Upload className="h-3.5 w-3.5" />
               {uploadingImage ? 'Téléversement…' : 'Choisir une image'}
@@ -575,11 +576,7 @@ const FormationForm: React.FC<FormationFormProps> = ({
 
   const stepRenderers = [renderStep0, renderStep1, renderStep2];
 
-  const submitLabel = (() => {
-    if (submitting) return 'Enregistrement…';
-    if (mode === 'create') return 'Créer';
-    return 'Enregistrer';
-  })();
+  const submitLabel = mode === 'create' ? 'Créer' : 'Enregistrer';
 
   return (
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
@@ -618,12 +615,12 @@ const FormationForm: React.FC<FormationFormProps> = ({
         <div className="max-h-[58vh] overflow-y-auto px-5 py-4">{stepRenderers[activeStep]()}</div>
 
         <DialogFooter className="mx-4 mb-4 border-t bg-ink-50/80 px-5 py-3">
-          <div className="flex w-full items-center justify-between">
+          <div className="flex w-full flex-wrap items-center justify-between gap-2">
             <span data-numeric className="text-xs text-ink-400">
               {activeStep + 1}/{STEPS.length}
             </span>
 
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center justify-end gap-2 ml-auto">
               <Button
                 type="button"
                 variant="ghost"
@@ -653,10 +650,14 @@ const FormationForm: React.FC<FormationFormProps> = ({
                   <ArrowRight className="h-3.5 w-3.5" />
                 </Button>
               ) : (
-                <Button type="button" size="sm" onClick={handleSubmit} disabled={submitting}>
-                  <CircleCheck className="h-3.5 w-3.5" />
+                <SaveButton
+                  size="sm"
+                  status={status}
+                  celebrate={mode === 'create'}
+                  onClick={handleSubmit}
+                >
                   {submitLabel}
-                </Button>
+                </SaveButton>
               )}
             </div>
           </div>

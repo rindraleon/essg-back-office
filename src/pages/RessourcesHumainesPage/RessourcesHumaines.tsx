@@ -27,11 +27,17 @@ import {
 } from '@/hooks';
 import { ApiError } from '@/api';
 import { formatFullName } from '@/utils';
+import { useAuth } from '@/contexts';
+import { PERMISSIONS } from '@/constants';
 
 const RessourcesHumaines: React.FC = () => {
   useScrollToTop();
   useTitle('Ressources humaines');
-  const { data = [] } = useRessourcesHumainesQuery();
+  const { hasPermission } = useAuth();
+  const canCreate = hasPermission(PERMISSIONS.CONTENT_CREATE);
+  const canUpdate = hasPermission(PERMISSIONS.CONTENT_UPDATE);
+  const canDelete = hasPermission(PERMISSIONS.CONTENT_DELETE);
+  const { data = [], isLoading, isError, refetch } = useRessourcesHumainesQuery();
   const createMutation = useCreateRessourceHumaine();
   const updateMutation = useUpdateRessourceHumaine();
   const deleteMutation = useDeleteRessourceHumaine();
@@ -123,6 +129,7 @@ const RessourcesHumaines: React.FC = () => {
           error instanceof ApiError ? error.message : "Erreur lors de l'enregistrement";
         toast.error(message);
         console.error('Error saving ressource humaine:', error);
+        throw error;
       }
     },
     [formMode, selectedRessource, createMutation, updateMutation]
@@ -140,6 +147,7 @@ const RessourcesHumaines: React.FC = () => {
   return (
     <div className="mx-auto max-w-7xl py-4 space-y-2 mx-auto min-w-0">
       <ListPageHeader
+        loading={isLoading}
         title="Liste des ressources humaines"
         totalCount={filteredData.length}
         searchValue={searchTerm}
@@ -148,8 +156,8 @@ const RessourcesHumaines: React.FC = () => {
         onToggleFilters={handleToggleFilters}
         filtersOpen={filtersOpen}
         activeFilterCount={activeFilterCount}
-        actionLabel="Nouvelle ressource"
-        onAction={handleOpenCreate}
+        actionLabel={canCreate ? 'Nouvelle ressource' : undefined}
+        onAction={canCreate ? handleOpenCreate : undefined}
       />
 
       {filtersOpen && (
@@ -169,6 +177,11 @@ const RessourcesHumaines: React.FC = () => {
       )}
 
       <RessourceHumaineTable
+        loading={isLoading}
+
+        error={isError}
+
+        onRetry={() => void refetch()}
         data={paginatedData}
         totalCount={filteredData.length}
         page={currentPage}
@@ -176,8 +189,8 @@ const RessourcesHumaines: React.FC = () => {
         onPageChange={handleChangePage}
         onRowsPerPageChange={handleChangeRowsPerPage}
         onView={handleView}
-        onEdit={handleOpenEdit}
-        onDelete={handleDeleteRequest}
+        onEdit={canUpdate ? handleOpenEdit : undefined}
+        onDelete={canDelete ? handleDeleteRequest : undefined}
       />
 
       <RessourceHumaineForm

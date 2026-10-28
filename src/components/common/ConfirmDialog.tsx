@@ -1,4 +1,4 @@
-import { CircleAlert, Info, Loader2, TriangleAlert } from 'lucide-react';
+import { CircleAlert, Info, TriangleAlert } from 'lucide-react';
 import React from 'react';
 import { Button } from '../ui/button';
 import { Dialog, DialogBody, DialogContent, DialogFooter, DialogHeader } from '../ui/dialog';
@@ -9,7 +9,7 @@ interface ConfirmDialogProps {
   open: boolean;
   title: string;
   message: React.ReactNode;
-  confirmLabel?: string;
+  confirmLabel?: string | null;
   cancelLabel?: string;
   onConfirm: () => void | Promise<void>;
   onCancel: () => void;
@@ -83,15 +83,11 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
           <Button variant="outline" onClick={onCancel} disabled={busy}>
             {cancelLabel}
           </Button>
-          <Button
-            variant={confirmVariant}
-            onClick={() => void handleConfirm()}
-            disabled={busy}
-            aria-busy={busy}
-          >
-            {busy && <Loader2 className="size-4 animate-spin" aria-hidden="true" />}
-            {busy ? (loadingLabel ?? 'Traitement en cours…') : confirmLabel}
-          </Button>
+          {confirmLabel !== null && (
+            <Button variant={confirmVariant} onClick={() => void handleConfirm()} loading={busy}>
+              {busy ? (loadingLabel ?? 'Traitement en cours…') : confirmLabel}
+            </Button>
+          )}
         </DialogFooter>
       </DialogContent>
     </Dialog>

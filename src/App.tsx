@@ -1,20 +1,25 @@
 import { QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'sonner';
+import { useLocation } from 'react-router-dom';
 import './styles/index.css';
 import { AppRoutes } from '@/routes';
 import { AuthProvider, ThemeProvider, useTheme } from '@/contexts';
 // Import direct (hors baril) pour ne pas charger les composants lourds
 // (PDF.js, Leaflet…) dans le shell pré-authentification (ESSG-PERF-02).
 import { SessionRealtimeProvider } from '@/components/common/SessionRealtimeProvider';
+import AppErrorBoundary from '@/components/common/AppErrorBoundary';
 import { queryClient } from '@/lib';
 
 /** Isole les hooks consommant le thème du reste du shell applicatif. */
 function ThemedShell() {
   const { theme } = useTheme();
+  const { pathname } = useLocation();
 
   return (
     <>
-      <AppRoutes />
+      <AppErrorBoundary resetKey={pathname}>
+        <AppRoutes />
+      </AppErrorBoundary>
       <Toaster position="top-right" richColors theme={theme} />
     </>
   );

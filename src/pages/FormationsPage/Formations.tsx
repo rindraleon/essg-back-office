@@ -20,11 +20,17 @@ import {
   useTitle,
 } from '@/hooks';
 import type { FormationFormData, Formation } from '@/types';
+import { useAuth } from '@/contexts';
+import { PERMISSIONS } from '@/constants';
 
 const Formations: React.FC = () => {
   useScrollToTop();
   useTitle('Formations');
-  const { data = [] } = useFormationsQuery();
+  const { hasPermission } = useAuth();
+  const canCreate = hasPermission(PERMISSIONS.CONTENT_CREATE);
+  const canUpdate = hasPermission(PERMISSIONS.CONTENT_UPDATE);
+  const canDelete = hasPermission(PERMISSIONS.CONTENT_DELETE);
+  const { data = [], isLoading, isError, refetch } = useFormationsQuery();
   const createMutation = useCreateFormation();
   const updateMutation = useUpdateFormation();
   const deleteMutation = useDeleteFormation();
@@ -129,6 +135,7 @@ const Formations: React.FC = () => {
             ? error.message
             : "Impossible d'enregistrer la formation. Vérifiez les informations puis réessayez."
         );
+        throw error;
       }
     },
     [formMode, selectedFormation, createMutation, updateMutation]
@@ -146,6 +153,7 @@ const Formations: React.FC = () => {
   return (
     <div className="mx-auto max-w-7xl py-4 space-y-2 mx-auto min-w-0">
       <ListPageHeader
+        loading={isLoading}
         title="Liste des formations"
         totalCount={filteredData.length}
         searchValue={searchTerm}
@@ -154,8 +162,8 @@ const Formations: React.FC = () => {
         onToggleFilters={handleToggleFilters}
         filtersOpen={filtersOpen}
         activeFilterCount={activeFilterCount}
-        actionLabel="Nouvelle formation"
-        onAction={handleOpenCreate}
+        actionLabel={canCreate ? 'Nouvelle formation' : undefined}
+        onAction={canCreate ? handleOpenCreate : undefined}
       />
 
       {filtersOpen && (
@@ -176,6 +184,11 @@ const Formations: React.FC = () => {
       )}
 
       <FormationTable
+        loading={isLoading}
+
+        error={isError}
+
+        onRetry={() => void refetch()}
         data={paginatedData}
         totalCount={filteredData.length}
         page={currentPage}
@@ -183,8 +196,8 @@ const Formations: React.FC = () => {
         onPageChange={handleChangePage}
         onRowsPerPageChange={handleChangeRowsPerPage}
         onView={handleView}
-        onEdit={handleOpenEdit}
-        onDelete={handleDeleteRequest}
+        onEdit={canUpdate ? handleOpenEdit : undefined}
+        onDelete={canDelete ? handleDeleteRequest : undefined}
       />
 
       <FormationForm

@@ -1,13 +1,14 @@
 import { useState, type ComponentProps } from 'react';
 import { Link } from 'react-router-dom';
-import { AlertCircle, ArrowLeft, LoaderCircle, Mail, MailCheck } from 'lucide-react';
+import { AlertCircle, ArrowLeft, Mail, MailCheck } from 'lucide-react';
 import { ApiError } from '@/api';
 import { routesStatic } from '@/routes';
 import { VALIDATION_MESSAGES, validateEmail } from '@/constants';
 import { useTitle, useScrollToTop } from '@/hooks';
+import { SaveButton } from '@/components/ui/save-button';
 import { requestPasswordReset } from '@/services/auth.service';
 import AuthLayout from './AuthLayout';
-import { loginFieldClass } from './auth-field';
+import { getAuthSubmitStatus, loginFieldClass } from './auth-field';
 
 type FormSubmitEvent = Parameters<NonNullable<ComponentProps<'form'>['onSubmit']>>[0];
 
@@ -140,23 +141,13 @@ export default function ForgotPassword() {
           </div>
 
           <div className="login-fade login-s3 pt-1">
-            <button
-              type="submit"
-              disabled={loading}
-              className="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-white text-sm font-bold text-brand-800 dark:text-brand-600 shadow-[0_12px_30px_-10px_rgba(0,0,0,0.55)] ring-1 ring-white/20 transition-all duration-200 hover:bg-brand-50 dark:hover:bg-white/90 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white/30 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-70 motion-reduce:transition-none"
+            <SaveButton
+              status={getAuthSubmitStatus(loading, Boolean(globalError))}
+              loadingLabel="Envoi en cours…"
+              className="h-12 w-full rounded-xl"
             >
-              {loading ? (
-                <>
-                  <LoaderCircle className="size-4 animate-spin" />
-                  Envoi en cours…
-                </>
-              ) : (
-                <>
-                  <Mail className="size-4" />
-                  Envoyer le lien de réinitialisation
-                </>
-              )}
-            </button>
+              Envoyer le lien de réinitialisation
+            </SaveButton>
           </div>
         </form>
       )}

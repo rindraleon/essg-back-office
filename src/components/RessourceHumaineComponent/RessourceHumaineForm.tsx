@@ -21,8 +21,9 @@ import {
   validateOptionalEmail,
   validateOptionalPhone,
 } from '@/constants';
-import { useFormValidation } from '@/hooks';
+import { useFormValidation, useSaveStatus } from '@/hooks';
 import { Button } from '../ui/button';
+import { SaveButton } from '../ui/save-button';
 import { Label } from '../ui/label';
 import { Checkbox } from '../ui/checkbox';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../ui/dialog';
@@ -100,7 +101,8 @@ const RessourceHumaineForm: React.FC<RessourceHumaineFormProps> = ({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [imagePreview, setImagePreview] = useState<string>('');
   const [uploadingImage, setUploadingImage] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
+  const { status, run } = useSaveStatus();
+  const submitting = status === 'loading';
   const [autoFilled, setAutoFilled] = useState<Set<keyof RessourceHumaineFormData>>(new Set());
 
   const {
@@ -185,7 +187,10 @@ const RessourceHumaineForm: React.FC<RessourceHumaineFormProps> = ({
       setImagePreview(getImageUrl(url));
       toast.success('Photo téléversée avec succès');
     } catch (err) {
-      console.warn('Échec dans handleImageUpload — poursuite en mode dégradé', err instanceof Error ? err.message : err);
+      console.warn(
+        'Échec dans handleImageUpload — poursuite en mode dégradé',
+        err instanceof Error ? err.message : err
+      );
       const message = err instanceof Error ? err.message : 'Échec du téléversement de la photo.';
       toast.error(message);
     } finally {
@@ -216,25 +221,15 @@ const RessourceHumaineForm: React.FC<RessourceHumaineFormProps> = ({
     }
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = () => {
     if (submitting || !validateAllSteps()) return;
-    setSubmitting(true);
-    try {
-      await onSubmit(formData);
-    } finally {
-      setSubmitting(false);
-    }
+    void run(() => onSubmit(formData));
   };
 
   const dialogTitle =
     mode === 'create' ? 'Nouvelle ressource humaine' : 'Modifier la ressource humaine';
 
-  let submitButtonLabel = 'Enregistrer';
-  if (submitting) {
-    submitButtonLabel = 'Enregistrement...';
-  } else if (mode === 'create') {
-    submitButtonLabel = 'Créer';
-  }
+  const submitButtonLabel = mode === 'create' ? 'Créer' : 'Enregistrer';
 
   const renderStep0 = () => (
     <div className="space-y-3">
@@ -462,12 +457,12 @@ const RessourceHumaineForm: React.FC<RessourceHumaineFormProps> = ({
         <div className="px-5 py-4 overflow-y-auto max-h-[58vh]">{stepRenderers[activeStep]()}</div>
 
         <DialogFooter className="px-5 py-3 mb-4 mx-4 border-t bg-ink-50/80">
-          <div className="flex items-center justify-between w-full">
+          <div className="flex flex-wrap items-center justify-between gap-2 w-full">
             <span className="text-xs text-ink-400">
               {activeStep + 1}/{STEPS.length}
             </span>
 
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center justify-end gap-2 ml-auto">
               <Button
                 type="button"
                 variant="ghost"
@@ -497,10 +492,14 @@ const RessourceHumaineForm: React.FC<RessourceHumaineFormProps> = ({
                   <ArrowRight className="h-3.5 w-3.5" />
                 </Button>
               ) : (
-                <Button type="button" size="sm" onClick={handleSubmit} disabled={submitting}>
-                  <CircleCheck className="h-3.5 w-3.5" />
+                <SaveButton
+                  size="sm"
+                  status={status}
+                  celebrate={mode === 'create'}
+                  onClick={handleSubmit}
+                >
                   {submitButtonLabel}
-                </Button>
+                </SaveButton>
               )}
             </div>
           </div>

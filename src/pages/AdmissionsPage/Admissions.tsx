@@ -1,5 +1,5 @@
 import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from 'react';
-import { Download, LoaderCircle } from 'lucide-react';
+import { Download } from 'lucide-react';
 import { toast } from 'sonner';
 import {
   Button,
@@ -45,7 +45,6 @@ const Admissions = () => {
   const [selectedAdmission, setSelectedAdmission] = useState<Admission | null>(null);
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [showStatusModal, setShowStatusModal] = useState(false);
-  const [updating, setUpdating] = useState(false);
   const [exporting, setExporting] = useState(false);
   const [detailId, setDetailId] = useState<number | null>(null);
   const [preview, setPreview] = useState<{ admission: Admission; file: AdmissionFile } | null>(
@@ -73,7 +72,7 @@ const Admissions = () => {
     Boolean(filterDateFin),
   ].filter(Boolean).length;
 
-  const { data, isLoading, isError, error, refetch } = useAdmissionsQuery({
+  const { data, isLoading, isError, refetch } = useAdmissionsQuery({
     page: currentPage + 1,
     limit: rowsPerPage,
     q: debouncedSearch || undefined,
@@ -136,7 +135,6 @@ const Admissions = () => {
     reponseMessage?: string;
   }) => {
     if (!selectedAdmission) return;
-    setUpdating(true);
     try {
       await updateStatusMutation.mutateAsync({
         id: selectedAdmission.id,
@@ -151,11 +149,13 @@ const Admissions = () => {
           : 'Décision enregistrée. L’email a été transmis au candidat.'
       );
     } catch (error) {
-      console.warn('Échec dans handleSaveDecision — poursuite en mode dégradé', error instanceof Error ? error.message : error);
+      console.warn(
+        'Échec dans handleSaveDecision — poursuite en mode dégradé',
+        error instanceof Error ? error.message : error
+      );
       const message = error instanceof ApiError ? error.message : "Impossible d'envoyer l'email";
       toast.error(message);
-    } finally {
-      setUpdating(false);
+      throw error;
     }
   };
 
@@ -178,7 +178,10 @@ const Admissions = () => {
       toast.success('Fichier supprimé avec succès');
       setFileToDelete(null);
     } catch (error) {
-      console.warn('Échec dans handleConfirmDeleteFile — poursuite en mode dégradé', error instanceof Error ? error.message : error);
+      console.warn(
+        'Échec dans handleConfirmDeleteFile — poursuite en mode dégradé',
+        error instanceof Error ? error.message : error
+      );
       toast.error(
         error instanceof ApiError ? error.message : 'Erreur lors de la suppression du fichier'
       );
@@ -192,7 +195,10 @@ const Admissions = () => {
       toast.success('Candidature supprimée avec succès');
       setDeleteTarget(null);
     } catch (error) {
-      console.warn('Échec dans handleConfirmDelete — poursuite en mode dégradé', error instanceof Error ? error.message : error);
+      console.warn(
+        'Échec dans handleConfirmDelete — poursuite en mode dégradé',
+        error instanceof Error ? error.message : error
+      );
       toast.error('Une erreur est survenue lors de la suppression.');
     }
   };
@@ -216,7 +222,10 @@ const Admissions = () => {
         `${count} candidature${count !== 1 ? 's' : ''} exportée${count !== 1 ? 's' : ''}.`
       );
     } catch (error) {
-      console.warn('Échec dans handleExport — poursuite en mode dégradé', error instanceof Error ? error.message : error);
+      console.warn(
+        'Échec dans handleExport — poursuite en mode dégradé',
+        error instanceof Error ? error.message : error
+      );
       toast.error(error instanceof Error ? error.message : "Impossible de générer l'export Excel.");
     } finally {
       setExporting(false);
@@ -242,6 +251,7 @@ const Admissions = () => {
   return (
     <div className="mx-auto max-w-7xl py-4 space-y-2 mx-auto min-w-0">
       <ListPageHeader
+        loading={isLoading}
         title="Liste des admissions"
         totalCount={totalItems}
         searchValue={searchTerm}
@@ -255,18 +265,15 @@ const Admissions = () => {
           type="button"
           variant="outline"
           onClick={() => void handleExport()}
-          disabled={exporting || filterFormation === 'all'}
+          loading={exporting}
+          disabled={filterFormation === 'all'}
           title={
             filterFormation === 'all'
               ? "Sélectionnez d'abord un parcours"
               : `Exporter ${filterFormation}`
           }
         >
-          {exporting ? (
-            <LoaderCircle className="size-4 animate-spin" />
-          ) : (
-            <Download className="size-4" />
-          )}
+          <Download className="size-4" />
           Exporter Excel
         </Button>
       </ListPageHeader>
@@ -295,21 +302,14 @@ const Admissions = () => {
         formations={formations}
       />
 
-      {isError && (
-        <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-          {error instanceof Error ? error.message : 'Erreur lors du chargement des admissions'}
-          <Button variant="outline" size="sm" className="ml-3" onClick={() => void refetch()}>
-            Réessayer
-          </Button>
-        </div>
-      )}
-
       <AdmissionTable
         data={admissions}
         totalCount={totalItems}
         page={currentPage}
         rowsPerPage={rowsPerPage}
         loading={isLoading}
+        error={isError}
+        onRetry={() => void refetch()}
         onPageChange={setCurrentPage}
         onRowsPerPageChange={(rows) => {
           setRowsPerPage(rows);
@@ -352,7 +352,6 @@ const Admissions = () => {
         <AdmissionDecisionDialog
           admission={selectedAdmission}
           open={showStatusModal}
-          submitting={updating}
           onClose={() => setShowStatusModal(false)}
           onSubmit={handleSaveDecision}
         />

@@ -16,11 +16,13 @@ interface MessageTableProps {
   onPageChange: (page: number) => void;
   onRowsPerPageChange: (rows: number) => void;
   onView: (message: Message) => void;
-  onDelete: (id: number) => void;
-  onMarkAsRead: (id: number) => void;
+  onDelete?: (id: number) => void;
+  onMarkAsRead?: (id: number) => void;
   onReply?: (message: Message) => void;
   loading?: boolean;
   emptyMessage?: string;
+  error?: boolean;
+  onRetry?: () => void;
 }
 
 const getSujetLabel = (sujet: string): string => {
@@ -58,6 +60,8 @@ const MessageTable: React.FC<MessageTableProps> = ({
   onMarkAsRead,
   onReply,
   loading = false,
+  error = false,
+  onRetry,
   emptyMessage = 'Aucun message trouvé',
 }) => {
   const columns = useMemo<Column<Message>[]>(
@@ -170,7 +174,7 @@ const MessageTable: React.FC<MessageTableProps> = ({
                   <TooltipContent>Répondre</TooltipContent>
                 </Tooltip>
               )}
-              {!row.lu && (
+              {!row.lu && onMarkAsRead && (
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Button
@@ -185,19 +189,21 @@ const MessageTable: React.FC<MessageTableProps> = ({
                   <TooltipContent>Marquer comme lu</TooltipContent>
                 </Tooltip>
               )}
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    onClick={() => onDelete(row.id)}
-                    className="h-8 w-8 text-red-600 hover:text-red-700"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Supprimer</TooltipContent>
-              </Tooltip>
+              {onDelete && (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      onClick={() => onDelete(row.id)}
+                      className="h-8 w-8 text-red-600 hover:text-red-700"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Supprimer</TooltipContent>
+                </Tooltip>
+              )}
             </div>
           </TooltipProvider>
         ),
@@ -206,19 +212,11 @@ const MessageTable: React.FC<MessageTableProps> = ({
     [onView, onDelete, onMarkAsRead, onReply]
   );
 
-  if (loading) {
-    return (
-      <div className="border border-ink-100 rounded-xl overflow-hidden bg-card p-8">
-        <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-ink-300 border-t-brand-600"></div>
-          <p className="mt-2 text-ink-600">Chargement des messages...</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <DataTable<Message>
+      loading={loading}
+      error={error}
+      onRetry={onRetry}
       columns={columns}
       data={data}
       totalCount={totalCount}

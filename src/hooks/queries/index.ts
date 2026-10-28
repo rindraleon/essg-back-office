@@ -44,6 +44,7 @@ export {
   useUpdateAdmissionStatus,
   useDeleteAdmission,
   useDeleteAdmissionFile,
+  useDownloadAdmissionArchive,
 } from './useAdmissionsQuery';
 export { useSettingsQuery, useUpdateSettings } from './useSettingsQuery';
 export { useDashboardStatsQuery, useRecentActivitiesQuery } from './useDashboardQuery';

@@ -2,6 +2,8 @@ import { ArrowLeft, ArrowRight, Filter, Info, LayoutGrid, RotateCcw } from 'luci
 import React, { useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useTitle } from '@/hooks';
+import { useAuth } from '@/contexts';
+import { canAccessMenu } from '@/constants';
 import { AIDE_PIED, DEMARRAGE, MANUEL_SECTIONS } from '@/constants/help.constants';
 import type { AideSection } from '@/constants/help.constants';
 import { Badge } from '@/components/ui/badge';
@@ -101,14 +103,24 @@ const Aide: React.FC = () => {
 
   const [params, setParams] = useSearchParams();
   const [query, setQuery] = useState('');
+  const { isAdmin, hasPermission } = useAuth();
+
+  const sections = useMemo(
+    () => MANUEL_SECTIONS.filter((section) => canAccessMenu(section, { isAdmin, hasPermission })),
+    [isAdmin, hasPermission]
+  );
+  const startSteps = useMemo(() => {
+    const visibleIds = new Set(sections.map((section) => section.id));
+    return DEMARRAGE.filter((step) => visibleIds.has(step.sectionId));
+  }, [sections]);
 
   const selected = params.get('notice');
 
   const filtered = useMemo(() => {
     const needle = normalize(query.trim());
-    if (!needle) return MANUEL_SECTIONS;
-    return MANUEL_SECTIONS.filter((section) => haystack(section).includes(needle));
-  }, [query]);
+    if (!needle) return sections;
+    return sections.filter((section) => haystack(section).includes(needle));
+  }, [query, sections]);
 
   const shownSection = selected
     ? (filtered.find((section) => section.id === selected) ?? filtered[0] ?? null)
@@ -225,7 +237,7 @@ const Aide: React.FC = () => {
       </div>
 
       <div className="space-y-4">
-        {showOverview && query.trim() === '' && (
+        {showOverview && query.trim() === '' && startSteps.length > 0 && (
           <section
             aria-labelledby="aide-demarrage-titre"
             className="rounded-xl border border-ink-100 bg-card p-5 shadow-card"
@@ -243,7 +255,7 @@ const Aide: React.FC = () => {
               notice.
             </p>
             <ol className="mt-3 grid gap-2 sm:grid-cols-2">
-              {DEMARRAGE.map((step, index) => (
+              {startSteps.map((step, index) => (
                 <li key={step.sectionId}>
                   <button
                     type="button"

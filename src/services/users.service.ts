@@ -1,5 +1,5 @@
 import { apiClient } from '@/api';
-import type { User } from '@/types';
+import type { User, UserRole } from '@/types';
 
 export interface UsersListResponse {
   data: User[];
@@ -26,7 +26,7 @@ interface CreateUserData {
   motDePasse: string;
   prenom: string;
   nom: string;
-  role?: 'admin' | 'editeur' | 'lecteur';
+  role?: UserRole;
   estActif?: boolean;
   avatar?: string;
 }
@@ -40,7 +40,7 @@ interface UpdateUserData {
   motDePasse?: string;
   prenom?: string;
   nom?: string;
-  role?: 'admin' | 'editeur' | 'lecteur';
+  role?: UserRole;
   estActif?: boolean;
   avatar?: string;
 }

@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 import {
-  Button,
   ListPageHeader,
   ConfirmDialog,
   ContactFilters,
@@ -9,6 +8,8 @@ import {
   MessageTable,
 } from '@/components';
 import { ApiError } from '@/api';
+import { useAuth } from '@/contexts';
+import { PERMISSIONS } from '@/constants';
 
 import {
   useDebounce,
@@ -36,12 +37,14 @@ const Contacts = () => {
   const [filterDateDebut, setFilterDateDebut] = useState('');
   const [filterDateFin, setFilterDateFin] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
+  const { hasPermission } = useAuth();
+  const canManage = hasPermission(PERMISSIONS.CONTACT_MANAGE);
+  const canDelete = hasPermission(PERMISSIONS.CONTACT_DELETE);
   const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
   const [viewDialogOpen, setViewDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [messageToDelete, setMessageToDelete] = useState<Message | null>(null);
   const [replyOpen, setReplyOpen] = useState(false);
-  const [replying, setReplying] = useState(false);
 
   const activeFilterCount = [
     filterSujet !== 'all',
@@ -56,7 +59,7 @@ const Contacts = () => {
     return undefined;
   };
 
-  const { data, isLoading, isError, error, refetch } = useMessagesQuery({
+  const { data, isLoading, isError, refetch } = useMessagesQuery({
     page: currentPage,
     limit: ITEMS_PER_PAGE,
     q: debouncedQuery,
@@ -93,7 +96,10 @@ const Contacts = () => {
         await markReadMutation.mutateAsync(id);
         if (!silent) toast.success('Message marqué comme lu');
       } catch (error) {
-        console.warn('Échec dans callback useCallback — poursuite en mode dégradé', error instanceof Error ? error.message : error);
+        console.warn(
+          'Échec dans callback useCallback — poursuite en mode dégradé',
+          error instanceof Error ? error.message : error
+        );
         if (!silent) toast.error('Erreur lors de la mise à jour du message');
       }
     },
@@ -104,27 +110,27 @@ const Contacts = () => {
     (message: Message) => {
       setSelectedMessage(message);
       setViewDialogOpen(true);
-      if (!message.lu) {
+      if (canManage && !message.lu) {
         void handleMarkAsRead(message.id, true);
       }
     },
-    [handleMarkAsRead]
+    [canManage, handleMarkAsRead]
   );
 
   const handleReply = useCallback(
     (message: Message) => {
+      if (!canManage) return;
       setSelectedMessage(message);
       setReplyOpen(true);
       if (!message.lu) {
         void handleMarkAsRead(message.id, true);
       }
     },
-    [handleMarkAsRead]
+    [canManage, handleMarkAsRead]
   );
 
   const handleSendReply = async (payload: { sujet: string; message: string }) => {
     if (!selectedMessage) return;
-    setReplying(true);
     try {
       await replyMutation.mutateAsync({
         id: selectedMessage.id,
@@ -136,11 +142,13 @@ const Contacts = () => {
       setViewDialogOpen(false);
       setSelectedMessage(null);
     } catch (error) {
-      console.warn('Échec dans handleSendReply — poursuite en mode dégradé', error instanceof Error ? error.message : error);
+      console.warn(
+        'Échec dans handleSendReply — poursuite en mode dégradé',
+        error instanceof Error ? error.message : error
+      );
       const message = error instanceof ApiError ? error.message : "Impossible d'envoyer l'email";
       toast.error(message);
-    } finally {
-      setReplying(false);
+      throw error;
     }
   };
 
@@ -167,7 +175,10 @@ const Contacts = () => {
       setDeleteDialogOpen(false);
       setMessageToDelete(null);
     } catch (error) {
-      console.warn('Échec dans callback useCallback — poursuite en mode dégradé', error instanceof Error ? error.message : error);
+      console.warn(
+        'Échec dans callback useCallback — poursuite en mode dégradé',
+        error instanceof Error ? error.message : error
+      );
       toast.error('Erreur lors de la suppression du message');
     }
   }, [messageToDelete, selectedMessage, deleteMutation]);
@@ -196,6 +207,7 @@ const Contacts = () => {
   return (
     <div className="mx-auto max-w-7xl py-4 space-y-2 mx-auto min-w-0">
       <ListPageHeader
+        loading={loading}
         title="Messages de contact"
         totalCount={totalItems}
         countLabel="message"
@@ -226,15 +238,6 @@ const Contacts = () => {
         onToggle={() => setFiltersOpen((prev) => !prev)}
       />
 
-      {isError && (
-        <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-          {error instanceof Error ? error.message : 'Erreur lors du chargement des messages'}
-          <Button variant="outline" size="sm" className="ml-3" onClick={() => void refetch()}>
-            Réessayer
-          </Button>
-        </div>
-      )}
-
       <div className="rounded-lg border border-ink-100 bg-card">
         <MessageTable
           data={messages}
@@ -244,10 +247,12 @@ const Contacts = () => {
           onPageChange={(page: number) => setCurrentPage(page + 1)}
           onRowsPerPageChange={() => undefined}
           onView={handleViewMessage}
-          onDelete={handleDeleteRequest}
-          onMarkAsRead={(id) => void handleMarkAsRead(id)}
-          onReply={handleReply}
+          onDelete={canDelete ? handleDeleteRequest : undefined}
+          onMarkAsRead={canManage ? (id) => void handleMarkAsRead(id) : undefined}
+          onReply={canManage ? handleReply : undefined}
           loading={loading}
+          error={isError}
+          onRetry={() => void refetch()}
           emptyMessage={hasActiveSearchOrFilter ? 'Aucun résultat trouvé' : 'Aucun message trouvé'}
         />
       </div>
@@ -299,7 +304,7 @@ const Contacts = () => {
               )}
             </div>
           }
-          confirmLabel="Répondre"
+          confirmLabel={canManage ? 'Répondre' : null}
           cancelLabel="Fermer"
           onConfirm={() => {
             setViewDialogOpen(false);
@@ -335,7 +340,6 @@ const Contacts = () => {
         <ContactReplyDialog
           message={selectedMessage}
           open={replyOpen}
-          submitting={replying}
           onClose={() => setReplyOpen(false)}
           onSubmit={handleSendReply}
         />

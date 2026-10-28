@@ -17,7 +17,7 @@ export type {
   VerificationDocumentInfo,
   AdmissionVerification,
 } from './admission.types';
-export type { LoginRequest, LoginResponse, User, UserFormData } from './auth.types';
+export type { LoginRequest, LoginResponse, User, UserFormData, UserRole } from './auth.types';
 export type { DashboardStats, Activity, Overview } from './dashboard.types';
 export type { NavLinkItem, ContactInfo, SocialItem, FooterProps } from './footer.types';
 export type {

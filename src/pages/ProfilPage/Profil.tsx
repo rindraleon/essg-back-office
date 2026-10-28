@@ -11,6 +11,7 @@ import {
 import React, { useState } from 'react';
 import { toast } from 'sonner';
 import { useAuth } from '@/contexts';
+import { getUserRoleLabel } from '@/constants';
 import { getImageUrl, formatFullName, getPersonInitials, formatRelativeTime } from '@/utils';
 import { useTitle, useScrollToTop, useMySessions, useRevokeMySession } from '@/hooks';
 import { Button } from '@/components';
@@ -26,12 +27,6 @@ const SESSION_STATUS_META: Record<
   inactive: { label: 'Inactive', variant: 'secondary' },
   expired: { label: 'Expirée', variant: 'outline' },
   revoked: { label: 'Révoquée', variant: 'destructive' },
-};
-
-const ROLE_LABELS: Record<string, string> = {
-  admin: 'Administrateur',
-  editeur: 'Éditeur',
-  lecteur: 'Lecteur',
 };
 
 const InfoCard: React.FC<{ icon: React.ReactNode; label: string; value: string }> = ({
@@ -98,7 +93,7 @@ const Profil: React.FC = () => {
           <div className="min-w-0 flex-1 text-center sm:text-left">
             <h1 className="mb-1.5 text-2xl font-bold text-ink-900">{formatFullName(user)}</h1>
             <span className="inline-block rounded-md bg-brand-600 px-2.5 py-1 text-xs font-medium text-white">
-              {ROLE_LABELS[user.role] ?? user.role}
+              {getUserRoleLabel(user.role)}
             </span>
           </div>
 
@@ -123,7 +118,7 @@ const Profil: React.FC = () => {
           <InfoCard
             icon={<Shield className="size-4" />}
             label="Rôle"
-            value={ROLE_LABELS[user.role] ?? user.role}
+            value={getUserRoleLabel(user.role)}
           />
         </div>
       </section>
@@ -144,7 +139,10 @@ const MySessionsSection: React.FC = () => {
       await revokeMySessionMutation.mutateAsync(sessionId);
       toast.success('Appareil déconnecté');
     } catch (error) {
-      console.warn('Échec dans handleRevoke — poursuite en mode dégradé', error instanceof Error ? error.message : error);
+      console.warn(
+        'Échec dans handleRevoke — poursuite en mode dégradé',
+        error instanceof Error ? error.message : error
+      );
       toast.error('Impossible de déconnecter cet appareil');
     }
   };

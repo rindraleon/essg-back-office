@@ -377,9 +377,12 @@ const BordereauDetails: React.FC<{ details: Record<string, unknown> }> = ({ deta
     faby: { label: 'FABY / BNI', color: 'text-emerald-700 bg-emerald-50 border-emerald-200' },
     bni: { label: 'BNI Madagascar', color: 'text-emerald-700 bg-emerald-50 border-emerald-200' },
     generic: { label: 'Format générique', color: 'text-ink-700 bg-ink-50 border-ink-200' },
-    unknown: { label: 'Modèle non identifié', color: 'text-slate-600 bg-slate-50 border-slate-200' },
+    unknown: {
+      label: 'Modèle non identifié',
+      color: 'text-slate-600 bg-slate-50 border-slate-200',
+    },
   };
-  const modelMeta = detectedModel ? modelLabels[detectedModel] ?? modelLabels.unknown : null;
+  const modelMeta = detectedModel ? (modelLabels[detectedModel] ?? modelLabels.unknown) : null;
 
   if (numbers.length === 0 && alphanumerics.length === 0 && !referenceField) return null;
   return (
@@ -580,7 +583,10 @@ export const AdmissionVerificationSection: React.FC<Props> = ({ admission, hideB
       toast.success('Vérification des pièces effectuée');
       await Promise.all([latestQuery.refetch(), historyQuery.refetch()]);
     } catch (error: unknown) {
-      console.warn('Échec dans handleVerify — poursuite en mode dégradé', error instanceof Error ? error.message : error);
+      console.warn(
+        'Échec dans handleVerify — poursuite en mode dégradé',
+        error instanceof Error ? error.message : error
+      );
       const msg = getErrorMessage(error);
       toast.error(msg);
     } finally {
@@ -970,7 +976,10 @@ export const AdmissionVerificationSection: React.FC<Props> = ({ admission, hideB
 
         {!latest && !latestQuery.isLoading && !isVerifying && (
           <div className="rounded-xl border border-dashed border-ink-200 bg-ink-50/40 px-4 py-8 text-center">
-            <ScanSearch className="mx-auto mb-2 size-8 text-ink-300 dark:text-ink-500" aria-hidden="true" />
+            <ScanSearch
+              className="mx-auto mb-2 size-8 text-ink-300 dark:text-ink-500"
+              aria-hidden="true"
+            />
             <p className="text-sm font-semibold text-ink-700">Aucune vérification effectuée</p>
             <p className="mx-auto mt-1 max-w-md text-xs leading-snug text-ink-500">
               Cliquez sur <strong>« Vérifier les pièces »</strong> pour lancer l’analyse automatique
@@ -980,7 +989,10 @@ export const AdmissionVerificationSection: React.FC<Props> = ({ admission, hideB
             <ul className="mx-auto mt-3 max-w-md list-disc list-inside text-left text-xs text-ink-500">
               <li>Infos personnelles (date/lieu avec formats multiples)</li>
               <li>BAC (numéro, année 4 chiffres, centre)</li>
-              <li>Bordereau complet — accepte les 2 modèles (Bank of Africa / FABY-BNI), référence prioritaire, unicité</li>
+              <li>
+                Bordereau complet — accepte les 2 modèles (Bank of Africa / FABY-BNI), référence
+                prioritaire, unicité
+              </li>
               <li>Relevé détaillé (toutes matières, coeffs, moyenne fiable)</li>
             </ul>
           </div>

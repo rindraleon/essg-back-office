@@ -1,11 +1,5 @@
-/**
- * Manuel complet du back-office ESSG — 100 % données, aucune logique.
- * Chaque notice décrit le comportement réel de l'application ; les règles
- * métier (unicité, protections à la suppression, hiérarchie) sont vérifiées
- * par le serveur et rappelées ici à titre indicatif.
- */
-
 import type { LucideIcon } from 'lucide-react';
+import { PERMISSIONS, type Permission } from './permissions.constants';
 import {
   Folder,
   GraduationCap,
@@ -32,6 +26,7 @@ export interface AideSection {
   icon: LucideIcon;
   /** Libellé court de la navigation latérale : le nom de l’entrée de menu. */
   menuLabel: string;
+  permission?: Permission;
   adminOnly?: boolean;
   resume: string;
   /** Prérequis métier à satisfaire avant d'utiliser la page. */
@@ -47,7 +42,7 @@ export const DEMARRAGE: { sectionId: string; label: string; detail: string }[] =
   {
     sectionId: 'utilisateurs',
     label: 'Comptes & rôles',
-    detail: 'Créez les comptes administrateurs, éditeurs et lecteurs.',
+    detail: 'Créez les comptes administrateurs, éditeurs et scolarité.',
   },
   {
     sectionId: 'parametres',
@@ -102,13 +97,14 @@ export const MANUEL_SECTIONS: AideSection[] = [
       'Après connexion, vous arrivez sur le tableau de bord ; le menu latéral affiche les pages autorisées pour votre rôle.',
     ],
     aNoter: [
-      'Trois rôles : admin (tout), éditeur (contenus, sans Utilisateurs / Journal / Paramètres) et lecteur (consultation).',
+      'Quatre rôles : administrateur (tout), scolarité (admissions et messages de contact, ouverture des admissions), éditeur (contenus éditoriaux uniquement) et lecteur (consultation). Le menu affiché dépend de votre rôle.',
       'Le lien de réinitialisation nécessite la configuration SMTP du serveur ; en l’absence d’email, un administrateur peut définir un mot de passe via la page Utilisateurs.',
       'Vos sessions actives sont visibles et révocables depuis votre profil (« Mon profil »).',
     ],
   },
   {
     id: 'dashboard',
+    permission: PERMISSIONS.DASHBOARD_VIEW,
     title: 'Tableau de bord',
     location: 'Menu « Accueil » — /dashboard',
     icon: LayoutDashboard,
@@ -128,6 +124,7 @@ export const MANUEL_SECTIONS: AideSection[] = [
   },
   {
     id: 'mentions-parcours',
+    permission: PERMISSIONS.CONTENT_VIEW,
     title: 'Mentions / Parcours',
     location: 'Menu « Mentions / Parcours » — /mentions-parcours',
     icon: Layers,
@@ -152,6 +149,7 @@ export const MANUEL_SECTIONS: AideSection[] = [
   },
   {
     id: 'equipes',
+    permission: PERMISSIONS.CONTENT_VIEW,
     title: 'Équipes pédagogiques (ressources humaines)',
     location: 'Menu « Équipes pédagogiques » — /ressources-humaines',
     icon: Users,
@@ -175,6 +173,7 @@ export const MANUEL_SECTIONS: AideSection[] = [
   },
   {
     id: 'formations',
+    permission: PERMISSIONS.CONTENT_VIEW,
     title: 'Formations',
     location: 'Menu « Formations » — /formations',
     icon: GraduationCap,
@@ -203,6 +202,7 @@ export const MANUEL_SECTIONS: AideSection[] = [
   },
   {
     id: 'actualites',
+    permission: PERMISSIONS.CONTENT_VIEW,
     title: 'Actualités',
     location: 'Menu « Actualités » — /actualites',
     icon: Newspaper,
@@ -226,6 +226,7 @@ export const MANUEL_SECTIONS: AideSection[] = [
   },
   {
     id: 'partenaires',
+    permission: PERMISSIONS.CONTENT_VIEW,
     title: 'Partenaires',
     location: 'Menu « Partenaires » — /partenaires',
     icon: Handshake,
@@ -247,6 +248,7 @@ export const MANUEL_SECTIONS: AideSection[] = [
   },
   {
     id: 'projets',
+    permission: PERMISSIONS.CONTENT_VIEW,
     title: 'Projets',
     location: 'Menu « Projets » — /projets',
     icon: Folder,
@@ -273,6 +275,7 @@ export const MANUEL_SECTIONS: AideSection[] = [
   },
   {
     id: 'admissions',
+    permission: PERMISSIONS.ADMISSION_VIEW,
     title: 'Admissions',
     location: 'Menu « Admissions » — /admissions',
     icon: UserCheck,
@@ -287,17 +290,20 @@ export const MANUEL_SECTIONS: AideSection[] = [
       'Filtrez la liste : statut (en attente, en cours d’étude, accepté, refusé), formation/parcours, période ou recherche par nom.',
       'Ouvrez un dossier (œil) : identité complète, baccalauréat, formation demandée, documents téléversés.',
       'Consultez les pièces jointes (relevés de notes, diplômes, pièce d’identité…) depuis l’onglet des documents.',
+      'Pour récupérer tout le dossier, cliquez sur « Télécharger toutes les pièces » : une archive ZIP est préparée puis téléchargée.',
       'Si la vérification automatique des pièces est disponible, lancez-la et consultez l’historique des contrôles dans le panneau dédié.',
       'Cliquez sur « Décision » : passez le dossier « en cours d’étude », puis « accepté » ou « refusé » avec vos remarques ; le statut est enregistré immédiatement.',
     ],
     aNoter: [
       'Les compteurs de l’en-tête (cloche « Admissions ») signalent les dossiers « en attente » à traiter.',
-      'Un dossier refusé ou accepté reste consultable ; seul l’administrateur peut supprimer définitivement un dossier.',
+      'Un dossier refusé ou accepté reste consultable ; seul l’administrateur peut prendre une décision ou supprimer définitivement un dossier.',
+      'Le bouton « Télécharger toutes les pièces » est indisponible lorsque la candidature n’a aucune pièce jointe.',
       'Les noms de mention/parcours affichés proviennent de la hiérarchie : une coquille corrigée dans « Mentions / Parcours » se reflète ici et sur le site.',
     ],
   },
   {
     id: 'contacts',
+    permission: PERMISSIONS.CONTACT_VIEW,
     title: 'Contacts (messages)',
     location: 'Menu « Contacts » — /contacts',
     icon: Mail,
@@ -314,7 +320,7 @@ export const MANUEL_SECTIONS: AideSection[] = [
     aNoter: [
       'La cloche « Messages » de l’en-tête affiche le nombre de messages non lus.',
       'La réponse par email nécessite la configuration SMTP du serveur ; sinon, notez le traitement dans l’objet du suivi et répondez hors outil.',
-      'Suppression : confirmation systématique, l’action est définitive.',
+      'Suppression : réservée à l’administrateur, confirmation systématique, l’action est définitive.',
     ],
   },
   {
@@ -328,7 +334,7 @@ export const MANUEL_SECTIONS: AideSection[] = [
     prerequis: [],
     adminOnly: true,
     etapes: [
-      'Cliquez sur « Nouvel utilisateur » : nom, prénom, email, mot de passe initial, rôle (admin, éditeur ou lecteur) et éventuellement un avatar.',
+      'Cliquez sur « Nouvel utilisateur » : nom, prénom, email, mot de passe initial, rôle (administrateur, éditeur ou scolarité) et éventuellement un avatar.',
       'Pour modifier un compte : champ par champ ; le mot de passe se met à jour en laissant le champ vide (inchangé) ou en saisissant un nouveau mot de passe.',
       'Activez ou désactivez un compte : un compte désactivé ne peut plus se connecter, l’historique de ses actions reste dans le journal.',
       'Ouvrez « Sessions » sur une ligne pour voir les connexions actives (appareil, IP, durée) et les révoquer une par une ou toutes d’un coup.',
@@ -336,7 +342,8 @@ export const MANUEL_SECTIONS: AideSection[] = [
     ],
     aNoter: [
       'Un utilisateur ne peut pas se rétrograder ou se désactiver lui-même quand il est le seul administrateur actif : prévoyez toujours un second compte admin.',
-      'Le rôle éditeur gère les contenus (actualités, formations, mentions/parcours, équipes, partenaires, projets, admissions, messages) sans accès aux comptes, au journal ni aux paramètres.',
+      'Le rôle éditeur gère les contenus (actualités, formations, mentions/parcours, équipes, partenaires, projets, médias) sans accès aux admissions, aux messages de contact, aux comptes, au journal ni aux paramètres.',
+      'Le rôle scolarité gère les admissions et les messages de contact, et peut ouvrir ou fermer les admissions. Il ne peut ni supprimer un dossier, ni modifier les contenus.',
       'La révocation de sessions déconnecte immédiatement la personne concernée.',
     ],
   },
@@ -362,14 +369,14 @@ export const MANUEL_SECTIONS: AideSection[] = [
   },
   {
     id: 'parametres',
+    permission: PERMISSIONS.SETTINGS_ADMISSION,
     title: 'Paramètres',
-    location: 'Menu « Paramètres » — /parametres · administrateur uniquement',
+    location: 'Menu « Paramètres » — /parametres · administrateur et scolarité',
     icon: Settings,
     menuLabel: 'Paramètres',
     resume:
       'Réglages partagés entre tous les utilisateurs et toutes les sessions, appliqués au site public comme au back-office.',
     prerequis: [],
-    adminOnly: true,
     etapes: [
       'Basculez « Admissions ouvertes » pour rendre visible (ou masquer) le formulaire de candidature du site public.',
       'Ajustez les autres réglages disponibles ; chaque interrupteur s’enregistre immédiatement, avec message de confirmation.',

@@ -24,7 +24,10 @@ const Parametres: React.FC = () => {
           : 'Les admissions sont fermées : le formulaire et les boutons sont masqués sur le site.'
       );
     } catch (err) {
-      console.warn('Échec dans handleToggle — poursuite en mode dégradé', err instanceof Error ? err.message : err);
+      console.warn(
+        'Échec dans handleToggle — poursuite en mode dégradé',
+        err instanceof Error ? err.message : err
+      );
       toast.error(
         err instanceof ApiError ? err.message : 'Impossible de mettre à jour les paramètres.'
       );

@@ -1,5 +1,6 @@
 import { apiClient } from '@/api';
-import type { LoginResponse, User } from '@/types';
+import type { LoginResponse, User, UserRole } from '@/types';
+import type { Permission } from '@/constants/permissions.constants';
 
 export const login = async (email: string, password: string): Promise<LoginResponse> => {
   return apiClient.post<LoginResponse>('/auth/login', { email, password });
@@ -49,7 +50,8 @@ interface VerifyPayload {
   user: {
     userId: number;
     email: string;
-    role: string;
+    role: UserRole;
+    permissions?: Permission[];
     prenom: string;
     nom: string;
     avatar?: string;
@@ -65,7 +67,8 @@ export const verifyToken = async (): Promise<User | null> => {
       return {
         id: payload.user.userId,
         email: payload.user.email,
-        role: payload.user.role as 'admin' | 'editeur' | 'lecteur',
+        role: payload.user.role,
+        permissions: payload.user.permissions ?? [],
         prenom: payload.user.prenom,
         nom: payload.user.nom,
         estActif: true,

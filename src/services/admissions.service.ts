@@ -70,6 +70,32 @@ export const updateAdmissionStatus = async (
   return apiClient.patch<Admission>(`/admissions/${id}/status`, payload);
 };
 
+export interface AdmissionArchive {
+  blob: Blob;
+  filename: string;
+  fileCount: number;
+  missingCount: number;
+}
+
+const readCountHeader = (headers: Headers, name: string): number => {
+  const value = Number(headers.get(name));
+  return Number.isFinite(value) ? value : 0;
+};
+
+const ARCHIVE_DOWNLOAD_TIMEOUT_MS = 180_000;
+
+export const downloadAdmissionArchive = async (id: number): Promise<AdmissionArchive> => {
+  const blob = await apiClient.getBlob(`/admissions/${id}/files/archive`, {
+    timeout: ARCHIVE_DOWNLOAD_TIMEOUT_MS,
+  });
+  return {
+    blob,
+    filename: blob.filename ?? `admission-ESSG-${id}.zip`,
+    fileCount: readCountHeader(blob.headers, 'X-Archive-File-Count'),
+    missingCount: readCountHeader(blob.headers, 'X-Archive-Missing-Files'),
+  };
+};
+
 export const getAdmissionFileBlob = async (
   id: number,
   fileId: number,

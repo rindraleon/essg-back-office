@@ -1,12 +1,4 @@
-
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
 export type ThemeMode = 'light' | 'dark' | 'system';
 
@@ -24,9 +16,7 @@ const STORAGE_KEY = 'essg-theme';
 const ThemeContext = createContext<ThemeContextValue | null>(null);
 
 function getSystemTheme(): ResolvedTheme {
-  return window.matchMedia('(prefers-color-scheme: dark)').matches
-    ? 'dark'
-    : 'light';
+  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
 }
 
 function readStoredMode(): ThemeMode {
@@ -37,24 +27,17 @@ function readStoredMode(): ThemeMode {
       return stored;
     }
   } catch (error) {
-    console.error(
-      'Erreur lors de la lecture du thème depuis localStorage :',
-      error,
-    );
+    console.error('Erreur lors de la lecture du thème depuis localStorage :', error);
   }
 
   return 'light';
 }
 
-export function ThemeProvider({
-  children,
-}: Readonly<{ children: React.ReactNode }>) {
+export function ThemeProvider({ children }: Readonly<{ children: React.ReactNode }>) {
   const [theme, setTheme] = useState<ThemeMode>(() => readStoredMode());
-  const [systemTheme, setSystemTheme] =
-    useState<ResolvedTheme>(getSystemTheme);
+  const [systemTheme, setSystemTheme] = useState<ResolvedTheme>(getSystemTheme);
 
-  const resolvedTheme: ResolvedTheme =
-    theme === 'system' ? systemTheme : theme;
+  const resolvedTheme: ResolvedTheme = theme === 'system' ? systemTheme : theme;
 
   /** Suit les changements de préférence système. */
   useEffect(() => {
@@ -84,16 +67,13 @@ export function ThemeProvider({
     try {
       localStorage.setItem(STORAGE_KEY, mode);
     } catch (error) {
-      console.error(
-        'Erreur lors de l’enregistrement du thème dans localStorage :',
-        error,
-      );
+      console.error('Erreur lors de l’enregistrement du thème dans localStorage :', error);
     }
   }, []);
 
   const toggleTheme = useCallback(
     () => persistTheme(resolvedTheme === 'dark' ? 'light' : 'dark'),
-    [resolvedTheme, persistTheme],
+    [resolvedTheme, persistTheme]
   );
 
   const value = useMemo<ThemeContextValue>(
@@ -103,23 +83,17 @@ export function ThemeProvider({
       setTheme: persistTheme,
       toggleTheme,
     }),
-    [theme, resolvedTheme, persistTheme, toggleTheme],
+    [theme, resolvedTheme, persistTheme, toggleTheme]
   );
 
-  return (
-    <ThemeContext.Provider value={value}>
-      {children}
-    </ThemeContext.Provider>
-  );
+  return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 }
 
 export function useTheme(): ThemeContextValue {
   const ctx = useContext(ThemeContext);
 
   if (!ctx) {
-    throw new Error(
-      'useTheme doit être utilisé à l’intérieur de <ThemeProvider>',
-    );
+    throw new Error('useTheme doit être utilisé à l’intérieur de <ThemeProvider>');
   }
 
   return ctx;

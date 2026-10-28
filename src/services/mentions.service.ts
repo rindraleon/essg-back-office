@@ -55,11 +55,6 @@ const updateMention = async (id: number, data: Partial<MentionFormData>): Promis
   return apiClient.put<Mention>(`/mentions/${id}`, data);
 };
 
-/**
- * Suppression protégée : `cascade=true` n'est transmis qu'après confirmation
- * explicite de l'utilisateur (le backend refuse si des formations dépendent
- * encore de la mention, même en cascade).
- */
 const deleteMention = async (id: number, cascade = false): Promise<void> => {
   await apiClient.delete(`/mentions/${id}${cascade ? '?cascade=true' : ''}`);
 };

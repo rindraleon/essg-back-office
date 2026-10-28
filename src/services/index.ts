@@ -10,6 +10,7 @@ export {
   getAdmissionById,
   updateAdmissionStatus,
   getAdmissionFileBlob,
+  downloadAdmissionArchive,
   deleteAdmissionFile,
   deleteAdmission,
   verifyAdmissionDocuments,
@@ -18,6 +19,7 @@ export {
   getAdmissionVerification,
 } from './admissions.service';
 export type {
+  AdmissionArchive,
   AdmissionQuery,
   AdmissionsListResponse,
   AdmissionDecisionPayload,
