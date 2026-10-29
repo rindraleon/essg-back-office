@@ -45,6 +45,35 @@ export {
 } from './mentions.service';
 export { getDashboardStats, getRecentActivities } from './dashboard.service';
 export {
+  getAllResultats,
+  getResultatById,
+  getResultatIndividuels,
+  getResultatFileBlob,
+  downloadModeleResultats,
+  importResultat,
+  confirmerImportResultat,
+  publierResultat,
+  depublierResultat,
+  archiverResultat,
+  supprimerResultat,
+} from './results.service';
+export type {
+  ResultatPublication,
+  ResultatIndividuel,
+  ResultatsListResponse,
+  ResultatsIndividuelsResponse,
+  ResultatQuery,
+  ResultatIndividuelQuery,
+  ImportResultatPayload,
+  ImportResultatResponse,
+  ImportResultatPreview,
+  ImportResultatPreviewRow,
+  ConfirmationImportResultat,
+  ResultatPublicationType,
+  ResultatPublicationStatus,
+  StatutAcademique,
+} from './results.service';
+export {
   getAllFormations,
   createFormation,
   updateFormation,

@@ -1,5 +1,6 @@
 import type { LucideIcon } from 'lucide-react';
 import {
+  Activity,
   Folder,
   GraduationCap,
   Handshake,
@@ -88,6 +89,13 @@ const NAV_ITEMS: NavItem[] = [
     href: routesStatic.admissions,
     icon: UserCheck,
     permission: PERMISSIONS.ADMISSION_VIEW,
+  },
+  {
+    name: 'Résultats',
+    label: 'Résultats',
+    href: routesStatic.resultats,
+    icon: Activity,
+    permission: PERMISSIONS.RESULTAT_VIEW,
   },
   {
     name: 'Équipes Pédagogiques',

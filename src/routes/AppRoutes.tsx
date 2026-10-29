@@ -23,6 +23,7 @@ const Projets = lazy(() => import('@/pages/ProjetsPage/Projets'));
 const Partenaires = lazy(() => import('@/pages/PartenairesPage/Partenaires'));
 const Contacts = lazy(() => import('@/pages/ContactsPage/Contacts'));
 const Admissions = lazy(() => import('@/pages/AdmissionsPage/Admissions'));
+const Resultats = lazy(() => import('@/pages/ResultatsPage/Resultats'));
 const Profil = lazy(() => import('@/pages/ProfilPage/Profil'));
 const ActivityLogs = lazy(() => import('@/pages/ActivityLogsPage/ActivityLogs'));
 const Parametres = lazy(() => import('@/pages/ParametresPage/Parametres'));
@@ -240,6 +241,17 @@ const AppRoutes = () => {
             <ProtectedRoute permission={PERMISSIONS.ADMISSION_VIEW}>
               <Layout showSidebar>
                 <Admissions />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path={routesStatic.resultats}
+          element={
+            <ProtectedRoute permission={PERMISSIONS.RESULTAT_VIEW}>
+              <Layout showSidebar>
+                <Resultats />
               </Layout>
             </ProtectedRoute>
           }

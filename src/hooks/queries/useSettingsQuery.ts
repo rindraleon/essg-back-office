@@ -12,7 +12,10 @@ export function useSettingsQuery() {
 export function useUpdateSettings() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (payload: { admissionsOuvertes: boolean }) => updateSettings(payload),
+    mutationFn: (payload: {
+      admissionsOuvertes?: boolean;
+      navigationPrincipale?: 'admission' | 'resultats' | 'aucun';
+    }) => updateSettings(payload),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: queryKeys.settings.all });
     },

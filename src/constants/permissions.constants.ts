@@ -13,6 +13,12 @@ export const PERMISSIONS = {
   CONTACT_MANAGE: 'contact.manage',
   CONTACT_DELETE: 'contact.delete',
   SETTINGS_ADMISSION: 'settings.admission',
+  SETTINGS_NAVIGATION: 'settings.navigation',
+  RESULTAT_VIEW: 'resultat.view',
+  RESULTAT_CREATE: 'resultat.create',
+  RESULTAT_UPDATE: 'resultat.update',
+  RESULTAT_DELETE: 'resultat.delete',
+  RESULTAT_PUBLISH: 'resultat.publish',
 } as const;
 
 export type Permission = (typeof PERMISSIONS)[keyof typeof PERMISSIONS];

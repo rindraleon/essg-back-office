@@ -28,13 +28,19 @@ export default defineConfig(({ mode }) => {
         : {}),
     },
     build: {
+      chunkSizeWarningLimit: 1000,
       rollupOptions: {
         output: {
           manualChunks(id) {
             if (!id.includes('node_modules')) return undefined;
-            if (/node_modules\/(react|react-dom|react-router|react-router-dom)\//.test(id)) return 'vendor-react';
-            if (id.includes('@tanstack/react-query')) return 'vendor-query';
-            if (id.includes('@base-ui/react')) return 'vendor-ui';
+            const normalizedId = id.replace(/\\/g, '/');
+            if (/node_modules\/(react|react-dom|react-router|react-router-dom)\//.test(normalizedId))
+              return 'vendor-react';
+            if (normalizedId.includes('@tanstack/react-query')) return 'vendor-query';
+            if (normalizedId.includes('@base-ui/react')) return 'vendor-ui';
+            if (normalizedId.includes('/exceljs/')) return 'vendor-exceljs';
+            if (normalizedId.includes('/pdfjs-dist/')) return 'vendor-pdf';
+            if (normalizedId.includes('/tesseract.js/')) return 'vendor-ocr';
             return undefined;
           },
         },

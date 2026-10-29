@@ -68,6 +68,11 @@ export { default as ProjetForm } from './ProjetComponents/ProjetForm';
 export { default as ProjetTable } from './ProjetComponents/ProjetTable';
 export { default as ProjetViewDialog } from './ProjetComponents/ProjetViewDialog';
 export { default as SourcesField } from './ProjetComponents/SourcesField';
+export { default as ResultatsTable } from './ResultatsComponents/ResultatsTable';
+export { default as ResultatsFilter } from './ResultatsComponents/ResultatsFilter';
+export type { ResultatFilters } from './ResultatsComponents/ResultatsFilter';
+export { default as ResultatsImportDialog } from './ResultatsComponents/ResultatsImportDialog';
+export { default as ResultatsViewDialog } from './ResultatsComponents/ResultatsViewDialog';
 export { default as CvImportPanel } from './RessourceHumaineComponent/CvImportPanel';
 export { default as ParcoursFields } from './RessourceHumaineComponent/ParcoursFields';
 export {
