@@ -123,7 +123,12 @@ export default function ResetPassword() {
               setTokenState({ phase: 'invalid', reason: toInvalidReason(result.status) });
             }
           })
-          .catch(() => undefined);
+          .catch((error: unknown) => {
+            console.warn(
+              'Nouvelle vérification du lien impossible',
+              error instanceof Error ? error.name : 'Erreur inconnue'
+            );
+          });
       }
     } finally {
       setSubmitting(false);
@@ -161,7 +166,7 @@ export default function ResetPassword() {
 
           <Link
             to={routesStatic.forgotPassword}
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-white text-sm font-bold text-brand-800 dark:text-brand-600 shadow-[0_12px_30px_-10px_rgba(0,0,0,0.55)] ring-1 ring-white/20 transition-all duration-200 hover:bg-brand-50 dark:hover:bg-white/90 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white/30"
+            className="flex h-12 w-full items-center justify-center gap-2 rounded-md bg-white text-sm font-bold text-brand-800 dark:text-brand-600 shadow-[0_12px_30px_-10px_rgba(0,0,0,0.55)] ring-1 ring-white/20 transition-all duration-200 hover:bg-brand-50 dark:hover:bg-white/90 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white/30"
           >
             <KeyRound className="size-4" />
             Demander un nouveau lien de réinitialisation
@@ -171,7 +176,7 @@ export default function ResetPassword() {
         <footer className="login-fade login-s3 mt-6 border-t border-white/12 pt-4 text-center">
           <Link
             to={routesStatic.login}
-            className="inline-flex items-center gap-1.5 text-xs font-medium text-white/75 transition-colors hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400/60 rounded-sm"
+            className="inline-flex items-center gap-1.5 text-xs font-medium text-white/75 transition-colors hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400/60 rounded-md"
           >
             <ArrowLeft className="size-3.5" />
             Retour à la connexion
@@ -231,14 +236,14 @@ export default function ResetPassword() {
               aria-invalid={Boolean(fieldErrors.password)}
               aria-describedby={fieldErrors.password ? 'password-error' : 'password-rules'}
               placeholder="••••••••"
-              className={`${loginFieldClass(Boolean(fieldErrors.password))} pr-12`}
+              className={`rounded-md ${loginFieldClass(Boolean(fieldErrors.password))} pr-12`}
             />
 
             <button
               type="button"
               onClick={() => setShowPassword((prev) => !prev)}
               aria-label={showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}
-              className="absolute inset-y-0 right-0 flex items-center rounded-r-xl pr-4 pl-2 text-ink-400 transition-colors hover:text-brand-700 focus-visible:text-brand-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/50 focus-visible:ring-inset"
+              className="rounded-md absolute inset-y-0 right-0 flex items-center rounded-md pr-4 pl-2 text-ink-400 transition-colors hover:text-brand-700 focus-visible:text-brand-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/50 focus-visible:ring-inset"
             >
               {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
             </button>
@@ -281,14 +286,14 @@ export default function ResetPassword() {
               aria-invalid={Boolean(fieldErrors.confirm)}
               aria-describedby={fieldErrors.confirm ? 'confirm-error' : undefined}
               placeholder="••••••••"
-              className={`${loginFieldClass(Boolean(fieldErrors.confirm))} pr-12`}
+              className={`rounded-md ${loginFieldClass(Boolean(fieldErrors.confirm))} pr-12`}
             />
 
             <button
               type="button"
               onClick={() => setShowConfirm((prev) => !prev)}
               aria-label={showConfirm ? 'Masquer la confirmation' : 'Afficher la confirmation'}
-              className="absolute inset-y-0 right-0 flex items-center rounded-r-xl pr-4 pl-2 text-ink-400 transition-colors hover:text-brand-700 focus-visible:text-brand-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/50 focus-visible:ring-inset"
+              className="rounded-md absolute inset-y-0 right-0 flex items-center rounded-md pr-4 pl-2 text-ink-400 transition-colors hover:text-brand-700 focus-visible:text-brand-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/50 focus-visible:ring-inset"
             >
               {showConfirm ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
             </button>
@@ -307,7 +312,7 @@ export default function ResetPassword() {
           <SaveButton
             status={getAuthSubmitStatus(submitting, Boolean(globalError))}
             loadingLabel="Réinitialisation…"
-            className="h-12 w-full rounded-xl"
+            className="h-12 w-full rounded-md"
           >
             Réinitialiser le mot de passe
           </SaveButton>
@@ -317,7 +322,7 @@ export default function ResetPassword() {
       <footer className="login-fade login-s5 mt-6 border-t border-white/12 pt-4 text-center">
         <Link
           to={routesStatic.login}
-          className="inline-flex items-center gap-1.5 text-xs font-medium text-white/75 transition-colors hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400/60 rounded-sm"
+          className="inline-flex items-center gap-1.5 text-xs font-medium text-white/75 transition-colors hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400/60 rounded-md"
         >
           <ArrowLeft className="size-3.5" />
           Retour à la connexion

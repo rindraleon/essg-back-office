@@ -13,7 +13,7 @@ export const getSettings = async (): Promise<Settings> => {
 };
 
 export const updateSettings = async (
-  payload: Partial<Pick<Settings, 'admissionsOuvertes' | 'navigationPrincipale'>>,
+  payload: Partial<Pick<Settings, 'admissionsOuvertes' | 'navigationPrincipale'>>
 ): Promise<Settings> => {
   return apiClient.patch<Settings>('/settings', payload);
 };

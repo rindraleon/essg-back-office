@@ -34,7 +34,9 @@ export default defineConfig(({ mode }) => {
           manualChunks(id) {
             if (!id.includes('node_modules')) return undefined;
             const normalizedId = id.replace(/\\/g, '/');
-            if (/node_modules\/(react|react-dom|react-router|react-router-dom)\//.test(normalizedId))
+            if (
+              /node_modules\/(react|react-dom|react-router|react-router-dom)\//.test(normalizedId)
+            )
               return 'vendor-react';
             if (normalizedId.includes('@tanstack/react-query')) return 'vendor-query';
             if (normalizedId.includes('@base-ui/react')) return 'vendor-ui';

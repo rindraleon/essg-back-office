@@ -237,7 +237,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
           type="file"
           accept="image/*"
           onChange={handleFileChange}
-          className="hidden"
+          className="rounded-md hidden"
         />
         <Button
           type="button"
@@ -252,6 +252,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
       </Box>
 
       <input
+        className="rounded-md"
         type="hidden"
         id="image"
         value={imageUrl}
@@ -275,7 +276,7 @@ export const FormCheckbox: React.FC<FormCheckboxProps> = ({ label, checked, onCh
         id={label.toLowerCase().replace(/\s+/g, '-')}
         checked={checked}
         onChange={(e) => onChange(e.target.checked)}
-        className="w-4 h-4 text-brand-600 rounded focus:ring-2 focus:ring-brand-500"
+        className="w-4 h-4 text-brand-600 rounded-md focus:ring-2 focus:ring-brand-500"
       />
       <label
         htmlFor={label.toLowerCase().replace(/\s+/g, '-')}

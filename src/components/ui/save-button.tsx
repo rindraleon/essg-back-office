@@ -73,7 +73,9 @@ function SaveButton({
 
   useEffect(() => {
     if (!isSuccess || !celebrate) return;
-    fireConfetti(buttonRef.current).catch(() => undefined);
+    fireConfetti(buttonRef.current).catch((error: unknown) => {
+      console.warn('Animation de confirmation indisponible', error);
+    });
   }, [isSuccess, celebrate]);
 
   const messages = { loading: loadingLabel, success: successLabel, error: errorLabel };

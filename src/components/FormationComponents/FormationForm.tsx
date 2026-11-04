@@ -543,7 +543,7 @@ const FormationForm: React.FC<FormationFormProps> = ({
               type="file"
               accept="image/*"
               onChange={handleImageUpload}
-              className="hidden"
+              className="rounded-md hidden"
             />
             <Button
               type="button"

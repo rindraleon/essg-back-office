@@ -105,7 +105,7 @@ export default function MultiImageUpload({
                 type="button"
                 onClick={() => onChange(value.filter((item) => item !== url))}
                 disabled={disabled || uploading}
-                className="absolute right-1 top-1 flex h-6 w-6 items-center justify-center rounded-full bg-ink-950/70 text-white opacity-0 transition-opacity group-hover:opacity-100"
+                className="absolute right-1 top-1 flex h-6 w-6 items-center justify-center rounded-md bg-ink-950/70 text-white opacity-0 transition-opacity group-hover:opacity-100"
                 aria-label="Retirer l'image"
               >
                 <Trash2 className="h-3 w-3" />
@@ -131,7 +131,7 @@ export default function MultiImageUpload({
           type="file"
           accept={ACCEPTED}
           multiple
-          className="hidden"
+          className="rounded-md hidden"
           disabled={disabled || uploading || remaining === 0}
           onChange={(event) => void uploadFiles(Array.from(event.target.files ?? []))}
         />

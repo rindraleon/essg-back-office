@@ -156,7 +156,7 @@ const RessourceHumaineViewDialog: React.FC<RessourceHumaineViewDialogProps> = ({
                   variant="ghost"
                   size="icon"
                   onClick={onClose}
-                  className="shrink-0 rounded-full border border-ink-100"
+                  className="shrink-0 rounded-md border border-ink-100"
                   aria-label="Fermer"
                 >
                   <X className="size-4" />

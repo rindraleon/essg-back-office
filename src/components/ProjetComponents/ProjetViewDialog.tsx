@@ -148,7 +148,7 @@ const ProjetViewDialog: React.FC<ProjetViewDialogProps> = ({ open, onClose, proj
                   variant="ghost"
                   size="icon"
                   onClick={onClose}
-                  className="h-10 w-10 shrink-0 rounded-full border border-ink-100 bg-card hover:bg-ink-100"
+                  className="h-10 w-10 shrink-0 rounded-md border border-ink-100 bg-card hover:bg-ink-100"
                   aria-label="Fermer"
                 >
                   <X className="h-4 w-4" />
@@ -219,7 +219,7 @@ const ProjetViewDialog: React.FC<ProjetViewDialogProps> = ({ open, onClose, proj
                               href={source.url}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="group flex items-center justify-between gap-2 rounded-lg border border-ink-100 bg-card px-3 py-2 text-sm text-ink-700 transition-colors hover:border-brand-300 hover:bg-brand-50"
+                              className="group flex items-center justify-between gap-2 rounded-md border border-ink-100 bg-card px-3 py-2 text-sm text-ink-700 transition-colors hover:border-brand-300 hover:bg-brand-50"
                             >
                               <span className="min-w-0 truncate font-medium">{source.title}</span>
                               <ExternalLink className="h-3.5 w-3.5 shrink-0 text-ink-400 transition-colors group-hover:text-brand-600" />
@@ -274,7 +274,7 @@ const ProjetViewDialog: React.FC<ProjetViewDialogProps> = ({ open, onClose, proj
             </div>
 
             <div className="flex shrink-0 items-center justify-end border-t border-ink-100 bg-card px-5 py-4 lg:px-6">
-              <Button type="button" onClick={onClose} variant="outline" className="rounded-xl">
+              <Button type="button" onClick={onClose} variant="outline" className="rounded-md">
                 Fermer
               </Button>
             </div>

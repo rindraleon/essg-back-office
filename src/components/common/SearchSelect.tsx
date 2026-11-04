@@ -165,7 +165,7 @@ const SearchSelect: React.FC<SearchSelectProps> = ({
             type="button"
             aria-label="Effacer la sélection"
             onClick={clear}
-            className="grid size-5 shrink-0 place-items-center rounded border-0 bg-transparent p-0 text-ink-400 hover:bg-ink-100 hover:text-ink-700"
+            className="grid size-5 shrink-0 place-items-center rounded-md border-0 bg-transparent p-0 text-ink-400 hover:bg-ink-100 hover:text-ink-700"
           >
             <X className="size-3.5" />
           </button>
@@ -202,7 +202,7 @@ const SearchSelect: React.FC<SearchSelectProps> = ({
               onChange={(event) => setQuery(event.target.value)}
               onKeyDown={handleKeyDown}
               placeholder={placeholder}
-              className="w-full bg-transparent text-sm outline-none placeholder:text-ink-400"
+              className="rounded-md w-full bg-transparent text-sm outline-none placeholder:text-ink-400"
             />
           </div>
 
@@ -249,7 +249,7 @@ const SearchSelect: React.FC<SearchSelectProps> = ({
                     onClick={() => select(option)}
                     onMouseEnter={() => setHighlighted(index)}
                     className={cn(
-                      'flex w-full items-center gap-2.5 px-3 py-2 text-left text-sm transition-colors',
+                      'rounded-md flex w-full items-center gap-2.5 px-3 py-2 text-left text-sm transition-colors',
                       index === highlighted ? 'bg-brand-50' : 'bg-card',
                       isSelected && 'font-medium text-brand-800'
                     )}

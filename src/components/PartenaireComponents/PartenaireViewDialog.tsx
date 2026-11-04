@@ -76,7 +76,7 @@ const PartenaireViewDialog: React.FC<PartenaireViewDialogProps> = ({
               className="
                 size-8
                 shrink-0
-                rounded-full
+                rounded-md
                 border border-ink-100
                 text-ink-400
                 hover:bg-ink-50 hover:text-ink-900
@@ -209,7 +209,7 @@ const PartenaireViewDialog: React.FC<PartenaireViewDialogProps> = ({
                       rel="noopener noreferrer"
                       className="
                         group flex items-center gap-3
-                        rounded-xl border border-ink-100 bg-card
+                        rounded-md border border-ink-100 bg-card
                         p-3 transition-all
                         hover:border-brand-200 hover:bg-brand-50/20
                       "
@@ -238,7 +238,7 @@ const PartenaireViewDialog: React.FC<PartenaireViewDialogProps> = ({
                       }
                       className="
                         group flex items-center gap-3
-                        rounded-xl border border-ink-100 bg-card
+                        rounded-md border border-ink-100 bg-card
                         p-3 transition-all
                         hover:border-brand-200 hover:bg-brand-50/20
                       "
@@ -272,7 +272,7 @@ const PartenaireViewDialog: React.FC<PartenaireViewDialogProps> = ({
             type="button"
             variant="outline"
             onClick={onClose}
-            className="h-8 rounded-lg text-xs"
+            className="h-8 rounded-md text-xs"
           >
             Fermer
           </Button>

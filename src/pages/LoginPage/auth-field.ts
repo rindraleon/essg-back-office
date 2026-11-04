@@ -2,7 +2,7 @@ import type { SaveStatus } from '@/components/ui/save-button';
 
 export const loginFieldClass = (hasError: boolean): string =>
   [
-    'h-12 w-full rounded-xl border bg-card/95 pl-11 text-sm text-ink-900 shadow-sm',
+    'h-12 w-full rounded-md border bg-card/95 pl-11 text-sm text-ink-900 shadow-sm',
     'placeholder:text-ink-400',
     'transition-all duration-200 outline-none',
     'hover:bg-card',

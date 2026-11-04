@@ -134,7 +134,7 @@ const MultiSearchSelect: React.FC<MultiSearchSelectProps> = ({
                   event.stopPropagation();
                   remove(option.value);
                 }}
-                className="shrink-0 rounded hover:text-red-600"
+                className="shrink-0 rounded-md hover:text-red-600"
               >
                 <X className="size-3" />
               </button>
@@ -173,7 +173,7 @@ const MultiSearchSelect: React.FC<MultiSearchSelectProps> = ({
               value={query}
               onChange={(event) => setQuery(event.target.value)}
               placeholder={placeholder}
-              className="w-full bg-transparent text-sm outline-none placeholder:text-ink-400"
+              className="rounded-md w-full bg-transparent text-sm outline-none placeholder:text-ink-400"
             />
           </div>
 
@@ -224,7 +224,7 @@ const MultiSearchSelect: React.FC<MultiSearchSelectProps> = ({
                     aria-selected={isSelected}
                     onClick={() => toggle(option)}
                     className={cn(
-                      'flex w-full items-center gap-2.5 px-3 py-2 text-left text-sm transition-colors hover:bg-brand-50',
+                      'rounded-md flex w-full items-center gap-2.5 px-3 py-2 text-left text-sm transition-colors hover:bg-brand-50',
                       isSelected && 'font-medium text-brand-800'
                     )}
                   >

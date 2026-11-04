@@ -68,6 +68,7 @@ export interface ResultatIndividuelQuery {
   limit?: number;
   q?: string;
   statutAcademique?: StatutAcademique;
+  classe?: string;
 }
 
 export interface ResultatsIndividuelsResponse {
@@ -117,6 +118,7 @@ export const getResultatIndividuels = async (
       limit: query.limit ?? 100,
       q: query.q || undefined,
       statutAcademique: query.statutAcademique || undefined,
+      classe: query.classe || undefined,
     }
   );
   return {
@@ -126,6 +128,11 @@ export const getResultatIndividuels = async (
     limit: result.meta.limit,
     totalPages: result.meta.totalPages,
   };
+};
+
+export const getResultatClassesIndividuels = async (publicationId: number): Promise<string[]> => {
+  const classes = await apiClient.get<string[]>(`/resultats/${publicationId}/individuels/classes`);
+  return Array.isArray(classes) ? classes : [];
 };
 
 export const downloadModeleResultats = async (): Promise<Blob> => {

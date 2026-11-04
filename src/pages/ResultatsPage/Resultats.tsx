@@ -11,10 +11,10 @@ import ResultatsFilter from '@/components/ResultatsComponents/ResultatsFilter';
 import type { ResultatFilters } from '@/components/ResultatsComponents/ResultatsFilter';
 import ResultatsImportDialog from '@/components/ResultatsComponents/ResultatsImportDialog';
 import ResultatsViewDialog from '@/components/ResultatsComponents/ResultatsViewDialog';
+import modeleResultatsUrl from '@/assets/docs/modele-resultats.xlsx?url';
 import {
   archiverResultat,
   depublierResultat,
-  downloadModeleResultats,
   getAllResultats,
   getResultatFileBlob,
   publierResultat,
@@ -27,6 +27,22 @@ const EMPTY_FILTERS: ResultatFilters = {
   type: '',
   statutPublication: '',
 };
+
+type ResultatAction = 'publier' | 'depublier' | 'archiver';
+
+function executeResultatAction({ action, id }: { action: ResultatAction; id: number }) {
+  if (action === 'publier') return publierResultat(id);
+  if (action === 'depublier') return depublierResultat(id);
+  return archiverResultat(id);
+}
+
+function valueWhen<T>(condition: boolean, value: T): T | undefined {
+  return condition ? value : undefined;
+}
+
+function confirmResultatDeletion(target: ResultatPublication | null, remove: (id: number) => void) {
+  if (target) remove(target.id);
+}
 
 export default function ResultatsPage() {
   useScrollToTop();
@@ -71,11 +87,7 @@ export default function ResultatsPage() {
   const invalidate = () => queryClient.invalidateQueries({ queryKey: ['resultats'] });
 
   const actionMutation = useMutation({
-    mutationFn: ({ action, id }: { action: 'publier' | 'depublier' | 'archiver'; id: number }) => {
-      if (action === 'publier') return publierResultat(id);
-      if (action === 'depublier') return depublierResultat(id);
-      return archiverResultat(id);
-    },
+    mutationFn: executeResultatAction,
     onSuccess: (_data, variables) => {
       void invalidate();
       const labels = {
@@ -109,21 +121,14 @@ export default function ResultatsPage() {
 
   const resultats = useMemo(() => data?.data ?? [], [data?.data]);
 
-  const telechargerModele = useCallback(async () => {
-    try {
-      const blob = await downloadModeleResultats();
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = 'modele-resultats.xlsx';
-      link.style.visibility = 'hidden';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Impossible de télécharger le modèle.');
-    }
+  const telechargerModele = useCallback(() => {
+    const link = document.createElement('a');
+    link.href = modeleResultatsUrl;
+    link.download = 'modele-resultats.xlsx';
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
   }, []);
 
   const handleDownload = useCallback(async (resultat: ResultatPublication) => {
@@ -136,7 +141,7 @@ export default function ResultatsPage() {
       link.style.visibility = 'hidden';
       document.body.appendChild(link);
       link.click();
-      document.body.removeChild(link);
+      link.remove();
       URL.revokeObjectURL(url);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Impossible de télécharger le fichier.');
@@ -162,9 +167,9 @@ export default function ResultatsPage() {
     <div className="mx-auto max-w-7xl py-4 space-y-3 min-w-0">
       <ListPageHeader
         loading={isLoading}
-        title="Résultats scolaires"
+        title="Résultats"
         totalCount={data?.total ?? 0}
-        countLabel="publication"
+        countLabel="résultat"
         searchValue={search}
         onSearchChange={(value) => {
           setSearch(value);
@@ -174,13 +179,13 @@ export default function ResultatsPage() {
         onToggleFilters={() => setFiltersOpen((open) => !open)}
         filtersOpen={filtersOpen}
         activeFilterCount={activeFilterCount}
-        actionLabel={canCreate ? 'Importer un fichier' : undefined}
-        onAction={canCreate ? () => setImportDialogOpen(true) : undefined}
+        actionLabel={valueWhen(canCreate, 'Importer résultat')}
+        onAction={valueWhen(canCreate, () => setImportDialogOpen(true))}
         actionIcon={<Upload className="h-4 w-4" />}
       >
         <button
           type="button"
-          onClick={() => void telechargerModele()}
+          onClick={() => telechargerModele()}
           className="inline-flex items-center justify-center gap-2 rounded-md border border-ink-200 bg-ink-50 px-4 py-2 text-sm font-medium text-ink-700 hover:bg-ink-100"
         >
           <Download className="h-4 w-4" />
@@ -194,7 +199,7 @@ export default function ResultatsPage() {
         onResetFilters={handleResetFilters}
         activeFilterCount={activeFilterCount}
         open={filtersOpen}
-        onToggle={() => setFiltersOpen(false)}
+        onToggle={() => setFiltersOpen((open) => !open)}
       />
 
       <ResultatsTable
@@ -208,20 +213,16 @@ export default function ResultatsPage() {
           setPage(0);
         }}
         onView={handleView}
-        onDelete={canDelete ? (row) => setDeleteTarget(row) : undefined}
-        onPublish={
-          canPublish ? (row) => actionMutation.mutate({ action: 'publier', id: row.id }) : undefined
-        }
-        onUnpublish={
-          canPublish
-            ? (row) => actionMutation.mutate({ action: 'depublier', id: row.id })
-            : undefined
-        }
-        onArchive={
-          canPublish
-            ? (row) => actionMutation.mutate({ action: 'archiver', id: row.id })
-            : undefined
-        }
+        onDelete={valueWhen(canDelete, (row) => setDeleteTarget(row))}
+        onPublish={valueWhen(canPublish, (row) =>
+          actionMutation.mutate({ action: 'publier', id: row.id })
+        )}
+        onUnpublish={valueWhen(canPublish, (row) =>
+          actionMutation.mutate({ action: 'depublier', id: row.id })
+        )}
+        onArchive={valueWhen(canPublish, (row) =>
+          actionMutation.mutate({ action: 'archiver', id: row.id })
+        )}
         onDownload={(row) => void handleDownload(row)}
         loading={isLoading}
         error={!!error}
@@ -254,9 +255,7 @@ export default function ResultatsPage() {
         confirmLabel="Supprimer"
         severity="error"
         loading={deleteMutation.isPending}
-        onConfirm={() => {
-          if (deleteTarget) deleteMutation.mutate(deleteTarget.id);
-        }}
+        onConfirm={() => confirmResultatDeletion(deleteTarget, deleteMutation.mutate)}
         onCancel={() => setDeleteTarget(null)}
       />
     </div>

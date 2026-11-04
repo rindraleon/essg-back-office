@@ -13,9 +13,12 @@ const BLOB_REQUEST_TIMEOUT = 30_000;
 
 let accessToken: string | undefined;
 
-/** Noms des anciens cookies JS (pré-ESSG-SEC-01), nettoyés à la migration. */
+/**
+ * Ancien cookie JS d'access token (pré-ESSG-SEC-01), nettoyé à la migration.
+ * ⚠️ Ne jamais cibler `refresh_token` ici : c'est désormais le cookie HttpOnly
+ * émis par le serveur, et l'écraser côté JS déconnecterait l'utilisateur.
+ */
 const LEGACY_TOKEN_COOKIE = 'token_name';
-const LEGACY_REFRESH_COOKIE = 'refresh_token';
 
 export type DocumentBlob = Blob & {
   inlineViewable: boolean;
@@ -68,7 +71,6 @@ function cleanupLegacyTokenCookies(): void {
   if (legacyCookiesCleaned || typeof document === 'undefined') return;
   legacyCookiesCleaned = true;
   expireLegacyCookie(LEGACY_TOKEN_COOKIE);
-  expireLegacyCookie(LEGACY_REFRESH_COOKIE);
 }
 cleanupLegacyTokenCookies();
 
@@ -96,30 +98,42 @@ export function hasAuthToken(): boolean {
 
 let refreshPromise: Promise<boolean> | null = null;
 
+async function performRefresh(): Promise<boolean> {
+  try {
+    const response = await fetch(buildUrl('/auth/refresh'), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+      credentials: 'include',
+    });
+    if (!response.ok) return false;
+
+    const envelope = (await parseJsonSafe(response)) as ApiEnvelope<{
+      accessToken: string;
+    }>;
+    const data = unwrap<{ accessToken: string }>(envelope);
+    if (!data?.accessToken) return false;
+
+    setAuthToken(data.accessToken);
+    return true;
+  } catch (error) {
+    console.warn(
+      'Échec dans callback — poursuite en mode dégradé',
+      error instanceof Error ? error.message : error
+    );
+    return false;
+  }
+}
+
 async function refreshAccessToken(): Promise<boolean> {
   refreshPromise ??= (async () => {
     try {
-      const response = await fetch(buildUrl('/auth/refresh'), {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-        credentials: 'include',
-      });
-      if (!response.ok) return false;
-
-      const envelope = (await parseJsonSafe(response)) as ApiEnvelope<{
-        accessToken: string;
-      }>;
-      const data = unwrap<{ accessToken: string }>(envelope);
-      if (!data?.accessToken) return false;
-
-      setAuthToken(data.accessToken);
-      return true;
-    } catch (error) {
-      console.warn(
-        'Échec dans callback — poursuite en mode dégradé',
-        error instanceof Error ? error.message : error
-      );
-      return false;
+      // Le Web Locks API sérialise les refresh entre onglets : sans cela, la
+      // rotation du refresh token ferait échouer le 2e onglet (401 → déconnexion).
+      const lockManager = typeof navigator !== 'undefined' ? navigator.locks : undefined;
+      if (lockManager) {
+        return await lockManager.request('essg-auth-refresh', () => performRefresh());
+      }
+      return await performRefresh();
     } finally {
       refreshPromise = null;
     }
@@ -339,6 +353,7 @@ async function request<T>(
       headers,
       body,
       signal: controller.signal,
+      credentials: 'include',
     });
 
     if (!response.ok) {
@@ -424,6 +439,7 @@ export const apiClient = {
         method: 'GET',
         headers,
         signal: controller.signal,
+        credentials: 'include',
       });
       const blob = await response.blob();
       if (!response.ok) {

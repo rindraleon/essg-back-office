@@ -188,11 +188,7 @@ function DataTableInner<T>({
       )}
       aria-busy={loading || undefined}
     >
-      {loading && (
-        <output className="sr-only">
-          Chargement des données…
-        </output>
-      )}
+      {loading && <output className="sr-only">Chargement des données…</output>}
 
       <div className="hidden max-w-full overflow-hidden rounded-xl border border-ink-100 bg-card shadow-card lg:block">
         <div className="overflow-x-auto">
@@ -231,7 +227,7 @@ function DataTableInner<T>({
               <select
                 value={rowsPerPage}
                 onChange={(e) => onRowsPerPageChange(Number(e.target.value))}
-                className="h-8 rounded-lg border border-ink-200 bg-card px-2 text-xs font-medium text-ink-700 outline-none transition-colors focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20"
+                className="h-8 rounded-md border border-ink-200 bg-card px-2 text-xs font-medium text-ink-700 outline-none transition-colors focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20"
               >
                 {ROWS_PER_PAGE_OPTIONS.map((option) => (
                   <option key={option} value={option}>

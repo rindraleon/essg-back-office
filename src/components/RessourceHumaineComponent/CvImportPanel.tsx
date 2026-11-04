@@ -140,7 +140,7 @@ const CvImportPanel: React.FC<CvImportPanelProps> = ({ onApply, disabled = false
         type="file"
         accept={ACCEPTED_CV_TYPES.join(',')}
         onChange={(event) => handleFile(event.target.files?.[0])}
-        className="hidden"
+        className="rounded-md hidden"
       />
 
       {status === 'idle' && (
@@ -225,7 +225,7 @@ const CvImportPanel: React.FC<CvImportPanelProps> = ({ onApply, disabled = false
               type="button"
               onClick={reset}
               aria-label="Retirer le CV"
-              className="grid size-6 shrink-0 place-items-center rounded text-ink-400 hover:bg-ink-100 hover:text-ink-700"
+              className="grid size-6 shrink-0 place-items-center rounded-md text-ink-400 hover:bg-ink-100 hover:text-ink-700"
             >
               <X className="size-4" />
             </button>

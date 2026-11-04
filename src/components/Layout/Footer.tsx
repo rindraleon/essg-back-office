@@ -71,7 +71,7 @@ const Footer: React.FC<FooterProps> = (props: Readonly<FooterProps>) => {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={s.ariaLabel ?? `Ouvrir ${companyName} social`}
-                  className="p-2 rounded-lg text-ink-300 hover:text-white hover:bg-white/10 transition-colors dark:text-ink-400"
+                  className="p-2 rounded-md text-ink-300 hover:text-white hover:bg-white/10 transition-colors dark:text-ink-400"
                 >
                   <SocialIcon kind={s.kind} />
                 </a>

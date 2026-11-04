@@ -260,7 +260,7 @@ export function Select({
       value={Array.isArray(value) ? value[0] : value}
       onChange={(event) => onChange?.({ target: { value: event.target.value } })}
       onBlur={onBlur}
-      className="flex h-10 w-full rounded-xl border border-ink-200 bg-card px-3 py-2 text-sm"
+      className="flex h-10 w-full rounded-md border border-ink-200 bg-card px-3 py-2 text-sm"
     >
       {children}
     </select>
@@ -298,7 +298,7 @@ export function Chip({
     >
       {label}
       {onDelete && (
-        <button type="button" onClick={onDelete} aria-label="Supprimer">
+        <button className="rounded-md" type="button" onClick={onDelete} aria-label="Supprimer">
           ×
         </button>
       )}

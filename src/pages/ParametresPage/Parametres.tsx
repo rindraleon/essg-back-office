@@ -55,16 +55,16 @@ const Parametres: React.FC = () => {
     setPending(value);
     try {
       await updateMutation.mutateAsync({ navigationPrincipale: value });
-      toast.success(
-        `Navigation principale définie sur "${NAV_LABEL[value]}".`
-      );
+      toast.success(`Navigation principale définie sur "${NAV_LABEL[value]}".`);
     } catch (err) {
       console.warn(
         'Échec dans handleNavigationChange — poursuite en mode dégradé',
         err instanceof Error ? err.message : err
       );
       toast.error(
-        err instanceof ApiError ? err.message : 'Impossible de mettre à jour la navigation principale.'
+        err instanceof ApiError
+          ? err.message
+          : 'Impossible de mettre à jour la navigation principale.'
       );
     } finally {
       setPending(null);
@@ -166,9 +166,8 @@ const Parametres: React.FC = () => {
               <div className="min-w-0 flex-1">
                 <h2 className="text-base font-semibold text-ink-900">Navigation principale</h2>
                 <p className="mt-1 text-sm text-ink-500">
-                  Choisissez quelle fonctionnalité est mise en avant dans le menu du site
-                  public. Une seule option peut être active à la fois : Admission, Résultats
-                  ou Aucun.
+                  Choisissez quelle fonctionnalité est mise en avant dans le menu du site public.
+                  Une seule option peut être active à la fois : Admission, Résultats ou Aucun.
                 </p>
 
                 <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-center">
@@ -202,8 +201,7 @@ const Parametres: React.FC = () => {
                 )}
 
                 <p className="mt-3 text-sm font-medium text-ink-600">
-                  Actuel&nbsp;: <strong>{NAV_LABEL[data.navigationPrincipale]}</strong>
-                  {' '}
+                  Actuel&nbsp;: <strong>{NAV_LABEL[data.navigationPrincipale]}</strong>{' '}
                   {data.navigationPrincipale === 'resultats' &&
                     '(le lien « Résultats » s’affiche dans le header du site public)'}
                   {data.navigationPrincipale === 'admission' &&

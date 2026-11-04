@@ -18,11 +18,6 @@ const STATUT_LABEL: Record<string, string> = {
   archive: 'Archivé',
 };
 
-const TYPE_LABEL: Record<string, string> = {
-  excel: 'Excel',
-  pdf: 'PDF',
-};
-
 const formatDate = (value?: string | null) =>
   value ? new Date(value).toLocaleDateString('fr-MG') : '—';
 
@@ -69,31 +64,20 @@ const ResultatsTable: React.FC<ResultatsTableProps> = ({
       render: (row) => (
         <div className="max-w-md">
           <span className="font-semibold text-ink-900 line-clamp-1">{row.titre}</span>
-          <p className="text-xs text-ink-500 line-clamp-1 mt-0.5">{row.fichierOriginal}</p>
         </div>
       ),
     },
     {
       id: 'anneeScolaire',
-      label: 'Année / Période',
+      label: 'Période',
       minWidth: 150,
       render: (row) => (
         <div className="text-sm text-ink-700">
           <p className="font-medium">{row.anneeScolaire}</p>
-          <p className="text-xs text-ink-500">{row.periode || '—'}</p>
         </div>
       ),
     },
-    {
-      id: 'type',
-      label: 'Type',
-      minWidth: 90,
-      render: (row) => (
-        <Badge variant="outline" className="text-xs">
-          {TYPE_LABEL[row.type] ?? row.type}
-        </Badge>
-      ),
-    },
+    
     {
       id: 'totaux',
       label: 'Résultats',
@@ -106,22 +90,7 @@ const ResultatsTable: React.FC<ResultatsTableProps> = ({
             </span>{' '}
             lignes
           </p>
-          <p>
-            <span className="text-emerald-700">{row.totalAdmis} admis</span>
-            {' · '}
-            <span className="text-red-700">{row.totalAjourne} ajourné(s)</span>
-          </p>
         </div>
-      ),
-    },
-    {
-      id: 'consultation',
-      label: 'Consultation',
-      minWidth: 120,
-      render: (row) => (
-        <span className="text-xs text-ink-600">
-          {row.modeConsultation === 'protege' ? 'Protégée (matricule + code)' : 'Publique'}
-        </span>
       ),
     },
     {

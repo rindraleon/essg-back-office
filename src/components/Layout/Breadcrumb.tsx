@@ -25,11 +25,11 @@ const Breadcrumb: React.FC = () => {
     'activity-logs': 'Journal',
     'ressources-humaines': 'Equipes pédagogiques',
     utilisateurs: 'Utilisateurs',
-    example: 'Example',
     profil: 'Profil',
     parametres: 'Paramètres',
     messages: 'Messages',
     notifications: 'Notifications',
+    resultats: 'Résultats',
   };
 
   const breadcrumbs: BreadcrumbItem[] = pathnames.map((value, index) => {

@@ -130,7 +130,7 @@ const MultiValueSelect: React.FC<MultiValueSelectProps> = ({
                   event.stopPropagation();
                   remove(value);
                 }}
-                className="shrink-0 rounded hover:text-red-600"
+                className="shrink-0 rounded-md hover:text-red-600"
               >
                 <X className="size-3" />
               </button>
@@ -174,7 +174,7 @@ const MultiValueSelect: React.FC<MultiValueSelectProps> = ({
                 }
               }}
               placeholder={placeholder}
-              className="w-full bg-transparent text-sm outline-none placeholder:text-ink-400"
+              className="rounded-md w-full bg-transparent text-sm outline-none placeholder:text-ink-400"
             />
           </div>
 
@@ -188,7 +188,7 @@ const MultiValueSelect: React.FC<MultiValueSelectProps> = ({
               <button
                 type="button"
                 onClick={addCustom}
-                className="flex w-full items-center gap-2.5 px-3 py-2 text-left text-sm font-medium text-brand-700 transition-colors hover:bg-brand-50 motion-reduce:transition-none"
+                className="rounded-md flex w-full items-center gap-2.5 px-3 py-2 text-left text-sm font-medium text-brand-700 transition-colors hover:bg-brand-50 motion-reduce:transition-none"
               >
                 <Plus className="size-4 shrink-0" />
                 <span className="min-w-0 flex-1 truncate">Ajouter « {trimmedQuery} »</span>
@@ -209,7 +209,7 @@ const MultiValueSelect: React.FC<MultiValueSelectProps> = ({
                   aria-selected={isSelected}
                   onClick={() => toggle(option)}
                   className={cn(
-                    'flex w-full items-center gap-2.5 px-3 py-2 text-left text-sm transition-colors hover:bg-brand-50 motion-reduce:transition-none',
+                    'rounded-md flex w-full items-center gap-2.5 px-3 py-2 text-left text-sm transition-colors hover:bg-brand-50 motion-reduce:transition-none',
                     isSelected && 'font-medium text-brand-800'
                   )}
                 >

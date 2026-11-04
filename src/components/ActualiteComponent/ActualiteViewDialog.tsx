@@ -117,7 +117,7 @@ const ActualiteViewDialog: React.FC<ActualiteViewDialogProps> = ({ open, onClose
                   variant="ghost"
                   size="icon"
                   onClick={onClose}
-                  className="h-10 w-10 shrink-0 rounded-full border border-ink-100 bg-card hover:bg-ink-100"
+                  className="h-10 w-10 shrink-0 rounded-md border border-ink-100 bg-card hover:bg-ink-100"
                   aria-label="Fermer"
                 >
                   <X className="h-4 w-4" />
@@ -201,7 +201,7 @@ const ActualiteViewDialog: React.FC<ActualiteViewDialogProps> = ({ open, onClose
             </div>
 
             <div className="flex shrink-0 items-center justify-end border-t border-ink-100 bg-card px-5 py-4 lg:px-6">
-              <Button type="button" onClick={onClose} variant="outline" className="rounded-xl">
+              <Button type="button" onClick={onClose} variant="outline" className="rounded-md">
                 Fermer
               </Button>
             </div>

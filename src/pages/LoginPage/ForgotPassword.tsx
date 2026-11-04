@@ -82,7 +82,7 @@ export default function ForgotPassword() {
 
           <Link
             to={routesStatic.login}
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-white text-sm font-bold text-brand-800 dark:text-brand-600 shadow-[0_12px_30px_-10px_rgba(0,0,0,0.55)] ring-1 ring-white/20 transition-all duration-200 hover:bg-brand-50 dark:hover:bg-white/90 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white/30"
+            className="flex h-12 w-full items-center justify-center gap-2 rounded-md bg-white text-sm font-bold text-brand-800 dark:text-brand-600 shadow-[0_12px_30px_-10px_rgba(0,0,0,0.55)] ring-1 ring-white/20 transition-all duration-200 hover:bg-brand-50 dark:hover:bg-white/90 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white/30"
           >
             <ArrowLeft className="size-4" />
             Retour à la connexion
@@ -127,7 +127,7 @@ export default function ForgotPassword() {
                 aria-invalid={Boolean(emailError)}
                 aria-describedby={emailError ? 'email-error' : undefined}
                 placeholder="votre adresse email"
-                className={`${loginFieldClass(Boolean(emailError))} pr-4`}
+                className={`rounded-md ${loginFieldClass(Boolean(emailError))} pr-4`}
               />
             </div>
 
@@ -144,7 +144,7 @@ export default function ForgotPassword() {
             <SaveButton
               status={getAuthSubmitStatus(loading, Boolean(globalError))}
               loadingLabel="Envoi en cours…"
-              className="h-12 w-full rounded-xl"
+              className="h-12 w-full rounded-md"
             >
               Envoyer le lien de réinitialisation
             </SaveButton>
@@ -155,7 +155,7 @@ export default function ForgotPassword() {
       <footer className="login-fade login-s4 mt-6 border-t border-white/12 pt-4 text-center">
         <Link
           to={routesStatic.login}
-          className="inline-flex items-center gap-1.5 text-xs font-medium text-white/75 transition-colors hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400/60 rounded-sm"
+          className="inline-flex items-center gap-1.5 text-xs font-medium text-white/75 transition-colors hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400/60 rounded-md"
         >
           <ArrowLeft className="size-3.5" />
           Retour à la connexion

@@ -150,7 +150,7 @@ export default function Login() {
               aria-invalid={Boolean(validationErrors.email)}
               aria-describedby={validationErrors.email ? 'email-error' : undefined}
               placeholder="votre adresse email"
-              className={`${loginFieldClass(Boolean(validationErrors.email))} pr-4`}
+              className={`rounded-md ${loginFieldClass(Boolean(validationErrors.email))} pr-4`}
             />
           </div>
 
@@ -173,7 +173,7 @@ export default function Login() {
             </label>
             <Link
               to={routesStatic.forgotPassword}
-              className="text-xs font-medium text-brand-200 dark:text-brand-400 transition-colors hover:text-white hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400/60 rounded-sm"
+              className="text-xs font-medium text-brand-200 dark:text-brand-400 transition-colors hover:text-white hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400/60 rounded-md"
             >
               Mot de passe oublié ?
             </Link>
@@ -200,14 +200,14 @@ export default function Login() {
               aria-invalid={Boolean(validationErrors.password)}
               aria-describedby={validationErrors.password ? 'password-error' : undefined}
               placeholder="••••••••"
-              className={`${loginFieldClass(Boolean(validationErrors.password))} pr-12`}
+              className={`rounded-md ${loginFieldClass(Boolean(validationErrors.password))} pr-12`}
             />
 
             <button
               type="button"
               onClick={() => setShowPassword((prev) => !prev)}
               aria-label={showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}
-              className="absolute inset-y-0 right-0 flex items-center rounded-r-xl pr-4 pl-2 text-ink-400 transition-colors hover:text-brand-700 focus-visible:text-brand-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/50 focus-visible:ring-inset"
+              className="rounded-md absolute inset-y-0 right-0 flex items-center rounded-md pr-4 pl-2 text-ink-400 transition-colors hover:text-brand-700 focus-visible:text-brand-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/50 focus-visible:ring-inset"
             >
               {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
             </button>
@@ -226,7 +226,7 @@ export default function Login() {
           <SaveButton
             status={getAuthSubmitStatus(loading, Boolean(error))}
             loadingLabel="Connexion…"
-            className="h-12 w-full rounded-xl"
+            className="h-12 w-full rounded-md"
           >
             Se connecter
           </SaveButton>

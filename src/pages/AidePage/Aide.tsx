@@ -139,7 +139,7 @@ const Aide: React.FC = () => {
 
   const chipClass = (active: boolean) =>
     cn(
-      'inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500',
+      'inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500',
       active
         ? 'border-brand-300 bg-brand-100 text-brand-800'
         : 'border-ink-100 bg-card text-ink-600 hover:border-brand-200 hover:bg-brand-50 hover:text-brand-800'
@@ -260,7 +260,7 @@ const Aide: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => select(step.sectionId)}
-                    className="flex h-full w-full items-start gap-2 rounded-lg border border-ink-100 px-3 py-2 text-left text-sm transition-colors hover:border-brand-300 hover:bg-brand-50/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
+                    className="flex h-full w-full items-start gap-2 rounded-md border border-ink-100 px-3 py-2 text-left text-sm transition-colors hover:border-brand-300 hover:bg-brand-50/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
                   >
                     <Badge
                       variant="secondary"

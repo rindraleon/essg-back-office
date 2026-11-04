@@ -9,7 +9,8 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "lint:sonar": "eslint \"src/**/*.{ts,tsx}\" --no-fix"
+    "lint:sonar": "eslint \"src/**/*.{ts,tsx}\" --no-fix",
+    "check:ui": "node scripts/check-ui-radius.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",

@@ -58,7 +58,7 @@ const ContactReplyDialog = ({ message, open, onClose, onSubmit }: ContactReplyDi
               value={body}
               onChange={(e) => setBody(e.target.value)}
               rows={7}
-              className="w-full rounded-lg border border-ink-300 px-4 py-2 text-sm focus:border-transparent focus:ring-2 focus:ring-brand-500"
+              className="w-full rounded-md border border-ink-300 px-4 py-2 text-sm focus:border-transparent focus:ring-2 focus:ring-brand-500"
               placeholder="Saisissez votre réponse…"
               disabled={submitting}
             />

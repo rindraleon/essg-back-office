@@ -275,7 +275,7 @@ const ActualiteForm: React.FC<ActualiteFormProps> = ({
               type="file"
               accept="image/*"
               onChange={handleImageUpload}
-              className="hidden"
+              className="rounded-md hidden"
             />
             <Button
               type="button"
@@ -363,7 +363,7 @@ const ActualiteForm: React.FC<ActualiteFormProps> = ({
                     type="button"
                     onClick={() => handleStepClick(index)}
                     className={`
-                      flex items-center gap-1.5 px-3 py-1.5 rounded-full
+                      flex items-center gap-1.5 px-3 py-1.5 rounded-md
                       text-xs font-medium transition-all
                       ${stepClass}
                     `}

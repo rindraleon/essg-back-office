@@ -9,7 +9,6 @@ import {
   Mail,
   Newspaper,
   ScrollText,
-  Settings,
   UserCheck,
   Users,
 } from 'lucide-react';
@@ -112,18 +111,11 @@ const NAV_ITEMS: NavItem[] = [
     adminOnly: true,
   },
   {
-    name: 'Journal',
-    label: 'Journal',
+    name: 'Journal d\'activité',
+    label: 'Journal d\'activité',
     href: routesStatic.activityLogs,
     icon: ScrollText,
     adminOnly: true,
-  },
-  {
-    name: 'Paramètres',
-    label: 'Paramètres',
-    href: routesStatic.parametres,
-    icon: Settings,
-    permission: PERMISSIONS.SETTINGS_ADMISSION,
   },
 ];
 

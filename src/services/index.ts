@@ -48,6 +48,7 @@ export {
   getAllResultats,
   getResultatById,
   getResultatIndividuels,
+  getResultatClassesIndividuels,
   getResultatFileBlob,
   downloadModeleResultats,
   importResultat,

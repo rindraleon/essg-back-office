@@ -41,7 +41,7 @@ interface ResultatsImportDialogProps {
 type Step = 'form' | 'preview';
 type FormState = Omit<ImportResultatPayload, 'fichier'>;
 
-const ACCEPTED_EXTENSIONS = ['.xlsx', '.pdf'];
+const ACCEPTED_EXTENSIONS = new Set(['.xlsx', '.pdf']);
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
 const PREVIEW_PAGE_SIZE = 10;
 
@@ -67,7 +67,10 @@ const formatSize = (bytes: number): string => {
 };
 
 const inferType = (file: File | null): 'excel' | 'pdf' =>
-  file && file.name.toLowerCase().endsWith('.pdf') ? 'pdf' : 'excel';
+  file?.name.toLowerCase().endsWith('.pdf') ? 'pdf' : 'excel';
+
+const isPreviewConfirmable = (preview: ImportResultatResponse['preview'] | undefined): boolean =>
+  preview !== undefined && (preview.type === 'pdf' || preview.lignesValides > 0);
 
 const ResultatsImportDialog: React.FC<ResultatsImportDialogProps> = ({
   open,
@@ -163,7 +166,7 @@ const ResultatsImportDialog: React.FC<ResultatsImportDialogProps> = ({
   const handleFileSelection = (file: File | null) => {
     if (!file) return;
     const extension = file.name.slice(file.name.lastIndexOf('.')).toLowerCase();
-    if (!ACCEPTED_EXTENSIONS.includes(extension)) {
+    if (!ACCEPTED_EXTENSIONS.has(extension)) {
       toast.error('Format non pris en charge. Utilisez un fichier .xlsx ou .pdf.');
       return;
     }
@@ -187,7 +190,7 @@ const ResultatsImportDialog: React.FC<ResultatsImportDialogProps> = ({
     handleFileSelection(event.dataTransfer.files?.[0] ?? null);
   };
 
-  const handleSubmit = (event: React.FormEvent) => {
+  const handleSubmit = (event: React.SubmitEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!selectedFile) {
       toast.error('Sélectionnez un fichier à importer.');
@@ -213,7 +216,7 @@ const ResultatsImportDialog: React.FC<ResultatsImportDialogProps> = ({
       link.style.visibility = 'hidden';
       document.body.appendChild(link);
       link.click();
-      document.body.removeChild(link);
+      link.remove();
       URL.revokeObjectURL(url);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : 'Impossible de télécharger le modèle.');
@@ -234,11 +237,7 @@ const ResultatsImportDialog: React.FC<ResultatsImportDialogProps> = ({
     formData.titre.trim().length > 0 &&
     formData.anneeScolaire.trim().length > 0;
 
-  const canConfirm = useMemo(() => {
-    if (!preview) return false;
-    if (preview.type === 'pdf') return true;
-    return preview.lignesValides > 0;
-  }, [preview]);
+  const canConfirm = useMemo(() => isPreviewConfirmable(preview), [preview]);
 
   const hasIssues =
     preview?.type === 'excel' && (preview.lignesInvalides > 0 || preview.doublons > 0);
@@ -305,7 +304,7 @@ const ResultatsImportDialog: React.FC<ResultatsImportDialogProps> = ({
                     accept=".xlsx,.pdf"
                     onChange={(event) => handleFileSelection(event.target.files?.[0] ?? null)}
                     disabled={isPending}
-                    className="sr-only"
+                    className="rounded-md sr-only"
                   />
                   <label
                     htmlFor="resultat-fichier"
@@ -388,7 +387,7 @@ const ResultatsImportDialog: React.FC<ResultatsImportDialogProps> = ({
                       }
                       placeholder="Ex : Concours d’entrée 2026"
                       disabled={isPending}
-                      className="w-full rounded-lg border border-ink-200 px-3 py-2 text-sm focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20"
+                      className="w-full rounded-md border border-ink-200 px-3 py-2 text-sm focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20"
                     />
                   </div>
 
@@ -411,7 +410,7 @@ const ResultatsImportDialog: React.FC<ResultatsImportDialogProps> = ({
                       }
                       placeholder="Ex : 2025-2026"
                       disabled={isPending}
-                      className="w-full rounded-lg border border-ink-200 px-3 py-2 text-sm focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20"
+                      className="w-full rounded-md border border-ink-200 px-3 py-2 text-sm focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20"
                     />
                   </div>
 
@@ -431,7 +430,7 @@ const ResultatsImportDialog: React.FC<ResultatsImportDialogProps> = ({
                       }
                       placeholder="Ex : Semestre 1"
                       disabled={isPending}
-                      className="w-full rounded-lg border border-ink-200 px-3 py-2 text-sm focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20"
+                      className="w-full rounded-md border border-ink-200 px-3 py-2 text-sm focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20"
                     />
                   </div>
 
@@ -455,7 +454,7 @@ const ResultatsImportDialog: React.FC<ResultatsImportDialogProps> = ({
                       }
                       placeholder="Ex : L1 Informatique"
                       disabled={isPending}
-                      className="w-full rounded-lg border border-ink-200 px-3 py-2 text-sm focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20"
+                      className="w-full rounded-md border border-ink-200 px-3 py-2 text-sm focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20"
                     />
                   </div>
 
@@ -643,7 +642,7 @@ const ResultatsImportDialog: React.FC<ResultatsImportDialogProps> = ({
                             setOnlyIssues(event.target.checked);
                             setPreviewPage(0);
                           }}
-                          className="rounded border-ink-300 text-brand-600 focus:ring-brand-500"
+                          className="rounded-md border-ink-300 text-brand-600 focus:ring-brand-500"
                         />
                         Afficher uniquement les lignes à corriger
                       </label>

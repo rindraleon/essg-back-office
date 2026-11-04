@@ -34,7 +34,7 @@ const QuickActions: React.FC = () => {
             key={action.label}
             type="button"
             onClick={() => (action.onClick ? action.onClick() : navigate(action.path))}
-            className="group flex items-center gap-3 rounded-xl border border-ink-100 px-4 py-3 text-left transition-all duration-200 hover:border-brand-200 hover:bg-brand-50/50 hover:shadow-card"
+            className="group flex items-center gap-3 rounded-md border border-ink-100 px-4 py-3 text-left transition-all duration-200 hover:border-brand-200 hover:bg-brand-50/50 hover:shadow-card"
           >
             <span
               className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg transition-colors ${ACTION_STYLES.iconBg}`}

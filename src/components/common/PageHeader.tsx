@@ -26,7 +26,7 @@ const PageHeader: React.FC<PageHeaderProps> = ({
       {actionLabel && onAction && (
         <Button
           onClick={onAction}
-          className="h-10 shrink-0 rounded-xl px-4 shadow-[0_10px_24px_-10px_rgba(46,106,95,0.55)]"
+          className="h-10 shrink-0 rounded-md px-4 shadow-[0_10px_24px_-10px_rgba(46,106,95,0.55)]"
         >
           {actionIcon || <Plus className="h-4 w-4" />}
           {actionLabel}

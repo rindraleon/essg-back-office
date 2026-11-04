@@ -257,7 +257,7 @@ const PartenaireForm: React.FC<PartenaireFormProps> = ({
               type="file"
               accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
               onChange={handleImageUpload}
-              className="hidden"
+              className="rounded-md hidden"
             />
             <Button
               type="button"

@@ -282,7 +282,7 @@ const Header: React.FC = () => {
                       type="button"
                       onClick={() => navigate(routesStatic.aide)}
                       aria-label="Aide"
-                      className="ml-1 inline-flex size-9 items-center justify-center rounded-full text-ink-500 transition-colors hover:bg-ink-50 hover:text-ink-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
+                      className="ml-1 inline-flex size-9 items-center justify-center rounded-md text-ink-500 transition-colors hover:bg-ink-50 hover:text-ink-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
                     >
                       <CircleHelp className="size-4" aria-hidden="true" />
                     </button>
@@ -298,7 +298,7 @@ const Header: React.FC = () => {
                       <DropdownMenuTrigger>
                         <button
                           type="button"
-                          className="flex items-center gap-2 ml-2 pl-2 pr-1 py-1 rounded-full hover:bg-ink-50 transition-colors outline-none"
+                          className="flex items-center gap-2 ml-2 pl-2 pr-1 py-1 rounded-md hover:bg-ink-50 transition-colors outline-none"
                           aria-label="profil"
                         >
                           <Avatar className="h-8 w-8">

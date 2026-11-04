@@ -208,7 +208,7 @@ const UsersForm: React.FC<UsersFormProps> = ({ open, onClose, onSubmit, initialD
                       onClick={handleDeleteAvatar}
                       disabled={saving}
                       aria-label="Retirer la photo"
-                      className="absolute -top-1 -right-1 size-7 rounded-full bg-card shadow-soft"
+                      className="absolute -top-1 -right-1 size-7 rounded-md bg-card shadow-soft"
                     >
                       <Trash2 className="size-3.5" aria-hidden="true" />
                     </Button>
@@ -221,7 +221,7 @@ const UsersForm: React.FC<UsersFormProps> = ({ open, onClose, onSubmit, initialD
                     type="file"
                     accept={ACCEPTED_IMAGE_MIME_TYPES.join(',')}
                     onChange={handleAvatarChange}
-                    className="hidden"
+                    className="rounded-md hidden"
                     aria-label="Choisir une photo pour ce compte"
                   />
                   <Button

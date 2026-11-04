@@ -177,7 +177,7 @@ function UsersViewDialog({ open, onClose, user }: Readonly<UsersViewDialogProps>
                 h-9
                 w-9
                 shrink-0
-                rounded-lg
+                rounded-md
                 text-ink-500
                 transition-colors
                 hover:bg-ink-100
@@ -257,7 +257,7 @@ function UsersViewDialog({ open, onClose, user }: Readonly<UsersViewDialogProps>
 
         {/* Footer */}
         <div className="flex justify-end border-t border-ink-100 bg-ink-50/40 px-6 py-4 sm:px-7">
-          <Button type="button" variant="outline" onClick={onClose} className="rounded-lg px-5">
+          <Button type="button" variant="outline" onClick={onClose} className="rounded-md px-5">
             Fermer
           </Button>
         </div>

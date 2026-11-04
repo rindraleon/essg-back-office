@@ -317,7 +317,7 @@ const ProjetForm: React.FC<ProjetFormProps> = ({ open, onClose, onSubmit, initia
               type="file"
               accept="image/*"
               onChange={handleImageUpload}
-              className="hidden"
+              className="rounded-md hidden"
             />
             <Button
               type="button"

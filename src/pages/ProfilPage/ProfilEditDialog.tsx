@@ -209,7 +209,7 @@ const ProfilEditDialog: React.FC<ProfilEditDialogProps> = ({ open, onClose, user
                   type="file"
                   accept={ACCEPTED_IMAGE_MIME_TYPES.join(',')}
                   onChange={handleAvatarChange}
-                  className="hidden"
+                  className="rounded-md hidden"
                   aria-label="Choisir une nouvelle photo de profil"
                 />
                 <Button

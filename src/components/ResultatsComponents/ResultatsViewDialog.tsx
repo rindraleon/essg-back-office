@@ -18,12 +18,15 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { useDebounce } from '@/hooks';
 import {
   getResultatById,
+  getResultatClassesIndividuels,
   getResultatIndividuels,
   type ResultatIndividuel,
   type ResultatPublication,
   type StatutAcademique,
 } from '@/services';
 import { useQuery } from '@tanstack/react-query';
+
+const ALL_VALUE = '__all__';
 
 const STATUT_BADGE: Record<string, string> = {
   brouillon: 'bg-amber-100 text-amber-800 border border-amber-200',
@@ -47,9 +50,6 @@ const STATUT_ACADEMIQUE_LABEL: Record<string, string> = {
   ajourne: 'Ajourné',
 };
 
-const formatDate = (value?: string | null) =>
-  value ? new Date(value).toLocaleDateString('fr-MG') : '—';
-
 interface ResultatsViewDialogProps {
   open: boolean;
   onClose: () => void;
@@ -61,11 +61,18 @@ const ResultatsViewDialog: React.FC<ResultatsViewDialogProps> = ({ open, onClose
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [search, setSearch] = useState('');
   const [statut, setStatut] = useState<StatutAcademique | ''>('');
+  const [classe, setClasse] = useState('');
   const debouncedSearch = useDebounce(search, 350);
 
   const publicationQuery = useQuery({
     queryKey: ['resultats', 'view', resultatId],
     queryFn: () => getResultatById(resultatId!),
+    enabled: !!resultatId && open,
+  });
+
+  const classesQuery = useQuery({
+    queryKey: ['resultats', 'view', resultatId, 'classes'],
+    queryFn: () => getResultatClassesIndividuels(resultatId!),
     enabled: !!resultatId && open,
   });
 
@@ -79,6 +86,7 @@ const ResultatsViewDialog: React.FC<ResultatsViewDialogProps> = ({ open, onClose
       rowsPerPage,
       debouncedSearch,
       statut,
+      classe,
     ],
     queryFn: () =>
       getResultatIndividuels(resultatId!, {
@@ -86,12 +94,14 @@ const ResultatsViewDialog: React.FC<ResultatsViewDialogProps> = ({ open, onClose
         limit: rowsPerPage,
         q: debouncedSearch || undefined,
         statutAcademique: statut || undefined,
+        classe: classe || undefined,
       }),
     enabled: !!resultatId && open,
   });
 
   const resultat: ResultatPublication | undefined = publicationQuery.data;
   const individus = useMemo(() => individusQuery.data?.data ?? [], [individusQuery.data]);
+  const classes = useMemo(() => classesQuery.data ?? [], [classesQuery.data]);
 
   const columns = useMemo<Column<ResultatIndividuel>[]>(
     () => [
@@ -110,9 +120,14 @@ const ResultatsViewDialog: React.FC<ResultatsViewDialogProps> = ({ open, onClose
             <p className="text-sm font-medium text-ink-900">
               {row.nom} {row.prenom}
             </p>
-            {row.classe && <p className="text-xs text-ink-500">{row.classe}</p>}
           </div>
         ),
+      },
+      {
+        id: 'classe',
+        label: 'parcours / classe',
+        minWidth: 120,
+        render: (row) => <span className="text-sm text-ink-700">{row.classe || '—'}</span>,
       },
       {
         id: 'statutAcademique',
@@ -182,30 +197,11 @@ const ResultatsViewDialog: React.FC<ResultatsViewDialogProps> = ({ open, onClose
                 </div>
                 <div>
                   <p className="text-[11px] font-bold uppercase tracking-wider text-ink-400 mb-1">
-                    Année / Période
+                    Période
                   </p>
-                  <p className="text-sm text-ink-700">
-                    {resultat.anneeScolaire} / {resultat.periode || '—'}
-                  </p>
+                  <p className="text-sm text-ink-700">{resultat.anneeScolaire}</p>
                 </div>
-                <div>
-                  <p className="text-[11px] font-bold uppercase tracking-wider text-ink-400 mb-1">
-                    Type
-                  </p>
-                  <Badge variant="outline" className="text-xs">
-                    {resultat.type === 'excel' ? 'Excel' : 'PDF'}
-                  </Badge>
-                </div>
-                <div>
-                  <p className="text-[11px] font-bold uppercase tracking-wider text-ink-400 mb-1">
-                    Consultation
-                  </p>
-                  <p className="text-sm text-ink-700">
-                    {resultat.modeConsultation === 'protege'
-                      ? 'Protégée (matricule + code)'
-                      : 'Publique'}
-                  </p>
-                </div>
+
                 <div>
                   <p className="text-[11px] font-bold uppercase tracking-wider text-ink-400 mb-1">
                     Statut
@@ -225,31 +221,11 @@ const ResultatsViewDialog: React.FC<ResultatsViewDialogProps> = ({ open, onClose
                     {resultat.totalIndividuels}
                   </p>
                 </div>
-                <div>
-                  <p className="text-[11px] font-bold uppercase tracking-wider text-ink-400 mb-1">
-                    Admis / Ajournés
-                  </p>
-                  <p className="text-sm text-ink-700">
-                    <span className="text-emerald-700">{resultat.totalAdmis}</span>
-                    {' / '}
-                    <span className="text-red-700">{resultat.totalAjourne}</span>
-                  </p>
-                </div>
-                <div>
-                  <p className="text-[11px] font-bold uppercase tracking-wider text-ink-400 mb-1">
-                    Fichier
-                  </p>
-                  <p className="text-sm text-ink-700 truncate">{resultat.fichierOriginal}</p>
-                  <p className="text-xs text-ink-500">
-                    {Math.max(1, Math.round(resultat.taille / 1024))} Ko ·{' '}
-                    {formatDate(resultat.creeLe)}
-                  </p>
-                </div>
               </div>
 
               <div className="space-y-3 border-t border-ink-100 pt-4">
                 <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                  <h3 className="text-sm font-semibold text-ink-900">Résultats individuels</h3>
+                  <h3 className="text-sm font-semibold text-ink-900">Détails des résultats</h3>
                   <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
                     <SearchInput
                       value={search}
@@ -261,9 +237,28 @@ const ResultatsViewDialog: React.FC<ResultatsViewDialogProps> = ({ open, onClose
                       className="sm:w-64"
                     />
                     <Select
-                      value={statut}
+                      value={classe || ALL_VALUE}
                       onValueChange={(value) => {
-                        setStatut((value as StatutAcademique) || '');
+                        setClasse(value && value !== ALL_VALUE ? value : '');
+                        setPage(0);
+                      }}
+                    >
+                      <SelectTrigger className="sm:w-44">
+                        <SelectValue placeholder="Tous les parcours" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value={ALL_VALUE}>Tous les parcours</SelectItem>
+                        {classes.map((item) => (
+                          <SelectItem key={item} value={item}>
+                            {item}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <Select
+                      value={statut || ALL_VALUE}
+                      onValueChange={(value) => {
+                        setStatut(!value || value === ALL_VALUE ? '' : (value as StatutAcademique));
                         setPage(0);
                       }}
                     >
@@ -271,6 +266,7 @@ const ResultatsViewDialog: React.FC<ResultatsViewDialogProps> = ({ open, onClose
                         <SelectValue placeholder="Tous les statuts" />
                       </SelectTrigger>
                       <SelectContent>
+                        <SelectItem value={ALL_VALUE}>Tous les statuts</SelectItem>
                         <SelectItem value="admis">Admis</SelectItem>
                         <SelectItem value="ajourne">Ajourné</SelectItem>
                       </SelectContent>
@@ -282,7 +278,7 @@ const ResultatsViewDialog: React.FC<ResultatsViewDialogProps> = ({ open, onClose
                   <p className="text-sm text-ink-500">Chargement des lignes…</p>
                 )}
                 {individusQuery.error && (
-                  <p className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+                  <p className="border border-red-200 bg-red-50 p-3 text-sm text-red-700">
                     Impossible de charger les lignes de résultat.
                   </p>
                 )}
